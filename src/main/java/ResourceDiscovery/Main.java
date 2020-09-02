@@ -63,9 +63,7 @@ public class Main {
         try {
             AssetObjectsList tempAssetObjectsList = jsonMapper.readValue(getHttpInfo(assetListUrl),
                                                                             AssetObjectsList.class);
-            int numOfAssets = tempAssetObjectsList.getNumOfAssets();
-            for (int i = 0; i < numOfAssets; i++) {
-                Map<String,String> assetObjectsMap = tempAssetObjectsList.getAssetObjectsList().get(i);
+            for (Map<String, String> assetObjectsMap : tempAssetObjectsList.getAssetObjectsList()) {
                 AssetObject assetObject = null;
                 switch (assetType) {
                     case INSTANCE_COMPUTE_ASSET:
