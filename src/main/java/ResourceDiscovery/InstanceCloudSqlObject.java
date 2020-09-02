@@ -10,7 +10,6 @@ public class InstanceCloudSqlObject extends AssetObject {
     public void setFieldValues(Map<String,String> itemsMap) {
         this.kind = itemsMap.get("kind");
         this.name = itemsMap.get("name");
-//        this.id = itemsMap.get("etag");
         this.type = itemsMap.get("databaseVersion");
         this.zone = itemsMap.get("region");
         this.status = itemsMap.get("state");

@@ -94,7 +94,7 @@ public class Main {
     /**
      * This function creates and returns a list of the different AssetObjects that belong to a
      * specific Google Cloud project.
-     * @return
+     * @return a list of the AssetObjects in a project.
      */
     public static List<AssetObject> getAllAssets() {
         List<AssetObject> assetObjectList = new ArrayList<AssetObject>();
