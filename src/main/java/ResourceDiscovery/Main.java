@@ -119,7 +119,7 @@ public class Main {
     public static List<AssetObject> getAllAssets() {
         List<AssetObject> assetObjectList = new ArrayList<AssetObject>();
 
-//        getAllComputeAssets(assetObjectList);
+        getAllComputeAssets(assetObjectList);
         getAllPubSubAssets(assetObjectList);
         getAllStorageAssets(assetObjectList);
         getAllCloudSqlAssets(assetObjectList);
