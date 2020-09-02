@@ -15,15 +15,16 @@ import java.util.Map;
 
 public class Main {
     private static String PROJECT_ID = "816515923616";
-    private static String PROJECT_ID_EXP = "{project_id}";
-    private static String ZONE_NAME_EXP = "{zone_name}";
-    private static String ASSET_TYPE_EXP = "{asset_type}";
+    private static final String PROJECT_ID_EXP = "{project_id}";
+    private static final String ZONE_NAME_EXP = "{zone_name}";
+    private static final String ASSET_TYPE_EXP = "{asset_type}";
 
-    private enum AssetTypes {INSTANCE_COMPUTE_ASSET, DISK_COMPUTE_ASSET, TOPIC_PUB_SUB_ASSET,
+    protected enum AssetTypes {INSTANCE_COMPUTE_ASSET, DISK_COMPUTE_ASSET, TOPIC_PUB_SUB_ASSET,
                                     SUBSCRIPTION_PUB_SUB_ASSET, BUCKET_STORAGE_ASSET,
                                     INSTANCE_CLOUD_SQL_ASSET};
 
     private static ObjectMapper jsonMapper = new ObjectMapper();
+    private static AssetObjectsFactory assetObjectFactory = new AssetObjectsFactory();
 
     public static void main(String[] args) {
         System.out.println(getAllAssets());
@@ -63,28 +64,9 @@ public class Main {
         try {
             AssetObjectsList tempAssetObjectsList = jsonMapper.readValue(getHttpInfo(assetListUrl),
                                                                             AssetObjectsList.class);
-            for (Map<String, String> assetObjectsMap : tempAssetObjectsList.getAssetObjectsList()) {
-                AssetObject assetObject = null;
-                switch (assetType) {
-                    case INSTANCE_COMPUTE_ASSET:
-                        assetObject = new InstanceComputeObject(assetObjectsMap);
-                        break;
-                    case DISK_COMPUTE_ASSET:
-                        assetObject = new DiskComputeObject(assetObjectsMap);
-                        break;
-                    case TOPIC_PUB_SUB_ASSET:
-                        assetObject = new TopicPubSubObject(assetObjectsMap);
-                        break;
-                    case SUBSCRIPTION_PUB_SUB_ASSET:
-                        assetObject = new SubscriptionPubSubObject(assetObjectsMap);
-                        break;
-                    case BUCKET_STORAGE_ASSET:
-                        assetObject = new BucketStorageObject(assetObjectsMap);
-                        break;
-                    case INSTANCE_CLOUD_SQL_ASSET:
-                        assetObject = new InstanceCloudSqlObject(assetObjectsMap);
-                        break;
-                }
+             for (Map<String, String> assetObjectsMap : tempAssetObjectsList.getAssetObjectsList()) {
+                AssetObject assetObject = assetObjectFactory.createAssetObject(assetType,
+                                                                                assetObjectsMap);
                 assetObjectList.add(assetObject);
             }
         } catch (IOException exception) {
