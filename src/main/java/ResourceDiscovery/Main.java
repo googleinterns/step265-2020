@@ -7,6 +7,7 @@ import com.google.api.client.http.GenericUrl;
 import com.google.api.client.http.HttpRequest;
 import com.google.api.client.http.HttpRequestFactory;
 import com.google.api.client.http.javanet.NetHttpTransport;
+import com.google.common.flogger.FluentLogger;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -14,17 +15,19 @@ import java.util.List;
 import java.util.Map;
 
 public class Main {
-    private static String PROJECT_ID = "816515923616";
+    private static final String PROJECT_ID = "816515923616";
     private static final String PROJECT_ID_EXP = "{project_id}";
     private static final String ZONE_NAME_EXP = "{zone_name}";
     private static final String ASSET_TYPE_EXP = "{asset_type}";
 
     protected enum AssetTypes {INSTANCE_COMPUTE_ASSET, DISK_COMPUTE_ASSET, TOPIC_PUB_SUB_ASSET,
                                     SUBSCRIPTION_PUB_SUB_ASSET, BUCKET_STORAGE_ASSET,
-                                    INSTANCE_CLOUD_SQL_ASSET};
+                                    INSTANCE_CLOUD_SQL_ASSET}
 
-    private static ObjectMapper jsonMapper = new ObjectMapper();
-    private static AssetObjectsFactory assetObjectFactory = new AssetObjectsFactory();
+    private static final ObjectMapper jsonMapper = new ObjectMapper();
+    private static final AssetObjectsFactory assetObjectFactory = new AssetObjectsFactory();
+
+    private static final FluentLogger logger = FluentLogger.forEnclosingClass();
 
     public static void main(String[] args) {
         System.out.println(getAllAssets());
@@ -36,9 +39,10 @@ public class Main {
      * json format).
      * @param assetListUrl - a string representing the url of a certain Google Cloud Api asset list
      * @return
+     * If an exception is caught, it logs the details to the logger and returns an empty string.
      */
     private static String getHttpInfo(String assetListUrl) {
-        String responseString = null;
+        String responseString = "";
         try {
             // todo: extract the initialization so that it will only execute once
             GoogleCredential credential = GoogleCredential.getApplicationDefault();
@@ -47,7 +51,8 @@ public class Main {
             HttpRequest request = requestFactory.buildGetRequest(new GenericUrl(assetListUrl));
             responseString = request.execute().parseAsString();
         } catch (IOException exception) {
-            System.out.println(exception);
+            String error_msg = "Encountered an IOException. Provided url was: " + assetListUrl;
+            logger.atInfo().withCause(exception).log(error_msg);
         }
         return responseString;
     }
@@ -58,6 +63,7 @@ public class Main {
      * @param assetType - an enum from the AssetTypes representing the relevant asset type that
      *                    should be listed.
      * @return
+     * If an exception is caught, it logs the details to the logger.
      */
     private static void getAssetObjectList(List<AssetObject> assetObjectList, String assetListUrl,
                                            AssetTypes assetType) {
@@ -70,13 +76,16 @@ public class Main {
                 assetObjectList.add(assetObject);
             }
         } catch (IOException exception) {
-            System.out.println(exception);
+            String error_msg = "Encountered an IOException while calling jsonMapper.readValue(). " +
+                                "Provided url was: " + assetListUrl;
+            logger.atInfo().withCause(exception).log(error_msg);
         }
     }
 
     /*
     This function returns a list of strings of all of the zones in a certain project based on the
     provided zonesUrl string.
+    If an exception is caught, it logs the details to the logger and returns an empty list.
      */
     private static List<String> getZonesList(String zonesUrl) {
         List<String> zonesList = new ArrayList<>();
@@ -86,7 +95,9 @@ public class Main {
                 zonesList.add(zoneNode.get("name").toString().replaceAll("\"", ""));
             }
         } catch (IOException exception) {
-            System.out.println(exception);
+            String error_msg = "Encountered an IOException while calling jsonMapper.readTree(). " +
+                                "Provided url was: " + zonesUrl;
+            logger.atInfo().withCause(exception).log(error_msg);
         }
         return zonesList;
     }
@@ -97,7 +108,7 @@ public class Main {
      * @return a list of the AssetObjects in a project.
      */
     public static List<AssetObject> getAllAssets() {
-        List<AssetObject> assetObjectList = new ArrayList<AssetObject>();
+        List<AssetObject> assetObjectList = new ArrayList<>();
 
         getAllComputeAssets(assetObjectList);
         getAllPubSubAssets(assetObjectList);

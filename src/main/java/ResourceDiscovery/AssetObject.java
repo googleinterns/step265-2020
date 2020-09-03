@@ -1,5 +1,6 @@
 package ResourceDiscovery;
 
+import com.google.common.flogger.FluentLogger;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -16,12 +17,16 @@ abstract public class AssetObject {
     protected Date creationTime;
     protected String status;
 
+    private static final FluentLogger logger = FluentLogger.forEnclosingClass();
+
     private static final Pattern LAST_SEGMENT_PATTERN = Pattern.compile(".*/");
+    private static final SimpleDateFormat DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
 
     /**
      * This function is in charge of setting all of the AssetObject relevant fields from the given
      * map.
-     * @param itemsMap
+     * @param itemsMap - a Map<String,String> which contains the attributes of the AssetObject that
+     *                   should be mapped into its fields.
      */
     abstract public void setFieldValues(Map<String,String> itemsMap);
 
@@ -41,15 +46,17 @@ abstract public class AssetObject {
     /*
     This function receives a string representing a date and time and returns it as a Date object.
     The provided dateString should be in the following format: yyyy-MM-ddTHH:mm:ss
+    If the provided dateString does not match this format, a Date(0) object is returned and details
+    are logged.
      */
     protected Date convertStringToDate(String dateString) {
-        SimpleDateFormat formatDate = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
-        Date parsedDate = null;
+        Date parsedDate = new Date(0);
         try {
-            parsedDate = formatDate.parse(dateString);
-        } catch (ParseException exception)
-        {
-            System.out.println(exception);
+            parsedDate = DATE_FORMAT.parse(dateString);
+        } catch (ParseException exception) {
+            String error_msg = "Encountered a date parsing error. Dates should be in " +
+                                "yyyy-MM-ddTHH:mm:ss format, provided date: " + dateString;
+            logger.atInfo().withCause(exception).log(error_msg);
         }
         return parsedDate;
     }
