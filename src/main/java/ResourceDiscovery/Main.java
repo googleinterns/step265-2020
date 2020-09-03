@@ -1,5 +1,6 @@
 package ResourceDiscovery;
 
+import ResourceDiscovery.AssetObjects.AssetObject;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.api.client.googleapis.auth.oauth2.GoogleCredential;
@@ -39,22 +40,21 @@ public class Main {
      * json format).
      * @param assetListUrl - a string representing the url of a certain Google Cloud Api asset list
      * @return
-     * If an exception is caught, it logs the details to the logger and returns an empty string.
+     * If an exception is caught, it logs the details to the logger and returns null.
      */
     private static String getHttpInfo(String assetListUrl) {
-        String responseString = "";
         try {
             // todo: extract the initialization so that it will only execute once
             GoogleCredential credential = GoogleCredential.getApplicationDefault();
             HttpRequestFactory requestFactory = new NetHttpTransport().createRequestFactory(credential);
 
             HttpRequest request = requestFactory.buildGetRequest(new GenericUrl(assetListUrl));
-            responseString = request.execute().parseAsString();
+            return request.execute().parseAsString();
         } catch (IOException exception) {
             String error_msg = "Encountered an IOException. Provided url was: " + assetListUrl;
             logger.atInfo().withCause(exception).log(error_msg);
         }
-        return responseString;
+        return null;
     }
 
     /*

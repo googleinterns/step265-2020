@@ -1,4 +1,4 @@
-package ResourceDiscovery;
+package ResourceDiscovery.AssetObjects;
 
 import java.util.Map;
 

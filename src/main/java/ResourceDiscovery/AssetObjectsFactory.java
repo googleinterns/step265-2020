@@ -1,5 +1,7 @@
 package ResourceDiscovery;
 
+import ResourceDiscovery.AssetObjects.*;
+
 import java.util.Map;
 
 public class AssetObjectsFactory {

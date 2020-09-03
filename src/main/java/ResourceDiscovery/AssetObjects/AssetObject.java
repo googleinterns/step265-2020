@@ -1,4 +1,4 @@
-package ResourceDiscovery;
+package ResourceDiscovery.AssetObjects;
 
 import com.google.common.flogger.FluentLogger;
 import java.text.ParseException;
@@ -46,18 +46,16 @@ abstract public class AssetObject {
     /*
     This function receives a string representing a date and time and returns it as a Date object.
     The provided dateString should be in the following format: yyyy-MM-ddTHH:mm:ss
-    If the provided dateString does not match this format, a Date(0) object is returned and details
-    are logged.
+    If the provided dateString does not match this format null is returned and details are logged.
      */
     protected Date convertStringToDate(String dateString) {
-        Date parsedDate = new Date(0);
         try {
-            parsedDate = DATE_FORMAT.parse(dateString);
+            return DATE_FORMAT.parse(dateString);
         } catch (ParseException exception) {
             String error_msg = "Encountered a date parsing error. Dates should be in " +
                                 "yyyy-MM-ddTHH:mm:ss format, provided date: " + dateString;
             logger.atInfo().withCause(exception).log(error_msg);
         }
-        return parsedDate;
+        return null;
     }
 }
