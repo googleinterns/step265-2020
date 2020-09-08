@@ -15,17 +15,17 @@ public class AssetObjectsFactory {
     public AssetObject createAssetObject(Main.AssetTypes assetType, Map<String, String> assetObjectsMap) {
         switch (assetType) {
             case INSTANCE_COMPUTE_ASSET:
-                return new InstanceComputeObject(assetObjectsMap);
+                return new InstanceComputeObject.Builder(assetObjectsMap).build();
             case DISK_COMPUTE_ASSET:
-                return new DiskComputeObject(assetObjectsMap);
+                return new DiskComputeObject.Builder(assetObjectsMap).build();
             case TOPIC_PUB_SUB_ASSET:
-                return new TopicPubSubObject(assetObjectsMap);
+                return new TopicPubSubObject.Builder(assetObjectsMap).build();
             case SUBSCRIPTION_PUB_SUB_ASSET:
-                return new SubscriptionPubSubObject(assetObjectsMap);
+                return new SubscriptionPubSubObject.Builder(assetObjectsMap).build();
             case BUCKET_STORAGE_ASSET:
-                return new BucketStorageObject(assetObjectsMap);
+                return new BucketStorageObject.Builder(assetObjectsMap).build();
             case INSTANCE_CLOUD_SQL_ASSET:
-                return new InstanceCloudSqlObject(assetObjectsMap);
+                return new InstanceCloudSqlObject.Builder(assetObjectsMap).build();
         }
         return null;
     }

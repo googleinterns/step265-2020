@@ -44,7 +44,6 @@ public class Main {
      */
     private static String getHttpInfo(String assetListUrl) {
         try {
-            // todo: extract the initialization so that it will only execute once
             GoogleCredential credential = GoogleCredential.getApplicationDefault();
             HttpRequestFactory requestFactory = new NetHttpTransport().createRequestFactory(credential);
 
@@ -129,7 +128,7 @@ public class Main {
 
         for (String zone : zonesList) {
             String computeUrl = (zonesComputeUrl + "/" + ZONE_NAME_EXP + "/" + ASSET_TYPE_EXP)
-                                    .replace(ZONE_NAME_EXP, zone);
+                                        .replace(ZONE_NAME_EXP, zone);
 
             String instanceComputeUrl = computeUrl.replace(ASSET_TYPE_EXP, "instances");
             getAssetObjectList(assetObjectList, instanceComputeUrl, AssetTypes.INSTANCE_COMPUTE_ASSET);
