@@ -5,8 +5,11 @@
 1. The class should:
     1. Extend the abstract AssetObject class (which will provide your asset with the following 
        fields: kind, name, id, type, zone, creationTime and status).
+    1. **Important** - the name and kind fields most have valid data as they are primary keys
+        in the Assets table. If there is no kind attribute you can add it based on the asset type. 
     1. Implement an inner Builder class which extends the BaseBuilder with the following functions:
         getSpecificClass, getSpecificClassBuilder, constructor and build.
+        
         <addr> public static class Builder extends BaseBuilder<NewObject, Builder> {
                        /*
                        This function returns a new NewObject.
