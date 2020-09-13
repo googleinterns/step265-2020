@@ -9,14 +9,25 @@ import com.google.api.client.http.HttpRequest;
 import com.google.api.client.http.HttpRequestFactory;
 import com.google.api.client.http.javanet.NetHttpTransport;
 import com.google.common.flogger.FluentLogger;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.boot.CommandLineRunner;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-public class Main {
-    private static final String PROJECT_ID = "816515923616";
+@SpringBootApplication
+@RestController
+public class Main implements CommandLineRunner {
+    // when we will add support for more projects the account id should be automatically generated
+    public static final String ACCOUNT_ID = "yardenvan";
+    public static final String PROJECT_ID = "816515923616";
+
     private static final String PROJECT_ID_EXP = "{project_id}";
     private static final String ZONE_NAME_EXP = "{zone_name}";
     private static final String ASSET_TYPE_EXP = "{asset_type}";
@@ -30,8 +41,50 @@ public class Main {
 
     private static final FluentLogger logger = FluentLogger.forEnclosingClass();
 
+    @Autowired
+    SpannerSchemaTools spannerSchemaTools;
+
+    @Autowired
+    SpannerTemplateAssets spannerTemplateAssets;
+
+    /**
+     * This function maps the /requests url and initializes the backend process.
+     * @return an empty string to be presented in the /requests url.
+     */
+    @GetMapping("/requests")
+    public String runService() {
+        run();
+        return "";
+    }
+
+    /**
+     * This is the main function which is in charge of running the SpringApplication.
+     * @param args - not needed.
+     */
     public static void main(String[] args) {
-        System.out.println(getAllAssets());
+        SpringApplication.run(Main.class, args);
+    }
+
+    /**
+     * This function creates adds all of the assets of the project to the relevant spanner tables.
+     * @param args - not needed.
+     */
+    public void run(String... args) {
+        spannerSchemaTools.createTableIfNotExists();
+
+        List<AssetObject> assetObjectList = getAllAssets();
+
+        spannerTemplateAssets.deleteProjectData(ACCOUNT_ID, PROJECT_ID);
+
+        for (AssetObject asset : assetObjectList) {
+            try {
+                spannerTemplateAssets.runTemplate(asset);
+            } catch (Exception exception) {
+                String error_msg = "Encountered error while trying to add to spanner the asset: "
+                                    + asset.getName() + "of kind: " + asset.getKind();
+                logger.atInfo().withCause(exception).log(error_msg);
+            }
+        }
     }
 
 
