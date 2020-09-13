@@ -1,6 +1,12 @@
 package ResourceDiscovery.AssetObjects;
 
+import ResourceDiscovery.Main;
 import com.google.common.flogger.FluentLogger;
+import org.springframework.cloud.gcp.data.spanner.core.mapping.Column;
+import org.springframework.cloud.gcp.data.spanner.core.mapping.NotMapped;
+import org.springframework.cloud.gcp.data.spanner.core.mapping.PrimaryKey;
+import org.springframework.cloud.gcp.data.spanner.core.mapping.Table;
+
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -8,18 +14,32 @@ import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+@Table(name = "Assets")
 abstract public class AssetObject {
+    @PrimaryKey(keyOrder = 1)
+    private String accountId = Main.ACCOUNT_ID;
+    @PrimaryKey(keyOrder = 2)
+    private String projectId = Main.PROJECT_ID;
+    // We are using both the asset name and kind in order to ensure uniqueness
+    @PrimaryKey(keyOrder = 4)
     protected String kind;
+    @PrimaryKey(keyOrder = 3)
+    @Column(name = "assetName")
     protected String name;
+
+    @Column(name = "assetId")
     protected String id;
+    @Column(name = "assetType")
     protected String type;
     protected String zone;
     protected Date creationTime;
     protected String status;
 
+    @NotMapped
     private static final FluentLogger logger = FluentLogger.forEnclosingClass();
-
+    @NotMapped
     private static final Pattern LAST_SEGMENT_PATTERN = Pattern.compile(".*/");
+    @NotMapped
     private static final SimpleDateFormat DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
 
     protected abstract static class BaseBuilder<T extends AssetObject, B extends BaseBuilder> {
