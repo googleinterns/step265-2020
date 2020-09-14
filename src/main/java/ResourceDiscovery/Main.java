@@ -74,11 +74,11 @@ public class Main implements CommandLineRunner {
 
         List<AssetObject> assetObjectList = getAllAssets();
 
-        spannerTemplateAssets.deleteProjectData(ACCOUNT_ID, PROJECT_ID);
+        spannerTemplateAssets.deleteProjectDataFromTable(ACCOUNT_ID, PROJECT_ID);
 
         for (AssetObject asset : assetObjectList) {
             try {
-                spannerTemplateAssets.runTemplate(asset);
+                spannerTemplateAssets.insertAssetToTable(asset);
             } catch (Exception exception) {
                 String error_msg = "Encountered error while trying to add to spanner the asset: "
                                     + asset.getName() + "of kind: " + asset.getKind();
