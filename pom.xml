@@ -29,6 +29,16 @@
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
+
+            <!--      for Spanner start      -->
+            <dependency>
+                <groupId>org.springframework.cloud</groupId>
+                <artifactId>spring-cloud-gcp-dependencies</artifactId>
+                <version>1.2.5.RELEASE</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+            <!--      for Spanner end      -->
         </dependencies>
     </dependencyManagement>
 
@@ -71,6 +81,20 @@
         </dependency>
         <!--    for Google Logger end    -->
 
+        <!--    for Spanner start    -->
+        <dependency>
+            <groupId>org.springframework.cloud</groupId>
+            <artifactId>spring-cloud-gcp-starter-data-spanner</artifactId>
+        </dependency>
+        <!--    for Spanner end    -->
+
+        <!--    for projectIds json start   -->
+        <dependency>
+            <groupId>com.googlecode.json-simple</groupId>
+            <artifactId>json-simple</artifactId>
+            <version>1.1</version>
+        </dependency>
+        <!--    for projectIds json end   -->
     </dependencies>
 
     <build>
