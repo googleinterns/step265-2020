@@ -1,6 +1,7 @@
 package ResourceDiscovery;
 
 import ResourceDiscovery.AssetObjects.*;
+import ResourceDiscovery.ProjectObjects.ProjectAssetsUpdater;
 
 import java.util.Map;
 
@@ -12,7 +13,7 @@ public class AssetObjectsFactory {
      * @param assetObjectsMap - A map which contains the attributes of the AssetObject to be created.
      * @return an object of one of the classes the extends the AssetObject class.
      */
-    public AssetObject createAssetObject(Main.AssetTypes assetType, Map<String, String> assetObjectsMap) {
+    public AssetObject createAssetObject(ProjectAssetsUpdater.AssetTypes assetType, Map<String, String> assetObjectsMap) {
         switch (assetType) {
             case INSTANCE_COMPUTE_ASSET:
                 return new InstanceComputeObject.Builder(assetObjectsMap).build();

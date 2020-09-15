@@ -1,6 +1,6 @@
 package ResourceDiscovery.AssetObjects;
 
-import ResourceDiscovery.Main;
+import ResourceDiscovery.ProjectObjects.ProjectConfig;
 import com.google.common.flogger.FluentLogger;
 import org.springframework.cloud.gcp.data.spanner.core.mapping.Column;
 import org.springframework.cloud.gcp.data.spanner.core.mapping.NotMapped;
@@ -17,9 +17,9 @@ import java.util.regex.Pattern;
 @Table(name = "Assets")
 abstract public class AssetObject {
     @PrimaryKey(keyOrder = 1)
-    private String accountId = Main.ACCOUNT_ID;
+    private String accountId = ProjectConfig.getInstance().getAccountId();
     @PrimaryKey(keyOrder = 2)
-    private String projectId = Main.PROJECT_ID;
+    private String projectId = ProjectConfig.getInstance().getProjectId();
     // We are using both the asset name and kind in order to ensure uniqueness
     @PrimaryKey(keyOrder = 4)
     protected String kind;

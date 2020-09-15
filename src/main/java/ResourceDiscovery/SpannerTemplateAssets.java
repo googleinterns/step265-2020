@@ -18,7 +18,7 @@ public class SpannerTemplateAssets {
      * @param accountId - a string of the account id for which the project assets will be deleted.
      * @param projectId - a string of the project id for which to delete the assets.
      */
-    public void deleteProjectData(String accountId, String projectId) {
+    public void deleteProjectDataFromTable(String accountId, String projectId) {
         Key projectKey = Key.of(accountId, projectId);
         KeyRange projectKeyRange = KeyRange.closedClosed(projectKey, projectKey);
 
@@ -29,7 +29,7 @@ public class SpannerTemplateAssets {
      * This function inserts the provided assetObject into the Assets table.
      * @param assetObject - the AssetObject to be inserted.
      */
-    public void runTemplate(AssetObject assetObject) {
+    public void insertAssetToTable(AssetObject assetObject) {
         this.spannerTemplate.insert(assetObject);
     }
 
