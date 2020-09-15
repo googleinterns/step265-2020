@@ -2,6 +2,7 @@ package ResourceDiscovery.ProjectObjects;
 
 import ResourceDiscovery.*;
 import ResourceDiscovery.AssetObjects.AssetObject;
+import ResourceDiscovery.AssetTypes;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.api.client.googleapis.auth.oauth2.GoogleCredential;
@@ -23,10 +24,6 @@ public class ProjectAssetsUpdater {
     private static final String PROJECT_ID_EXP = "{project_id}";
     private static final String ZONE_NAME_EXP = "{zone_name}";
     private static final String ASSET_TYPE_EXP = "{asset_type}";
-
-    public enum AssetTypes {INSTANCE_COMPUTE_ASSET, DISK_COMPUTE_ASSET, TOPIC_PUB_SUB_ASSET,
-                                    SUBSCRIPTION_PUB_SUB_ASSET, BUCKET_STORAGE_ASSET,
-                                    INSTANCE_CLOUD_SQL_ASSET}
 
     private static final ObjectMapper jsonMapper = new ObjectMapper();
     private static final AssetObjectsFactory assetObjectFactory = new AssetObjectsFactory();
@@ -55,7 +52,7 @@ public class ProjectAssetsUpdater {
                 spannerTemplateAssets.insertAssetToTable(asset);
             } catch (Exception exception) {
                 String error_msg = "Encountered error while trying to add to spanner the asset: "
-                        + asset.getName() + "of kind: " + asset.getKind();
+                        + asset.getName() + " of kind: " + asset.getKind();
                 logger.atInfo().withCause(exception).log(error_msg);
             }
         }
