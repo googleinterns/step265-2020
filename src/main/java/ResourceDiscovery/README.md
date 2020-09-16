@@ -45,6 +45,8 @@
                        }
                    }
         </addr>
+1. Add a new const to the enum AssetTypes class by the following convention:
+    {SPECIFIC_ASSET_TYPE}_{GENERAL_ASSET_TYPE}_ASSET (for example: DISK_COMPUTE_ASSET)
 1. Add its creation to the AssetObjectsFactory (to the createAssetObject function).
 1. Add its creation to the getAllAssets function in the Main class.
 
