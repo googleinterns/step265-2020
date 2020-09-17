@@ -4,6 +4,9 @@ import ResourceDiscovery.AssetObjects.*;
 
 import java.util.Map;
 
+/**
+ * The AssetObjectsFactory is in charge of creating a specific AssetObject based on its assetType.
+ */
 public class AssetObjectsFactory {
     /**
      * This function is in charge of creating a specific AssetObject based on the provided assetType
