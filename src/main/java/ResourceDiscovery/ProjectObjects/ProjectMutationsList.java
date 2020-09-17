@@ -61,6 +61,7 @@ public class ProjectMutationsList {
                 InstanceComputeObject instanceComputeObject = (InstanceComputeObject) asset;
                 this.mutations.add(setCommonColumnValues(tableName, asset)
                                 .set("description").to(instanceComputeObject.getDescription())
+                                .set("canIpForward").to(instanceComputeObject.getCanIpForward())
                                 .set("cpuPlatform").to(instanceComputeObject.getCpuPlatform())
                                 .build());
                 break;

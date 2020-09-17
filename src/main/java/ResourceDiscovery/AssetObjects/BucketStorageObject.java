@@ -32,7 +32,7 @@ public class BucketStorageObject extends AssetObject {
          * @param assetObjectsMap - a Map<String,String> which contains all of the relevant data for
          *                          this BucketStorageObject.
          */
-        public Builder(Map<String,String> assetObjectsMap) {
+        public Builder(Map<String,Object> assetObjectsMap) {
             super(assetObjectsMap);
         }
 
@@ -52,7 +52,7 @@ public class BucketStorageObject extends AssetObject {
             setAssetTypeEnum(AssetTypes.BUCKET_STORAGE_ASSET);
 
             // set specific asset type fields
-            specificObjectClass.storageClass = assetObjectsMap.get("storageClass");
+            specificObjectClass.storageClass = (String) assetObjectsMap.get("storageClass");
             specificObjectClass.updatedTime = convertStringToDate(assetObjectsMap.get("updated"));
 
             return super.build();

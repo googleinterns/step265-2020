@@ -38,7 +38,7 @@ abstract public class AssetObject {
     private static final SimpleDateFormat DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
 
     protected abstract static class BaseBuilder<T extends AssetObject, B extends BaseBuilder> {
-        protected Map<String,String> assetObjectsMap;
+        protected Map<String,Object> assetObjectsMap;
         protected T specificObjectClass;
         protected B specificObjectClassBuilder;
 
@@ -50,7 +50,7 @@ abstract public class AssetObject {
          * object.
          * @param assetMap - a Map<String,String> of the relevant asset properties.
          */
-        protected BaseBuilder(Map<String,String> assetMap) {
+        protected BaseBuilder(Map<String,Object> assetMap) {
             specificObjectClass = getSpecificClass();
             specificObjectClassBuilder = getSpecificClassBuilder();
             assetObjectsMap = assetMap;
@@ -59,40 +59,40 @@ abstract public class AssetObject {
         /*
         Set the kind field of this object with the provided string and return its specific Builder.
         */
-        public B setKind(String kind) {
-            specificObjectClass.kind = kind;
+        public B setKind(Object kind) {
+            specificObjectClass.kind = (String) kind;
             return specificObjectClassBuilder;
         }
 
         /*
         Set the name field of this object with the provided string and return its specific Builder.
         */
-        public B setName(String name) {
-            specificObjectClass.name = name;
+        public B setName(Object name) {
+            specificObjectClass.name = (String) name;
             return specificObjectClassBuilder;
         }
 
         /*
         Set the id field of this object with the provided string and return its specific Builder.
         */
-        public B setId(String id) {
-            specificObjectClass.id = id;
+        public B setId(Object id) {
+            specificObjectClass.id = (String) id;
             return specificObjectClassBuilder;
         }
 
         /*
         Set the type field of this object with the provided string and return its specific Builder.
         */
-        public B setType(String type) {
-            specificObjectClass.type = type;
+        public B setType(Object type) {
+            specificObjectClass.type = (String) type;
             return specificObjectClassBuilder;
         }
 
         /*
         Set the zone field of this object with the provided string and return its specific Builder.
         */
-        public B setZone(String zone) {
-            specificObjectClass.zone = zone;
+        public B setZone(Object zone) {
+            specificObjectClass.zone = (String) zone;
             return specificObjectClassBuilder;
         }
 
@@ -107,8 +107,8 @@ abstract public class AssetObject {
         /*
         Set the status field of this object with the provided string and return its specific Builder.
         */
-        public B setStatus(String status) {
-            specificObjectClass.status = status;
+        public B setStatus(Object status) {
+            specificObjectClass.status = (String) status;
             return specificObjectClassBuilder;
         }
 
@@ -214,12 +214,13 @@ abstract public class AssetObject {
      * char in the url.
      * If the provided string does not match that pattern the original string is returned.
      */
-    protected static String getLastSeg(String url) {
-        Matcher matcher = LAST_SEGMENT_PATTERN.matcher(url);
+    protected static String getLastSeg(Object url) {
+        String urlToReturn = (String) url;
+        Matcher matcher = LAST_SEGMENT_PATTERN.matcher(urlToReturn);
         if (matcher.find()) {
             return matcher.replaceAll("");
         }
-        return url;
+        return urlToReturn;
     }
 
     /*
@@ -227,14 +228,21 @@ abstract public class AssetObject {
     The provided dateString should be in the following format: yyyy-MM-ddTHH:mm:ss
     If the provided dateString does not match this format null is returned and details are logged.
      */
-    protected static Timestamp convertStringToDate(String dateString) {
+    protected static Timestamp convertStringToDate(Object dateString) {
         try {
-            return Timestamp.of(DATE_FORMAT.parse(dateString));
+            return Timestamp.of(DATE_FORMAT.parse((String) dateString));
         } catch (ParseException exception) {
             String error_msg = "Encountered a date parsing error. Dates should be in " +
                                 "yyyy-MM-ddTHH:mm:ss format, provided date: " + dateString;
             logger.atInfo().withCause(exception).log(error_msg);
         }
         return null;
+    }
+
+    /*
+    This function receives a string representing an int and returns it as an int.
+     */
+    protected static int convertStringToInt(Object intString) {
+        return Integer.valueOf((String) intString);
     }
 }
