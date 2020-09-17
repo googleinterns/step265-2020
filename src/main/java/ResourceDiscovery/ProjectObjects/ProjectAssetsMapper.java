@@ -1,11 +1,9 @@
 package ResourceDiscovery.ProjectObjects;
 
-
 import ResourceDiscovery.AssetObjects.AssetObject;
 import ResourceDiscovery.AssetObjectsFactory;
 import ResourceDiscovery.AssetObjectsList;
 import ResourceDiscovery.AssetTypes;
-import ResourceDiscovery.SpannerTemplateAssets;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.api.client.googleapis.auth.oauth2.GoogleCredential;
@@ -14,16 +12,17 @@ import com.google.api.client.http.HttpRequest;
 import com.google.api.client.http.HttpRequestFactory;
 import com.google.api.client.http.javanet.NetHttpTransport;
 import com.google.common.flogger.FluentLogger;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
 
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-@Component
-public class ProjectAssetsUpdater {
+/**
+ * The ProjectAssetsMapper class is in charge of getting all of the different assets for the given
+ * account ID & project ID.
+ */
+public class ProjectAssetsMapper {
     private static final String PROJECT_ID_EXP = "{project_id}";
     private static final String ZONE_NAME_EXP = "{zone_name}";
     private static final String ASSET_TYPE_EXP = "{asset_type}";
@@ -36,29 +35,14 @@ public class ProjectAssetsUpdater {
     private String accountId;
     private String projectId;
 
-    @Autowired
-    SpannerTemplateAssets spannerTemplateAssets;
 
     /**
-     * This function creates adds all of the assets of the project to the relevant spanner tables.
+     * The ProjectAssetsMapper constructor initialized the account ID & project ID of this project
+     * object.
      */
-    public void updateAssets() {
-        accountId = ProjectConfig.getInstance().getAccountId();
-        projectId = ProjectConfig.getInstance().getProjectId();
-
-        List<AssetObject> assetObjectList = getAllAssets();
-
-        spannerTemplateAssets.deleteProjectDataFromTable(accountId, projectId);
-
-        for (AssetObject asset : assetObjectList) {
-            try {
-                spannerTemplateAssets.insertAssetToTable(asset);
-            } catch (Exception exception) {
-                String error_msg = "Encountered error while trying to add to spanner the asset: "
-                        + asset.getName() + " of kind: " + asset.getKind();
-                logger.atInfo().withCause(exception).log(error_msg);
-            }
-        }
+    public ProjectAssetsMapper() {
+        this.accountId = ProjectConfig.getInstance().getAccountId();
+        this.projectId = ProjectConfig.getInstance().getProjectId();
     }
 
     /*
