@@ -1,45 +1,40 @@
 package ResourceDiscovery.AssetObjects;
 
+import ResourceDiscovery.AssetTypes;
 import ResourceDiscovery.ProjectObjects.ProjectConfig;
+import com.google.cloud.Timestamp;
 import com.google.common.flogger.FluentLogger;
-import org.springframework.cloud.gcp.data.spanner.core.mapping.Column;
-import org.springframework.cloud.gcp.data.spanner.core.mapping.NotMapped;
-import org.springframework.cloud.gcp.data.spanner.core.mapping.PrimaryKey;
-import org.springframework.cloud.gcp.data.spanner.core.mapping.Table;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.Date;
 import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-@Table(name = "Assets")
+/**
+ * The AssetObject class is an abstract class which is the parent of all of the specific asset
+ * object classes. This class provides setters and getters to all of the common fields of the
+ * asset objects. In addition it provides some helper functions for specific type parsing and
+ * conversions which are used in several asset object classes (such as a convertStringToDate function).
+ */
 abstract public class AssetObject {
-    @PrimaryKey(keyOrder = 1)
-    private String accountId = ProjectConfig.getInstance().getAccountId();
-    @PrimaryKey(keyOrder = 2)
-    private String projectId = ProjectConfig.getInstance().getProjectId();
-    // We are using both the asset name and kind in order to ensure uniqueness
-    @PrimaryKey(keyOrder = 4)
+    // asset primary keys
+    public String accountId = ProjectConfig.getInstance().getAccountId();
+    public String projectId = ProjectConfig.getInstance().getProjectId();
     protected String kind;
-    @PrimaryKey(keyOrder = 3)
-    @Column(name = "assetName")
     protected String name;
 
-    @Column(name = "assetId")
+    // asset additional data
     protected String id;
-    @Column(name = "assetType")
     protected String type;
     protected String zone;
-    protected Date creationTime;
+    protected Timestamp creationTime;
     protected String status;
 
-    @NotMapped
+    protected AssetTypes assetTypeEnum;
+
     private static final FluentLogger logger = FluentLogger.forEnclosingClass();
-    @NotMapped
     private static final Pattern LAST_SEGMENT_PATTERN = Pattern.compile(".*/");
-    @NotMapped
     private static final SimpleDateFormat DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
 
     protected abstract static class BaseBuilder<T extends AssetObject, B extends BaseBuilder> {
@@ -104,7 +99,7 @@ abstract public class AssetObject {
         /*
         Set the creationTime field of this object with the provided string and return its specific Builder.
         */
-        public B setCreationTime(Date creationTime) {
+        public B setCreationTime(Timestamp creationTime) {
             specificObjectClass.creationTime = creationTime;
             return specificObjectClassBuilder;
         }
@@ -118,6 +113,14 @@ abstract public class AssetObject {
         }
 
         /*
+        Set the status assetTypeEnum of this object with the provided enum and return its specific Builder.
+        */
+        public B setAssetTypeEnum(AssetTypes assetType) {
+            specificObjectClass.assetTypeEnum = assetType;
+            return specificObjectClassBuilder;
+        }
+
+        /*
         This function returns the specific asset object.
          */
         public T build() {
@@ -126,6 +129,22 @@ abstract public class AssetObject {
     }
 
     // AssetObject Class Getters
+    /**
+     * Get the accountId field of this object.
+     * @return A string representing the account ID of this Asset Object.
+     */
+    public String getAccountId() {
+        return this.accountId;
+    }
+
+    /**
+     * Get the projectId field of this object .
+     * @return A string representing the project ID of this Asset Object.
+     */
+    public String getProjectId() {
+        return this.projectId;
+    }
+
     /**
      * Get the kind field of this object (the kind of Google Cloud Asset).
      * @return A string representing the kind of this Asset Object.
@@ -168,9 +187,9 @@ abstract public class AssetObject {
 
     /**
      * Get the creationTime field of this object.
-     * @return A Date object representing the creation time of this Asset Object.
+     * @return A Timestamp object representing the creation time of this Asset Object.
      */
-    public Date getCreationTime() {
+    public Timestamp getCreationTime() {
         return this.creationTime;
     }
 
@@ -180,6 +199,14 @@ abstract public class AssetObject {
      */
     public String getStatus() {
         return this.status;
+    }
+
+    /**
+     * Get the AssetType of this object.
+     * @return A enum of AssetTypes representing the specific type of this Asset Object.
+     */
+    public AssetTypes getAssetTypeEnum() {
+        return this.assetTypeEnum;
     }
 
     /*
@@ -200,9 +227,9 @@ abstract public class AssetObject {
     The provided dateString should be in the following format: yyyy-MM-ddTHH:mm:ss
     If the provided dateString does not match this format null is returned and details are logged.
      */
-    protected static Date convertStringToDate(String dateString) {
+    protected static Timestamp convertStringToDate(String dateString) {
         try {
-            return DATE_FORMAT.parse(dateString);
+            return Timestamp.of(DATE_FORMAT.parse(dateString));
         } catch (ParseException exception) {
             String error_msg = "Encountered a date parsing error. Dates should be in " +
                                 "yyyy-MM-ddTHH:mm:ss format, provided date: " + dateString;
