@@ -1,5 +1,8 @@
 package ResourceDiscovery.ProjectObjects;
 
+/**
+ * The ProjectConfig class provides setters and getters for a certain project configurations.
+ */
 public class ProjectConfig {
     private static ProjectConfig projectConfigInstance = null;
     private String accountId;
