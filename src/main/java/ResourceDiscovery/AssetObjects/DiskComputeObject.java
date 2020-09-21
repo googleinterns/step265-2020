@@ -65,7 +65,7 @@ public class DiskComputeObject extends AssetObject {
     }
     /**
      * Get the diskSizeGb field of this object.
-     * @return An string representing the disk size of this Disk Asset Object.
+     * @return An int representing the disk size of this Disk Asset Object.
      */
     public int getDiskSizeGb() {
         return this.diskSizeGb;
@@ -81,7 +81,7 @@ public class DiskComputeObject extends AssetObject {
 
     /**
      * Get the licenses field of this object.
-     * @return A list of string representing the licenses for this Disk Asset Object.
+     * @return A list of strings representing the licenses for this Disk Asset Object.
      */
     public List<String> getLicenses() {
         return this.licenses;
