@@ -38,6 +38,7 @@ public class Main {
     private static Spanner spanner;
     private static DatabaseId db;
     private static DatabaseClient dbClient;
+    private static List<String> existingTableNames;
 
 
     /**
@@ -80,15 +81,39 @@ public class Main {
             ProjectConfig.getInstance().setNewProject(accountId, projectId);
             ProjectAssetsMapper projectAssets = new ProjectAssetsMapper();
             ProjectMutationsList projectMutations = new ProjectMutationsList();
-            dbClient.write(projectMutations.getMutationList(projectAssets.getAllAssets()));
+            List<Mutation> mutationsToAdd = projectMutations.getMutationList(projectAssets.getAllAssets());
+
+            // we prepare the insertion of the new assets before the deletion of the old ones so
+            // that we wont have data loss in case of an error
+            deleteProjectAssets(accountId, projectId);
+            dbClient.write(mutationsToAdd);
         }
+    }
+
+    /*
+    This function deletes all of the assets for the given project ID from all of the asset tables
+    that already existed before this process began to run (no need to delete from tables that were
+    just created by this process).
+     */
+    private static void deleteProjectAssets(String accountId, String projectId) {
+        List<Mutation> deleteMutations = new ArrayList<>();
+
+        for (AssetTables table : AssetTables.values()) {
+            String tableName = table.getTableName();
+            // only delete values from tables that existed before this process ran
+            if (existingTableNames.contains(tableName)) {
+                Key projectKey = Key.of(accountId, projectId);
+                deleteMutations.add(Mutation.delete(tableName, KeySet.range(KeyRange.closedClosed(projectKey, projectKey))));
+            }
+        }
+        dbClient.write(deleteMutations);
     }
 
     /*
     This function finds asset tables that do not exist and creates them.
      */
     private static void createTablesIfNotExist() {
-        List<String> existingTableNames = getExistingTableNames();
+        existingTableNames = getExistingTableNames();
         List<String> tablesToCreateQueries = new ArrayList<>();
 
         for (AssetTables table : AssetTables.values()) {

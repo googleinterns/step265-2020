@@ -116,7 +116,7 @@ public class ProjectMutationsList {
     common to all of the asset tables.
      */
     private Mutation.WriteBuilder setCommonColumnValues(String tableName, AssetObject asset) {
-        return Mutation.newInsertOrUpdateBuilder(tableName)
+        return Mutation.newInsertBuilder(tableName)
                 .set("accountId").to(asset.getAccountId())
                 .set("projectId").to(asset.getProjectId())
                 .set("kind").to(asset.getKind())
