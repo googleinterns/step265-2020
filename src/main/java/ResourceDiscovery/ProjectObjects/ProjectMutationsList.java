@@ -71,7 +71,7 @@ public class ProjectMutationsList {
                 this.mutations.add(setCommonColumnValues(tableName, asset)
                                 .set("diskSizeGb").to(diskComputeObject.getDiskSizeGb())
                                 .set("updatedTime").to(diskComputeObject.getUpdatedTime())
-                                .set("licenses").to(diskComputeObject.getLicenses())
+                                .set("licenses").to(Value.stringArray(diskComputeObject.getLicenses()))
                                 .build());
                 break;
             case BUCKET_STORAGE_ASSET:
@@ -87,6 +87,10 @@ public class ProjectMutationsList {
                 InstanceCloudSqlObject instanceCloudSqlObject = (InstanceCloudSqlObject) asset;
                 this.mutations.add(setCommonColumnValues(tableName, asset)
                                 .set("etag").to(instanceCloudSqlObject.getEtag())
+                                .set("diskSizeGb").to(instanceCloudSqlObject.getDiskSizeGb())
+                                .set("backupEnabled").to(instanceCloudSqlObject.getBackupEnabled())
+                                .set("replicationType").to(instanceCloudSqlObject.getReplicationType())
+                                .set("activationPolicy").to(instanceCloudSqlObject.getActivationPolicy())
                                 .build());
                 break;
         }
