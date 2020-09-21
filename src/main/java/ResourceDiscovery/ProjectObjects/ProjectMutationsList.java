@@ -93,6 +93,14 @@ public class ProjectMutationsList {
                                 .set("activationPolicy").to(instanceCloudSqlObject.getActivationPolicy())
                                 .build());
                 break;
+            case SUBSCRIPTION_PUB_SUB_ASSET:
+                tableName = AssetTables.SUBSCRIPTION_PUB_SUB_TABLE.getTableName();
+                SubscriptionPubSubObject subscriptionPubSubObject = (SubscriptionPubSubObject) asset;
+                this.mutations.add(setCommonColumnValues(tableName, asset)
+                        .set("topic").to(subscriptionPubSubObject.getTopic())
+                        .set("ttl").to(subscriptionPubSubObject.getTtl())
+                        .build());
+                break;
         }
     }
 

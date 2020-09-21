@@ -37,6 +37,11 @@ public enum AssetTables {
             " description STRING(MAX)," +
             " canIpForward BOOL," +
             " cpuPlatform STRING(MAX)," +
+            getInterleavedString()),
+
+    SUBSCRIPTION_PUB_SUB_TABLE("Subscription_Pub_Sub_Assets", getCommonColumnsString("Subscription_Pub_Sub_Assets") +
+            " topic STRING(MAX)," +
+            " ttl STRING(MAX)," +
             getInterleavedString());
 
     private final String tableName;
