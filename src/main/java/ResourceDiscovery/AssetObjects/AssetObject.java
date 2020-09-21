@@ -7,6 +7,8 @@ import com.google.common.flogger.FluentLogger;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -221,6 +223,19 @@ abstract public class AssetObject {
             return matcher.replaceAll("");
         }
         return urlToReturn;
+    }
+
+    /*
+     * This function receives a list of strings representing urls and returns a list of strings
+     * with the last segment for each url.
+     */
+    protected static List<String> convertListToLastSegList(Object urlsObject) {
+        List<String> urlsList = (List<String>) urlsObject;
+        List<String> listToReturn = new ArrayList<>();
+        for (String url : urlsList) {
+            listToReturn.add(getLastSeg(url));
+        }
+        return listToReturn;
     }
 
     /*
