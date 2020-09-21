@@ -42,7 +42,11 @@ public enum AssetTables {
     SUBSCRIPTION_PUB_SUB_TABLE("Subscription_Pub_Sub_Assets", getCommonColumnsString("Subscription_Pub_Sub_Assets") +
             " topic STRING(MAX)," +
             " ttl STRING(MAX)," +
-            getInterleavedString());
+            getInterleavedString()),
+
+    TOPIC_PUB_SUB_TABLE("Topic_Pub_Sub_Assets", getCommonColumnsString("Topic_Pub_Sub_Assets") +
+            " allowedPersistenceRegions ARRAY<STRING(MAX)>," +
+    getInterleavedString());
 
     private final String tableName;
     private final String tableCreateQuery;

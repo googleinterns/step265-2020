@@ -101,6 +101,13 @@ public class ProjectMutationsList {
                         .set("ttl").to(subscriptionPubSubObject.getTtl())
                         .build());
                 break;
+            case TOPIC_PUB_SUB_ASSET:
+                tableName = AssetTables.TOPIC_PUB_SUB_TABLE.getTableName();
+                TopicPubSubObject topicPubSubObject = (TopicPubSubObject) asset;
+                this.mutations.add(setCommonColumnValues(tableName, asset)
+                        .set("allowedPersistenceRegions").to(Value.stringArray(topicPubSubObject.getAllowedPersistenceRegions()))
+                        .build());
+                break;
         }
     }
 
