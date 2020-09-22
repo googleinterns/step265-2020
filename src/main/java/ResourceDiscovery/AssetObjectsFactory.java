@@ -9,14 +9,14 @@ import java.util.Map;
  */
 public class AssetObjectsFactory {
     /**
-     * This function is in charge of creating a specific AssetObject based on the provided assetType
+     * This function is in charge of creating a specific AssetObject based on the provided assetTypeEnum
      * from the provided assetObjectsMap.
-     * @param assetType - an enum which indicates which type of AssetObject should be created.
+     * @param assetTypeEnum - an enum which indicates which type of AssetObject should be created.
      * @param assetObjectsMap - A map which contains the attributes of the AssetObject to be created.
      * @return an object of one of the classes the extends the AssetObject class.
      */
-    public AssetObject createAssetObject(AssetTypes assetType, Map<String, Object> assetObjectsMap) {
-        switch (assetType) {
+    public AssetObject createAssetObject(AssetType assetTypeEnum, Map<String, Object> assetObjectsMap) {
+        switch (assetTypeEnum) {
             case INSTANCE_COMPUTE_ASSET:
                 return new InstanceComputeObject.Builder(assetObjectsMap).build();
             case DISK_COMPUTE_ASSET:
