@@ -40,7 +40,7 @@ abstract public class AssetObject {
     protected AssetType assetTypeEnum;
 
     private static final FluentLogger logger = FluentLogger.forEnclosingClass();
-    private static final Pattern LAST_SEGMENT_PATTERN = Pattern.compile(".*/");
+    private static final Pattern LAST_SEGMENT_PATTERN = Pattern.compile("/?([^/]*$)");
     private static final SimpleDateFormat DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
 
     protected abstract static class BaseBuilder<T extends AssetObject, B extends BaseBuilder> {
@@ -222,12 +222,12 @@ abstract public class AssetObject {
      */
     protected static String getLastSeg(Object url) {
         try {
-            String urlToReturn = (String) url;
-            Matcher matcher = LAST_SEGMENT_PATTERN.matcher(urlToReturn);
+            String urlToParse = (String) url;
+            Matcher matcher = LAST_SEGMENT_PATTERN.matcher(urlToParse);
             if (matcher.find()) {
-                return matcher.replaceAll("");
+                // Return the grouped part of the regex (not including the last "/" char)
+                return matcher.group(1);
             }
-            return urlToReturn;
         } catch (ClassCastException exception) {
             String error_msg = "Encountered a casting error, expected to get an object that can be " +
                     "casted into a string. Received object: " + url;
