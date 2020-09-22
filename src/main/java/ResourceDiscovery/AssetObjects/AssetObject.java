@@ -208,7 +208,7 @@ abstract public class AssetObject {
 
     /**
      * Get the AssetType of this object.
-     * @return A enum of AssetTypes representing the specific type of this Asset Object.
+     * @return An enum of AssetType representing the specific type of this Asset Object.
      */
     public AssetType getAssetTypeEnum() {
         return this.assetTypeEnum;
