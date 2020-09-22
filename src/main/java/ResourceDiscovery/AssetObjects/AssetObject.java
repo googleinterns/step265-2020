@@ -7,12 +7,12 @@ import com.google.common.flogger.FluentLogger;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 /**
  * The AssetObject class is an abstract class which is the parent of all of the specific asset
@@ -243,11 +243,7 @@ abstract public class AssetObject {
     protected static List<String> convertListToLastSegList(Object urlsObject) {
         try {
             List<String> urlsList = (List<String>) urlsObject;
-            List<String> listToReturn = new ArrayList<>();
-            for (String url : urlsList) {
-                listToReturn.add(getLastSeg(url));
-            }
-            return listToReturn;
+            return urlsList.stream().map(AssetObject::getLastSeg).collect(Collectors.toList());
         } catch (ClassCastException exception) {
             String error_msg = "Encountered a casting error, expected to get an object that can be " +
                     "casted into a list of strings. Received object: " + urlsObject;
@@ -334,7 +330,7 @@ abstract public class AssetObject {
      */
     protected static HashMap<String, Object> convertObjectToMap(Object mapToConvert) {
         try {
-            return (HashMap) mapToConvert;
+            return (HashMap<String, Object>) mapToConvert;
         } catch (ClassCastException exception) {
             String error_msg = "Encountered a casting error, expected to get an object that can be " +
                     "casted into a HashMap<String, Object>. Received object: " + mapToConvert;
