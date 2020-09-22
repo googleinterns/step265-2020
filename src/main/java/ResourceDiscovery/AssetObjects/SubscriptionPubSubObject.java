@@ -1,7 +1,6 @@
 package ResourceDiscovery.AssetObjects;
 
-import ResourceDiscovery.AssetTypes;
-import com.google.cloud.Timestamp;
+import ResourceDiscovery.AssetType;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -49,7 +48,7 @@ public class SubscriptionPubSubObject extends AssetObject {
             // Set kind field manually as this asset does not return it
             setKind(SUBSCRIPTION_TYPE);
             setName(assetObjectsMap.get("name"));
-            setAssetTypeEnum(AssetTypes.SUBSCRIPTION_PUB_SUB_ASSET);
+            setAssetTypeEnum(AssetType.SUBSCRIPTION_PUB_SUB_ASSET);
 
             // Set specific asset type fields
             specificObjectClass.topic = (String) assetObjectsMap.get("topic");

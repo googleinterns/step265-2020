@@ -1,6 +1,6 @@
 package ResourceDiscovery.AssetObjects;
 
-import ResourceDiscovery.AssetTypes;
+import ResourceDiscovery.AssetType;
 import com.google.cloud.Timestamp;
 
 import java.util.Map;
@@ -49,7 +49,7 @@ public class BucketStorageObject extends AssetObject {
             setId(assetObjectsMap.get("id"));
             setLocation(getLastSeg(assetObjectsMap.get("location")));
             setCreationTime(convertStringToDate(assetObjectsMap.get("timeCreated")));
-            setAssetTypeEnum(AssetTypes.BUCKET_STORAGE_ASSET);
+            setAssetTypeEnum(AssetType.BUCKET_STORAGE_ASSET);
 
             // Set specific asset type fields
             specificObjectClass.storageClass = (String) assetObjectsMap.get("storageClass");

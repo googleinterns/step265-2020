@@ -1,6 +1,6 @@
 package ResourceDiscovery.AssetObjects;
 
-import ResourceDiscovery.AssetTypes;
+import ResourceDiscovery.AssetType;
 import ResourceDiscovery.ProjectObjects.ProjectConfig;
 import com.google.cloud.Timestamp;
 import com.google.common.flogger.FluentLogger;
@@ -33,7 +33,10 @@ abstract public class AssetObject {
     protected Timestamp creationTime;
     protected String status;
 
-    protected AssetTypes assetTypeEnum;
+    // This field corresponds with the "kind" field as they both indicate the asset specific type,
+    // the "kind" field is usually provided by the asset api and therefore we needed the
+    // "assetTypeEnum" field as well which is fully in our control and not prone to unexpected changes.
+    protected AssetType assetTypeEnum;
 
     private static final FluentLogger logger = FluentLogger.forEnclosingClass();
     private static final Pattern LAST_SEGMENT_PATTERN = Pattern.compile(".*/");
@@ -117,7 +120,7 @@ abstract public class AssetObject {
         /*
         Set the status assetTypeEnum of this object with the provided enum and return its specific Builder.
         */
-        public B setAssetTypeEnum(AssetTypes assetType) {
+        public B setAssetTypeEnum(AssetType assetType) {
             specificObjectClass.assetTypeEnum = assetType;
             return specificObjectClassBuilder;
         }
@@ -207,7 +210,7 @@ abstract public class AssetObject {
      * Get the AssetType of this object.
      * @return A enum of AssetTypes representing the specific type of this Asset Object.
      */
-    public AssetTypes getAssetTypeEnum() {
+    public AssetType getAssetTypeEnum() {
         return this.assetTypeEnum;
     }
 

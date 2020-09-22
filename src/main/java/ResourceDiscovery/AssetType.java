@@ -1,6 +1,6 @@
 package ResourceDiscovery;
 
-public enum AssetTypes {
+public enum AssetType {
     INSTANCE_COMPUTE_ASSET,
     DISK_COMPUTE_ASSET,
     TOPIC_PUB_SUB_ASSET,

@@ -1,6 +1,6 @@
 package ResourceDiscovery.AssetObjects;
 
-import ResourceDiscovery.AssetTypes;
+import ResourceDiscovery.AssetType;
 
 import java.util.HashMap;
 import java.util.List;
@@ -48,7 +48,7 @@ public class TopicPubSubObject extends AssetObject {
             // Set kind field manually as this asset does not return it
             setKind(TOPIC_TYPE);
             setName(assetObjectsMap.get("name"));
-            setAssetTypeEnum(AssetTypes.TOPIC_PUB_SUB_ASSET);
+            setAssetTypeEnum(AssetType.TOPIC_PUB_SUB_ASSET);
 
             // Set specific asset type fields
             HashMap<String, Object> messageStoragePolicyMap = (HashMap<String, Object>) assetObjectsMap.get("messageStoragePolicy");

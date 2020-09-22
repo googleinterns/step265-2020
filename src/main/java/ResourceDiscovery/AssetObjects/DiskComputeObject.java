@@ -1,6 +1,6 @@
 package ResourceDiscovery.AssetObjects;
 
-import ResourceDiscovery.AssetTypes;
+import ResourceDiscovery.AssetType;
 import com.google.cloud.Timestamp;
 
 import java.util.List;
@@ -53,7 +53,7 @@ public class DiskComputeObject extends AssetObject {
             setLocation(getLastSeg(assetObjectsMap.get("zone")));
             setCreationTime(convertStringToDate(assetObjectsMap.get("creationTimestamp")));
             setStatus(assetObjectsMap.get("status"));
-            setAssetTypeEnum(AssetTypes.DISK_COMPUTE_ASSET);
+            setAssetTypeEnum(AssetType.DISK_COMPUTE_ASSET);
 
             // Set specific asset type fields
             specificObjectClass.diskSizeGb = convertStringToInt(assetObjectsMap.get("sizeGb"));

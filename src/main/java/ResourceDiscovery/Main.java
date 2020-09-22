@@ -98,7 +98,7 @@ public class Main {
     private static void deleteProjectAssets(String accountId, String projectId) {
         List<Mutation> deleteMutations = new ArrayList<>();
 
-        for (AssetTables table : AssetTables.values()) {
+        for (AssetTable table : AssetTable.values()) {
             String tableName = table.getTableName();
             // Only delete values from tables that existed before this process ran
             if (existingTableNames.contains(tableName)) {
@@ -116,7 +116,7 @@ public class Main {
         existingTableNames = getExistingTableNames();
         List<String> tablesToCreateQueries = new ArrayList<>();
 
-        for (AssetTables table : AssetTables.values()) {
+        for (AssetTable table : AssetTable.values()) {
             if (!existingTableNames.contains(table.getTableName())) {
                 tablesToCreateQueries.add(table.getTableCreateQuery());
             }

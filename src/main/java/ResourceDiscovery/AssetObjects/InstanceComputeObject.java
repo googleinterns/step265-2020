@@ -1,6 +1,6 @@
 package ResourceDiscovery.AssetObjects;
 
-import ResourceDiscovery.AssetTypes;
+import ResourceDiscovery.AssetType;
 
 import java.util.Map;
 import java.lang.String;
@@ -52,7 +52,7 @@ public class InstanceComputeObject extends AssetObject {
             setLocation(getLastSeg(assetObjectsMap.get("zone")));
             setCreationTime(convertStringToDate(assetObjectsMap.get("creationTimestamp")));
             setStatus(assetObjectsMap.get("status"));
-            setAssetTypeEnum(AssetTypes.INSTANCE_COMPUTE_ASSET);
+            setAssetTypeEnum(AssetType.INSTANCE_COMPUTE_ASSET);
 
             // Set specific asset type fields
             specificObjectClass.description = (String) assetObjectsMap.get("description");

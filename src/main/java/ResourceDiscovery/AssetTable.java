@@ -4,7 +4,7 @@ package ResourceDiscovery;
  * This enum class contains all of the tables that should be created for this project together with
  * their CREATE TABLE queries.
  */
-public enum AssetTables {
+public enum AssetTable {
     // MAIN_TABLE must be first as all other tables have an interleaved relationship with this table
     MAIN_TABLE("Main_Assets", getCommonColumnsString("Main_Assets") +
             " assetId STRING(MAX)," +
@@ -54,7 +54,7 @@ public enum AssetTables {
     /*
     This private constructor initialized the fields for the given enum.
      */
-    private AssetTables(String name, String query) {
+    private AssetTable(String name, String query) {
         this.tableName = name;
         this.tableCreateQuery = query;
     }

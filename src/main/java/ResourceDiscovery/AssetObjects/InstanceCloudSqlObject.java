@@ -1,6 +1,6 @@
 package ResourceDiscovery.AssetObjects;
 
-import ResourceDiscovery.AssetTypes;
+import ResourceDiscovery.AssetType;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -51,7 +51,7 @@ public class InstanceCloudSqlObject extends AssetObject {
             setType(getLastSeg(assetObjectsMap.get("databaseVersion")));
             setLocation(getLastSeg(assetObjectsMap.get("region")));
             setStatus(assetObjectsMap.get("state"));
-            setAssetTypeEnum(AssetTypes.INSTANCE_CLOUD_SQL_ASSET);
+            setAssetTypeEnum(AssetType.INSTANCE_CLOUD_SQL_ASSET);
 
             // Set specific asset type fields
             specificObjectClass.etag = (String) assetObjectsMap.get("etag");
