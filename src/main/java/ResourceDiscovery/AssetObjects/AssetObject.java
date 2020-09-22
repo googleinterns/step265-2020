@@ -29,7 +29,7 @@ abstract public class AssetObject {
     // Asset additional data
     protected String id;
     protected String type;
-    protected String zone;
+    protected String location;
     protected Timestamp creationTime;
     protected String status;
 
@@ -91,10 +91,10 @@ abstract public class AssetObject {
         }
 
         /*
-        Set the zone field of this object with the provided string and return its specific Builder.
+        Set the location field of this object with the provided string and return its specific Builder.
         */
-        public B setZone(Object zone) {
-            specificObjectClass.zone = (String) zone;
+        public B setLocation(Object location) {
+            specificObjectClass.location = (String) location;
             return specificObjectClassBuilder;
         }
 
@@ -180,11 +180,11 @@ abstract public class AssetObject {
     }
 
     /**
-     * Get the zone field of this object.
-     * @return A string representing the zone of this Asset Object.
+     * Get the location field of this object.
+     * @return A string representing the location of this Asset Object.
      */
-    public String getZone() {
-        return this.zone;
+    public String getLocation() {
+        return this.location;
     }
 
     /**

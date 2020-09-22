@@ -40,7 +40,7 @@ public class DiskComputeObject extends AssetObject {
 
         /**
          * This function sets the relevant fields of the DiskComputeObject.
-         * Fields that should be initialized for this object are: kind, name, id, type, zone,
+         * Fields that should be initialized for this object are: kind, name, id, type, location,
          * creationTime and status.
          * @return the newly initialized DiskComputeObject
          */
@@ -50,7 +50,7 @@ public class DiskComputeObject extends AssetObject {
             setName(assetObjectsMap.get("name"));
             setId(assetObjectsMap.get("id"));
             setType(getLastSeg(assetObjectsMap.get("type")));
-            setZone(getLastSeg(assetObjectsMap.get("zone")));
+            setLocation(getLastSeg(assetObjectsMap.get("zone")));
             setCreationTime(convertStringToDate(assetObjectsMap.get("creationTimestamp")));
             setStatus(assetObjectsMap.get("status"));
             setAssetTypeEnum(AssetTypes.DISK_COMPUTE_ASSET);

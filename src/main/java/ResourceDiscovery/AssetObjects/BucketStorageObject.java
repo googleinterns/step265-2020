@@ -38,7 +38,7 @@ public class BucketStorageObject extends AssetObject {
 
         /**
          * This function sets the relevant fields of the BucketStorageObject.
-         * Fields that should be initialized for this object are: kind, name, id, zone and
+         * Fields that should be initialized for this object are: kind, name, id, location and
          * creationTime.
          * @return the newly initialized BucketStorageObject
          */
@@ -47,7 +47,7 @@ public class BucketStorageObject extends AssetObject {
             setKind(assetObjectsMap.get("kind"));
             setName(assetObjectsMap.get("name"));
             setId(assetObjectsMap.get("id"));
-            setZone(getLastSeg(assetObjectsMap.get("location")));
+            setLocation(getLastSeg(assetObjectsMap.get("location")));
             setCreationTime(convertStringToDate(assetObjectsMap.get("timeCreated")));
             setAssetTypeEnum(AssetTypes.BUCKET_STORAGE_ASSET);
 

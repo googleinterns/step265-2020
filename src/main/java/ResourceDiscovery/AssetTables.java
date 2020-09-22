@@ -11,7 +11,7 @@ public enum AssetTables {
             " assetType STRING(MAX)," +
             " creationTime TIMESTAMP," +
             " status STRING(MAX)," +
-            " zone STRING(MAX)," +
+            " location STRING(MAX)," +
             getPrimaryKeysStatementString()),
 
     BUCKET_STORAGE_TABLE("Bucket_Storage_Assets", getCommonColumnsString("Bucket_Storage_Assets") +

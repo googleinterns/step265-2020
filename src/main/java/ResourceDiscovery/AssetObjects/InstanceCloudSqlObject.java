@@ -41,7 +41,7 @@ public class InstanceCloudSqlObject extends AssetObject {
 
         /**
          * This function sets the relevant fields of the InstanceCloudSqlObject.
-         * Fields that should be initialized for this object are: kind, name, type, zone and status.
+         * Fields that should be initialized for this object are: kind, name, type, location and status.
          * @return the newly initialized InstanceCloudSqlObject
          */
         public InstanceCloudSqlObject build() {
@@ -49,7 +49,7 @@ public class InstanceCloudSqlObject extends AssetObject {
             setKind(assetObjectsMap.get("kind"));
             setName(assetObjectsMap.get("name"));
             setType(getLastSeg(assetObjectsMap.get("databaseVersion")));
-            setZone(getLastSeg(assetObjectsMap.get("region")));
+            setLocation(getLastSeg(assetObjectsMap.get("region")));
             setStatus(assetObjectsMap.get("state"));
             setAssetTypeEnum(AssetTypes.INSTANCE_CLOUD_SQL_ASSET);
 

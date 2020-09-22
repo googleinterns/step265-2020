@@ -39,7 +39,7 @@ public class ProjectMutationsList {
                     .set("assetType").to(asset.getType())
                     .set("creationTime").to(asset.getCreationTime())
                     .set("status").to(asset.getStatus())
-                    .set("zone").to(asset.getZone())
+                    .set("location").to(asset.getLocation())
                     .build());
 
             // It is important that the insertion of the specific asset types happens after the

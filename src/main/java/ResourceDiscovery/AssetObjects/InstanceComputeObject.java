@@ -39,7 +39,7 @@ public class InstanceComputeObject extends AssetObject {
 
         /**
          * This function sets the relevant fields of the InstanceComputeObject.
-         * Fields that should be initialized for this object are: kind, name, id, type, zone,
+         * Fields that should be initialized for this object are: kind, name, id, type, location,
          * creationTime and status.
          * @return the newly initialized InstanceComputeObject
          */
@@ -49,7 +49,7 @@ public class InstanceComputeObject extends AssetObject {
             setName(assetObjectsMap.get("name"));
             setId(assetObjectsMap.get("id"));
             setType(getLastSeg(assetObjectsMap.get("machineType")));
-            setZone(getLastSeg(assetObjectsMap.get("zone")));
+            setLocation(getLastSeg(assetObjectsMap.get("zone")));
             setCreationTime(convertStringToDate(assetObjectsMap.get("creationTimestamp")));
             setStatus(assetObjectsMap.get("status"));
             setAssetTypeEnum(AssetTypes.INSTANCE_COMPUTE_ASSET);
