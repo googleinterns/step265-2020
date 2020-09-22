@@ -40,7 +40,7 @@
                         * @return the newly initialized NewObject
                         */
                        public NewObject build() {
-                           // set relevant fields
+                           // Set relevant fields
                            return super.build();
                        }
                    }

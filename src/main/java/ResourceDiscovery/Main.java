@@ -49,7 +49,7 @@ public class Main {
         SpannerOptions options = SpannerOptions.newBuilder().setProjectId(SPANNER_PROJECT_ID).build();
         spanner = options.getService();
         try {
-            // create spanner DatabaseClient
+            // Create spanner DatabaseClient
             db = DatabaseId.of(SPANNER_PROJECT_ID, SPANNER_INSTANCE_ID, SPANNER_DATABASE_ID);
             dbClient = spanner.getDatabaseClient(db);
             createTablesIfNotExist();
@@ -77,14 +77,14 @@ public class Main {
             String accountId = (String) key;
             String projectId = (String) projectJson.get(key);
 
-            // update project config and assets
+            // Update project config and assets
             ProjectConfig.getInstance().setNewProject(accountId, projectId);
             ProjectAssetsMapper projectAssets = new ProjectAssetsMapper();
             ProjectMutationsList projectMutations = new ProjectMutationsList();
             List<Mutation> mutationsToAdd = projectMutations.getMutationList(projectAssets.getAllAssets());
 
-            // we prepare the insertion of the new assets before the deletion of the old ones so
-            // that we wont have data loss in case of an error
+            // We prepare the insertion of the new assets before the deletion of the old ones so
+            // that we wont have data loss in case of an error.
             deleteProjectAssets(accountId, projectId);
             dbClient.write(mutationsToAdd);
         }
@@ -100,7 +100,7 @@ public class Main {
 
         for (AssetTables table : AssetTables.values()) {
             String tableName = table.getTableName();
-            // only delete values from tables that existed before this process ran
+            // Only delete values from tables that existed before this process ran
             if (existingTableNames.contains(tableName)) {
                 Key projectKey = Key.of(accountId, projectId);
                 deleteMutations.add(Mutation.delete(tableName, KeySet.range(KeyRange.closedClosed(projectKey, projectKey))));
@@ -130,7 +130,7 @@ public class Main {
     provided in the tablesToCreateQueries list.
      */
     private static void ExecuteTablesCreation(List<String> tablesToCreateQueries) {
-        // create asset tables only if there are new ones
+        // Create asset tables only if there are new ones
         if (tablesToCreateQueries.size() > 0) {
             DatabaseAdminClient dbAdminClient = spanner.getDatabaseAdminClient();
             OperationFuture<Void, UpdateDatabaseDdlMetadata> createTables;

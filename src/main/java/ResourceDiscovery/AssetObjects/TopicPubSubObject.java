@@ -44,13 +44,13 @@ public class TopicPubSubObject extends AssetObject {
          * @return the newly initialized TopicPubSubObject
          */
         public TopicPubSubObject build() {
-            // set AssetObject fields
-            // set kind manually as this asset does not return it
+            // Set AssetObject fields
+            // Set kind field manually as this asset does not return it
             setKind(TOPIC_TYPE);
             setName(assetObjectsMap.get("name"));
             setAssetTypeEnum(AssetTypes.TOPIC_PUB_SUB_ASSET);
 
-            // set specific asset type fields
+            // Set specific asset type fields
             HashMap<String, Object> messageStoragePolicyMap = (HashMap<String, Object>) assetObjectsMap.get("messageStoragePolicy");
             specificObjectClass.allowedPersistenceRegions = (List<String>) messageStoragePolicyMap.get("allowedPersistenceRegions");
             return super.build();

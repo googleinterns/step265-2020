@@ -43,7 +43,7 @@ public class ProjectMutationsList {
                     .build());
 
             // It is important that the insertion of the specific asset types happens after the
-            // insertion of the AssetObject as the specific tables are interleaved with MAIN_TABLE
+            // insertion of the AssetObject as the specific tables are interleaved with MAIN_TABLE.
             addSpecificAssetMutation(asset);
         }
         return this.mutations;

@@ -20,13 +20,13 @@ import java.util.regex.Pattern;
  * conversions which are used in several asset object classes (such as a convertStringToDate function).
  */
 abstract public class AssetObject {
-    // asset primary keys
+    // Asset primary keys
     public String accountId = ProjectConfig.getInstance().getAccountId();
     public String projectId = ProjectConfig.getInstance().getProjectId();
     protected String kind;
     protected String name;
 
-    // asset additional data
+    // Asset additional data
     protected String id;
     protected String type;
     protected String zone;

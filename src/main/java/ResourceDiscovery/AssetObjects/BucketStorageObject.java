@@ -43,7 +43,7 @@ public class BucketStorageObject extends AssetObject {
          * @return the newly initialized BucketStorageObject
          */
         public BucketStorageObject build() {
-            // set AssetObject fields
+            // Set AssetObject fields
             setKind(assetObjectsMap.get("kind"));
             setName(assetObjectsMap.get("name"));
             setId(assetObjectsMap.get("id"));
@@ -51,7 +51,7 @@ public class BucketStorageObject extends AssetObject {
             setCreationTime(convertStringToDate(assetObjectsMap.get("timeCreated")));
             setAssetTypeEnum(AssetTypes.BUCKET_STORAGE_ASSET);
 
-            // set specific asset type fields
+            // Set specific asset type fields
             specificObjectClass.storageClass = (String) assetObjectsMap.get("storageClass");
             specificObjectClass.updatedTime = convertStringToDate(assetObjectsMap.get("updated"));
 

@@ -45,7 +45,7 @@ public class InstanceCloudSqlObject extends AssetObject {
          * @return the newly initialized InstanceCloudSqlObject
          */
         public InstanceCloudSqlObject build() {
-            // set AssetObject fields
+            // Set AssetObject fields
             setKind(assetObjectsMap.get("kind"));
             setName(assetObjectsMap.get("name"));
             setType(getLastSeg(assetObjectsMap.get("databaseVersion")));
@@ -53,7 +53,7 @@ public class InstanceCloudSqlObject extends AssetObject {
             setStatus(assetObjectsMap.get("state"));
             setAssetTypeEnum(AssetTypes.INSTANCE_CLOUD_SQL_ASSET);
 
-            // set specific asset type fields
+            // Set specific asset type fields
             specificObjectClass.etag = (String) assetObjectsMap.get("etag");
             updateFieldsFromSettings();
 

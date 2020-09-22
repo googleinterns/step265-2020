@@ -45,13 +45,13 @@ public class SubscriptionPubSubObject extends AssetObject {
          * @return the newly initialized SubscriptionPubSubObject
          */
         public SubscriptionPubSubObject build() {
-            // set AssetObject fields
-            // set kind manually as this asset does not return it
+            // Set AssetObject fields
+            // Set kind field manually as this asset does not return it
             setKind(SUBSCRIPTION_TYPE);
             setName(assetObjectsMap.get("name"));
             setAssetTypeEnum(AssetTypes.SUBSCRIPTION_PUB_SUB_ASSET);
 
-            // set specific asset type fields
+            // Set specific asset type fields
             specificObjectClass.topic = (String) assetObjectsMap.get("topic");
             HashMap<String, Object> expirationPolicyMap = (HashMap<String, Object>) assetObjectsMap.get("expirationPolicy");
             specificObjectClass.ttl = (String) expirationPolicyMap.get("ttl");

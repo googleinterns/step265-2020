@@ -44,7 +44,7 @@ public class InstanceComputeObject extends AssetObject {
          * @return the newly initialized InstanceComputeObject
          */
         public InstanceComputeObject build() {
-            // set AssetObject fields
+            // Set AssetObject fields
             setKind(assetObjectsMap.get("kind"));
             setName(assetObjectsMap.get("name"));
             setId(assetObjectsMap.get("id"));
@@ -54,7 +54,7 @@ public class InstanceComputeObject extends AssetObject {
             setStatus(assetObjectsMap.get("status"));
             setAssetTypeEnum(AssetTypes.INSTANCE_COMPUTE_ASSET);
 
-            // set specific asset type fields
+            // Set specific asset type fields
             specificObjectClass.description = (String) assetObjectsMap.get("description");
             specificObjectClass.canIpForward = (Boolean) assetObjectsMap.get("canIpForward");
             specificObjectClass.cpuPlatform = (String) assetObjectsMap.get("cpuPlatform");

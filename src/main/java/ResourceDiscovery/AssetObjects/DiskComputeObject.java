@@ -45,7 +45,7 @@ public class DiskComputeObject extends AssetObject {
          * @return the newly initialized DiskComputeObject
          */
         public DiskComputeObject build() {
-            // set AssetObject fields
+            // Set AssetObject fields
             setKind(assetObjectsMap.get("kind"));
             setName(assetObjectsMap.get("name"));
             setId(assetObjectsMap.get("id"));
@@ -55,7 +55,7 @@ public class DiskComputeObject extends AssetObject {
             setStatus(assetObjectsMap.get("status"));
             setAssetTypeEnum(AssetTypes.DISK_COMPUTE_ASSET);
 
-            // set specific asset type fields
+            // Set specific asset type fields
             specificObjectClass.diskSizeGb = convertStringToInt(assetObjectsMap.get("sizeGb"));
             specificObjectClass.updatedTime = convertStringToDate(assetObjectsMap.get("lastAttachTimestamp"));
             specificObjectClass.licenses = convertListToLastSegList(assetObjectsMap.get("licenses"));
