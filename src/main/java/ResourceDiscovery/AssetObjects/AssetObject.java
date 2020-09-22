@@ -135,82 +135,42 @@ abstract public class AssetObject {
     }
 
     // AssetObject Class Getters
-    /**
-     * Get the accountId field of this object.
-     * @return A string representing the account ID of this Asset Object.
-     */
     public String getAccountId() {
         return this.accountId;
     }
 
-    /**
-     * Get the projectId field of this object .
-     * @return A string representing the project ID of this Asset Object.
-     */
     public String getProjectId() {
         return this.projectId;
     }
 
-    /**
-     * Get the kind field of this object (the kind of Google Cloud Asset).
-     * @return A string representing the kind of this Asset Object.
-     */
     public String getKind() {
         return this.kind;
     }
 
-    /**
-     * Get the name field of this object.
-     * @return A string representing the name of this Asset Object.
-     */
     public String getName() {
         return this.name;
     }
 
-    /**
-     * Get the id field of this object.
-     * @return A string representing the id of this Asset Object.
-     */
     public String getId() {
         return this.id;
     }
 
-    /**
-     * Get the type field of this object.
-     * @return A string representing the type of this Asset Object.
-     */
     public String getType() {
         return this.type;
     }
 
-    /**
-     * Get the location field of this object.
-     * @return A string representing the location of this Asset Object.
-     */
     public String getLocation() {
         return this.location;
     }
 
-    /**
-     * Get the creationTime field of this object.
-     * @return A Timestamp object representing the creation time of this Asset Object.
-     */
     public Timestamp getCreationTime() {
         return this.creationTime;
     }
 
-    /**
-     * Get the status field of this object.
-     * @return A string representing the status of this Asset Object.
-     */
     public String getStatus() {
         return this.status;
     }
 
-    /**
-     * Get the AssetType of this object.
-     * @return An enum of AssetType representing the specific type of this Asset Object.
-     */
     public AssetType getAssetTypeEnum() {
         return this.assetTypeEnum;
     }
