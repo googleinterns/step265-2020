@@ -31,11 +31,11 @@ public class SubscriptionPubSubObject extends AssetObject {
 
         /**
          * This function returns a Builder object for the SubscriptionPubSubObject class.
-         * @param assetObjectsMap - a Map<String,String> which contains all of the relevant data for
+         * @param assetProperties - a Map<String,String> which contains all of the relevant data for
          *                          this SubscriptionPubSubObject.
          */
-        public Builder(Map<String,Object> assetObjectsMap) {
-            super(assetObjectsMap);
+        public Builder(Map<String,Object> assetProperties) {
+            super(assetProperties);
         }
 
         /**
@@ -47,12 +47,12 @@ public class SubscriptionPubSubObject extends AssetObject {
             // Set AssetObject fields
             // Set kind field manually as this asset does not return it
             setKind(SUBSCRIPTION_TYPE);
-            setName(assetObjectsMap.get("name"));
+            setName(assetProperties.get("name"));
             setAssetTypeEnum(AssetType.SUBSCRIPTION_PUB_SUB_ASSET);
 
             // Set specific asset type fields
-            specificObjectClass.topic = (String) assetObjectsMap.get("topic");
-            HashMap<String, Object> expirationPolicyMap = (HashMap<String, Object>) assetObjectsMap.get("expirationPolicy");
+            specificObjectClass.topic = (String) assetProperties.get("topic");
+            HashMap<String, Object> expirationPolicyMap = (HashMap<String, Object>) assetProperties.get("expirationPolicy");
             specificObjectClass.ttl = (String) expirationPolicyMap.get("ttl");
             return super.build();
         }

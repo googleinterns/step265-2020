@@ -31,11 +31,11 @@ public class TopicPubSubObject extends AssetObject {
 
         /**
          * This function returns a Builder object for the TopicPubSubObject class.
-         * @param assetObjectsMap - a Map<String,String> which contains all of the relevant data for
+         * @param assetProperties - a Map<String,String> which contains all of the relevant data for
          *                          this TopicPubSubObject.
          */
-        public Builder(Map<String,Object> assetObjectsMap) {
-            super(assetObjectsMap);
+        public Builder(Map<String,Object> assetProperties) {
+            super(assetProperties);
         }
 
         /**
@@ -47,11 +47,11 @@ public class TopicPubSubObject extends AssetObject {
             // Set AssetObject fields
             // Set kind field manually as this asset does not return it
             setKind(TOPIC_TYPE);
-            setName(assetObjectsMap.get("name"));
+            setName(assetProperties.get("name"));
             setAssetTypeEnum(AssetType.TOPIC_PUB_SUB_ASSET);
 
             // Set specific asset type fields
-            HashMap<String, Object> messageStoragePolicyMap = (HashMap<String, Object>) assetObjectsMap.get("messageStoragePolicy");
+            HashMap<String, Object> messageStoragePolicyMap = (HashMap<String, Object>) assetProperties.get("messageStoragePolicy");
             specificObjectClass.allowedPersistenceRegions = (List<String>) messageStoragePolicyMap.get("allowedPersistenceRegions");
             return super.build();
         }

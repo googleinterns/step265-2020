@@ -30,11 +30,11 @@ public class InstanceComputeObject extends AssetObject {
 
         /**
          * This function returns a Builder object for the InstanceComputeObject class.
-         * @param assetObjectsMap - a Map<String,String> which contains all of the relevant data for
+         * @param assetProperties - a Map<String,String> which contains all of the relevant data for
          *                          this InstanceComputeObject.
          */
-        public Builder(Map<String,Object> assetObjectsMap) {
-            super(assetObjectsMap);
+        public Builder(Map<String,Object> assetProperties) {
+            super(assetProperties);
         }
 
         /**
@@ -45,19 +45,19 @@ public class InstanceComputeObject extends AssetObject {
          */
         public InstanceComputeObject build() {
             // Set AssetObject fields
-            setKind(assetObjectsMap.get("kind"));
-            setName(assetObjectsMap.get("name"));
-            setId(assetObjectsMap.get("id"));
-            setType(getLastSeg(assetObjectsMap.get("machineType")));
-            setLocation(getLastSeg(assetObjectsMap.get("zone")));
-            setCreationTime(convertStringToDate(assetObjectsMap.get("creationTimestamp")));
-            setStatus(assetObjectsMap.get("status"));
+            setKind(assetProperties.get("kind"));
+            setName(assetProperties.get("name"));
+            setId(assetProperties.get("id"));
+            setType(getLastSeg(assetProperties.get("machineType")));
+            setLocation(getLastSeg(assetProperties.get("zone")));
+            setCreationTime(convertStringToDate(assetProperties.get("creationTimestamp")));
+            setStatus(assetProperties.get("status"));
             setAssetTypeEnum(AssetType.INSTANCE_COMPUTE_ASSET);
 
             // Set specific asset type fields
-            specificObjectClass.description = (String) assetObjectsMap.get("description");
-            specificObjectClass.canIpForward = (Boolean) assetObjectsMap.get("canIpForward");
-            specificObjectClass.cpuPlatform = (String) assetObjectsMap.get("cpuPlatform");
+            specificObjectClass.description = (String) assetProperties.get("description");
+            specificObjectClass.canIpForward = (Boolean) assetProperties.get("canIpForward");
+            specificObjectClass.cpuPlatform = (String) assetProperties.get("cpuPlatform");
 
             return super.build();
         }

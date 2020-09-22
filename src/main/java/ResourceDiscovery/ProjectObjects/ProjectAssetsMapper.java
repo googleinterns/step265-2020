@@ -79,9 +79,9 @@ public class ProjectAssetsMapper {
         try {
             AssetObjectsList tempAssetObjectsList = jsonMapper.readValue(getHttpInfo(assetListUrl),
                                                                             AssetObjectsList.class);
-             for (Map<String,Object> assetObjectsMap : tempAssetObjectsList.getAssetObjectsList()) {
+             for (Map<String,Object> assetProperties : tempAssetObjectsList.getAssetObjectsList()) {
                 AssetObject assetObject = assetObjectFactory.createAssetObject(assetType,
-                                                                                assetObjectsMap);
+                                                                                assetProperties);
                 assetObjectList.add(assetObject);
             }
         } catch (IOException exception) {

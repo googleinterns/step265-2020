@@ -27,11 +27,11 @@
                
                        /**
                         * This function returns a Builder object for the NewObject class.
-                        * @param assetObjectsMap - a Map<String,String> which contains all of the relevant data for
+                        * @param assetProperties - a Map<String,String> which contains all of the relevant data for
                         *                          this NewObject.
                         */
-                       public Builder(Map<String,String> assetObjectsMap) {
-                           super(assetObjectsMap);
+                       public Builder(Map<String,String> assetProperties) {
+                           super(assetProperties);
                        }
                
                        /**

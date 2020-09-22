@@ -43,7 +43,7 @@ abstract public class AssetObject {
     private static final SimpleDateFormat DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
 
     protected abstract static class BaseBuilder<T extends AssetObject, B extends BaseBuilder> {
-        protected Map<String,Object> assetObjectsMap;
+        protected Map<String,Object> assetProperties;
         protected T specificObjectClass;
         protected B specificObjectClassBuilder;
 
@@ -58,7 +58,7 @@ abstract public class AssetObject {
         protected BaseBuilder(Map<String,Object> assetMap) {
             specificObjectClass = getSpecificClass();
             specificObjectClassBuilder = getSpecificClassBuilder();
-            assetObjectsMap = assetMap;
+            assetProperties = assetMap;
         }
 
         /*

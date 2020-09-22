@@ -31,11 +31,11 @@ public class DiskComputeObject extends AssetObject {
 
         /**
          * This function returns a Builder object for the DiskComputeObject class.
-         * @param assetObjectsMap - a Map<String,String> which contains all of the relevant data for
+         * @param assetProperties - a Map<String,String> which contains all of the relevant data for
          *                          this DiskComputeObject.
          */
-        public Builder(Map<String,Object> assetObjectsMap) {
-            super(assetObjectsMap);
+        public Builder(Map<String,Object> assetProperties) {
+            super(assetProperties);
         }
 
         /**
@@ -46,19 +46,19 @@ public class DiskComputeObject extends AssetObject {
          */
         public DiskComputeObject build() {
             // Set AssetObject fields
-            setKind(assetObjectsMap.get("kind"));
-            setName(assetObjectsMap.get("name"));
-            setId(assetObjectsMap.get("id"));
-            setType(getLastSeg(assetObjectsMap.get("type")));
-            setLocation(getLastSeg(assetObjectsMap.get("zone")));
-            setCreationTime(convertStringToDate(assetObjectsMap.get("creationTimestamp")));
-            setStatus(assetObjectsMap.get("status"));
+            setKind(assetProperties.get("kind"));
+            setName(assetProperties.get("name"));
+            setId(assetProperties.get("id"));
+            setType(getLastSeg(assetProperties.get("type")));
+            setLocation(getLastSeg(assetProperties.get("zone")));
+            setCreationTime(convertStringToDate(assetProperties.get("creationTimestamp")));
+            setStatus(assetProperties.get("status"));
             setAssetTypeEnum(AssetType.DISK_COMPUTE_ASSET);
 
             // Set specific asset type fields
-            specificObjectClass.diskSizeGb = convertStringToInt(assetObjectsMap.get("sizeGb"));
-            specificObjectClass.updatedTime = convertStringToDate(assetObjectsMap.get("lastAttachTimestamp"));
-            specificObjectClass.licenses = convertListToLastSegList(assetObjectsMap.get("licenses"));
+            specificObjectClass.diskSizeGb = convertStringToInt(assetProperties.get("sizeGb"));
+            specificObjectClass.updatedTime = convertStringToDate(assetProperties.get("lastAttachTimestamp"));
+            specificObjectClass.licenses = convertListToLastSegList(assetProperties.get("licenses"));
 
             return super.build();
         }

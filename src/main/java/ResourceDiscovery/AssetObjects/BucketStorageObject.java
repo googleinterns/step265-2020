@@ -29,11 +29,11 @@ public class BucketStorageObject extends AssetObject {
 
         /**
          * This function returns a Builder object for the BucketStorageObject class.
-         * @param assetObjectsMap - a Map<String,String> which contains all of the relevant data for
+         * @param assetProperties - a Map<String,String> which contains all of the relevant data for
          *                          this BucketStorageObject.
          */
-        public Builder(Map<String,Object> assetObjectsMap) {
-            super(assetObjectsMap);
+        public Builder(Map<String,Object> assetProperties) {
+            super(assetProperties);
         }
 
         /**
@@ -44,16 +44,16 @@ public class BucketStorageObject extends AssetObject {
          */
         public BucketStorageObject build() {
             // Set AssetObject fields
-            setKind(assetObjectsMap.get("kind"));
-            setName(assetObjectsMap.get("name"));
-            setId(assetObjectsMap.get("id"));
-            setLocation(getLastSeg(assetObjectsMap.get("location")));
-            setCreationTime(convertStringToDate(assetObjectsMap.get("timeCreated")));
+            setKind(assetProperties.get("kind"));
+            setName(assetProperties.get("name"));
+            setId(assetProperties.get("id"));
+            setLocation(getLastSeg(assetProperties.get("location")));
+            setCreationTime(convertStringToDate(assetProperties.get("timeCreated")));
             setAssetTypeEnum(AssetType.BUCKET_STORAGE_ASSET);
 
             // Set specific asset type fields
-            specificObjectClass.storageClass = (String) assetObjectsMap.get("storageClass");
-            specificObjectClass.updatedTime = convertStringToDate(assetObjectsMap.get("updated"));
+            specificObjectClass.storageClass = (String) assetProperties.get("storageClass");
+            specificObjectClass.updatedTime = convertStringToDate(assetProperties.get("updated"));
 
             return super.build();
         }

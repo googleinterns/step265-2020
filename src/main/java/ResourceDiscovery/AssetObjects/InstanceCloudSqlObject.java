@@ -32,11 +32,11 @@ public class InstanceCloudSqlObject extends AssetObject {
 
         /**
          * This function returns a Builder object for the InstanceCloudSqlObject class.
-         * @param assetObjectsMap - a Map<String,String> which contains all of the relevant data for
+         * @param assetProperties - a Map<String,String> which contains all of the relevant data for
          *                          this InstanceCloudSqlObject.
          */
-        public Builder(Map<String,Object> assetObjectsMap) {
-            super(assetObjectsMap);
+        public Builder(Map<String,Object> assetProperties) {
+            super(assetProperties);
         }
 
         /**
@@ -46,15 +46,15 @@ public class InstanceCloudSqlObject extends AssetObject {
          */
         public InstanceCloudSqlObject build() {
             // Set AssetObject fields
-            setKind(assetObjectsMap.get("kind"));
-            setName(assetObjectsMap.get("name"));
-            setType(getLastSeg(assetObjectsMap.get("databaseVersion")));
-            setLocation(getLastSeg(assetObjectsMap.get("region")));
-            setStatus(assetObjectsMap.get("state"));
+            setKind(assetProperties.get("kind"));
+            setName(assetProperties.get("name"));
+            setType(getLastSeg(assetProperties.get("databaseVersion")));
+            setLocation(getLastSeg(assetProperties.get("region")));
+            setStatus(assetProperties.get("state"));
             setAssetTypeEnum(AssetType.INSTANCE_CLOUD_SQL_ASSET);
 
             // Set specific asset type fields
-            specificObjectClass.etag = (String) assetObjectsMap.get("etag");
+            specificObjectClass.etag = (String) assetProperties.get("etag");
             updateFieldsFromSettings();
 
             return super.build();
@@ -65,7 +65,7 @@ public class InstanceCloudSqlObject extends AssetObject {
         backupEnabled, replicationType & activationPolicy.
          */
         private void updateFieldsFromSettings() {
-            HashMap<String, Object> settingsMap = (HashMap<String, Object>) assetObjectsMap.get("settings");
+            HashMap<String, Object> settingsMap = (HashMap<String, Object>) assetProperties.get("settings");
             specificObjectClass.diskSizeGb = convertStringToInt(settingsMap.get("dataDiskSizeGb"));
             HashMap<String, Object> backupConfig = (HashMap<String, Object>) settingsMap.get("backupConfiguration");
             specificObjectClass.backupEnabled = (Boolean) backupConfig.get("enabled");
