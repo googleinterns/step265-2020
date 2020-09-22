@@ -59,18 +59,10 @@ public class BucketStorageObject extends AssetObject {
         }
     }
 
-    /**
-     * Get the storageClass field of this object.
-     * @return A string representing the storageClass of this Bucket Asset Object.
-     */
     public String getStorageClass() {
         return this.storageClass;
     }
 
-    /**
-     * Get the updatedTime field of this object.
-     * @return A Timestamp representing the last time this Bucket Asset Object was updated.
-     */
     public Timestamp getUpdatedTime() {
         return this.updatedTime;
     }

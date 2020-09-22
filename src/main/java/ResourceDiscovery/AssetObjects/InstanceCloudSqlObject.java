@@ -74,42 +74,22 @@ public class InstanceCloudSqlObject extends AssetObject {
         }
     }
 
-    /**
-     * Get the etag field of this object.
-     * @return An string representing the etag of this Cloud Sql Asset Object.
-     */
     public String getEtag() {
         return this.etag;
     }
 
-    /**
-     * Get the diskSizeGb field of this object.
-     * @return An int representing the disk size of this Cloud Sql Asset Object.
-     */
     public int getDiskSizeGb() {
         return this.diskSizeGb;
     }
 
-    /**
-     * Get the backupEnabled field of this object.
-     * @return A Boolean representing if backup is enabled for this Cloud Sql Asset Object.
-     */
     public Boolean getBackupEnabled() {
         return this.backupEnabled;
     }
 
-    /**
-     * Get the replicationType field of this object.
-     * @return A string representing the replication type of this Cloud Sql Asset Object.
-     */
     public String getReplicationType() {
         return this.replicationType;
     }
 
-    /**
-     * Get the activationPolicy field of this object.
-     * @return A string representing the activation policy of this Cloud Sql Asset Object.
-     */
     public String getActivationPolicy() {
         return this.activationPolicy;
     }

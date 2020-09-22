@@ -63,26 +63,14 @@ public class InstanceComputeObject extends AssetObject {
         }
     }
 
-    /**
-     * Get the description field of this object.
-     * @return A string representing the description of this VM Asset Object.
-     */
     public String getDescription() {
         return this.description;
     }
 
-    /**
-     * Get the canIpForward field of this object.
-     * @return A Boolean representing if this VM Asset Object can ip forward.
-     */
     public Boolean getCanIpForward() {
         return this.canIpForward;
     }
 
-    /**
-     * Get the cpuPlatform field of this object.
-     * @return A string representing the cpu platform of this VM Asset Object.
-     */
     public String getCpuPlatform() {
         return this.cpuPlatform;
     }

@@ -63,26 +63,15 @@ public class DiskComputeObject extends AssetObject {
             return super.build();
         }
     }
-    /**
-     * Get the diskSizeGb field of this object.
-     * @return An int representing the disk size of this Disk Asset Object.
-     */
+
     public int getDiskSizeGb() {
         return this.diskSizeGb;
     }
 
-    /**
-     * Get the updatedTime field of this object.
-     * @return A Timestamp representing the last time this Disk Asset Object was updated.
-     */
     public Timestamp getUpdatedTime() {
         return this.updatedTime;
     }
 
-    /**
-     * Get the licenses field of this object.
-     * @return A list of strings representing the licenses for this Disk Asset Object.
-     */
     public List<String> getLicenses() {
         return this.licenses;
     }

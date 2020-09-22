@@ -57,10 +57,6 @@ public class TopicPubSubObject extends AssetObject {
         }
     }
 
-    /**
-     * Get the allowedPersistenceRegions field of this object.
-     * @return A list of strings representing the allowedPersistenceRegions for this Topic Asset Object.
-     */
     public List<String> getAllowedPersistenceRegions() {
         return this.allowedPersistenceRegions;
     }

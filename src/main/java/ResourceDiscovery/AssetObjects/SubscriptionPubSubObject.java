@@ -57,18 +57,11 @@ public class SubscriptionPubSubObject extends AssetObject {
             return super.build();
         }
     }
-    /**
-     * Get the topic field of this object.
-     * @return A string representing the related topic for this Subscription Asset Object.
-     */
+
     public String getTopic() {
         return this.topic;
     }
 
-    /**
-     * Get the ttl field of this object.
-     * @return A string representing the ttl of the expiration policy of this Subscription Asset Object.
-     */
     public String getTtl() {
         return this.ttl;
     }
