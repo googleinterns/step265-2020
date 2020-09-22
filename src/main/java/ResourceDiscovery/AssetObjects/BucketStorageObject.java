@@ -52,7 +52,7 @@ public class BucketStorageObject extends AssetObject {
             setAssetTypeEnum(AssetType.BUCKET_STORAGE_ASSET);
 
             // Set specific asset type fields
-            specificObjectClass.storageClass = (String) assetProperties.get("storageClass");
+            specificObjectClass.storageClass = convertObjectToString(assetProperties.get("storageClass"));
             specificObjectClass.updatedTime = convertStringToDate(assetProperties.get("updated"));
 
             return super.build();

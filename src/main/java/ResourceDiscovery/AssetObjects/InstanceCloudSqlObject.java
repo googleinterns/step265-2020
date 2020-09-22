@@ -65,12 +65,12 @@ public class InstanceCloudSqlObject extends AssetObject {
         backupEnabled, replicationType & activationPolicy.
          */
         private void updateFieldsFromSettings() {
-            HashMap<String, Object> settingsMap = (HashMap<String, Object>) assetProperties.get("settings");
+            HashMap<String, Object> settingsMap = convertObjectToMap(assetProperties.get("settings"));
             specificObjectClass.diskSizeGb = convertStringToInt(settingsMap.get("dataDiskSizeGb"));
-            HashMap<String, Object> backupConfig = (HashMap<String, Object>) settingsMap.get("backupConfiguration");
-            specificObjectClass.backupEnabled = (Boolean) backupConfig.get("enabled");
-            specificObjectClass.replicationType = (String) settingsMap.get("replicationType");
-            specificObjectClass.activationPolicy = (String) settingsMap.get("activationPolicy");
+            HashMap<String, Object> backupConfig = convertObjectToMap(settingsMap.get("backupConfiguration"));
+            specificObjectClass.backupEnabled = convertObjectToBoolean(backupConfig.get("enabled"));
+            specificObjectClass.replicationType = convertObjectToString(settingsMap.get("replicationType"));
+            specificObjectClass.activationPolicy = convertObjectToString(settingsMap.get("activationPolicy"));
         }
     }
 

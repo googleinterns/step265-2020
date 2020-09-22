@@ -51,8 +51,8 @@ public class TopicPubSubObject extends AssetObject {
             setAssetTypeEnum(AssetType.TOPIC_PUB_SUB_ASSET);
 
             // Set specific asset type fields
-            HashMap<String, Object> messageStoragePolicyMap = (HashMap<String, Object>) assetProperties.get("messageStoragePolicy");
-            specificObjectClass.allowedPersistenceRegions = (List<String>) messageStoragePolicyMap.get("allowedPersistenceRegions");
+            HashMap<String, Object> messageStoragePolicyMap = convertObjectToMap(assetProperties.get("messageStoragePolicy"));
+            specificObjectClass.allowedPersistenceRegions = convertListToLastSegList(messageStoragePolicyMap.get("allowedPersistenceRegions"));
             return super.build();
         }
     }

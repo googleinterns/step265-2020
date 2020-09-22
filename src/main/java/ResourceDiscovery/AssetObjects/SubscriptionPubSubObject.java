@@ -51,9 +51,9 @@ public class SubscriptionPubSubObject extends AssetObject {
             setAssetTypeEnum(AssetType.SUBSCRIPTION_PUB_SUB_ASSET);
 
             // Set specific asset type fields
-            specificObjectClass.topic = (String) assetProperties.get("topic");
-            HashMap<String, Object> expirationPolicyMap = (HashMap<String, Object>) assetProperties.get("expirationPolicy");
-            specificObjectClass.ttl = (String) expirationPolicyMap.get("ttl");
+            specificObjectClass.topic = convertObjectToString(assetProperties.get("topic"));
+            HashMap<String, Object> expirationPolicyMap = convertObjectToMap(assetProperties.get("expirationPolicy"));
+            specificObjectClass.ttl = convertObjectToString(expirationPolicyMap.get("ttl"));
             return super.build();
         }
     }

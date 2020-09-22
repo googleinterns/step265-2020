@@ -8,6 +8,7 @@ import com.google.common.flogger.FluentLogger;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.regex.Matcher;
@@ -220,12 +221,19 @@ abstract public class AssetObject {
      * If the provided string does not match that pattern the original string is returned.
      */
     protected static String getLastSeg(Object url) {
-        String urlToReturn = (String) url;
-        Matcher matcher = LAST_SEGMENT_PATTERN.matcher(urlToReturn);
-        if (matcher.find()) {
-            return matcher.replaceAll("");
+        try {
+            String urlToReturn = (String) url;
+            Matcher matcher = LAST_SEGMENT_PATTERN.matcher(urlToReturn);
+            if (matcher.find()) {
+                return matcher.replaceAll("");
+            }
+            return urlToReturn;
+        } catch (ClassCastException exception) {
+            String error_msg = "Encountered a casting error, expected to get an object that can be " +
+                    "casted into a string. Received object: " + url;
+            logger.atInfo().withCause(exception).log(error_msg);
         }
-        return urlToReturn;
+        return null;
     }
 
     /*
@@ -233,12 +241,19 @@ abstract public class AssetObject {
      * with the last segment for each url.
      */
     protected static List<String> convertListToLastSegList(Object urlsObject) {
-        List<String> urlsList = (List<String>) urlsObject;
-        List<String> listToReturn = new ArrayList<>();
-        for (String url : urlsList) {
-            listToReturn.add(getLastSeg(url));
+        try {
+            List<String> urlsList = (List<String>) urlsObject;
+            List<String> listToReturn = new ArrayList<>();
+            for (String url : urlsList) {
+                listToReturn.add(getLastSeg(url));
+            }
+            return listToReturn;
+        } catch (ClassCastException exception) {
+            String error_msg = "Encountered a casting error, expected to get an object that can be " +
+                    "casted into a list of strings. Received object: " + urlsObject;
+            logger.atInfo().withCause(exception).log(error_msg);
         }
-        return listToReturn;
+        return null;
     }
 
     /*
@@ -253,14 +268,78 @@ abstract public class AssetObject {
             String error_msg = "Encountered a date parsing error. Dates should be in " +
                                 "yyyy-MM-ddTHH:mm:ss format, provided date: " + dateString;
             logger.atInfo().withCause(exception).log(error_msg);
+        } catch (ClassCastException exception) {
+            String error_msg = "Encountered a casting error, expected to get an object that can be " +
+                    "casted into a string. Received object: " + dateString;
+            logger.atInfo().withCause(exception).log(error_msg);
         }
         return null;
     }
 
     /*
-    This function receives a string representing an int and returns it as an int.
+    This function receives a string representing an int and returns it as an Integer.
+    If the provided intString does not match this format null is returned and details are logged.
      */
-    protected static int convertStringToInt(Object intString) {
-        return Integer.valueOf((String) intString);
+    protected static Integer convertStringToInt(Object intString) {
+        try {
+            return Integer.valueOf((String) intString);
+        } catch (ClassCastException exception) {
+            String error_msg = "Encountered a casting error, expected to get an object that can be " +
+                                "casted into a string. Received object: " + intString;
+            logger.atInfo().withCause(exception).log(error_msg);
+        } catch (NumberFormatException exception) {
+            String error_msg = "Encountered a formatting error, expected to get an object that can be " +
+                                "casted into an Integer. Received object: " + intString;
+            logger.atInfo().withCause(exception).log(error_msg);
+        }
+        return null;
+    }
+
+    /*
+    This function receives an Object representing a string and returns it as a String.
+    If the provided stringToConvert can not be casted into a String, null is returned and details
+    are logged.
+     */
+    protected static String convertObjectToString(Object stringToConvert) {
+        try {
+            return (String) stringToConvert;
+        } catch (ClassCastException exception) {
+            String error_msg = "Encountered a casting error, expected to get an object that can be " +
+                    "casted into a string. Received object: " + stringToConvert;
+            logger.atInfo().withCause(exception).log(error_msg);
+        }
+        return null;
+    }
+
+    /*
+    This function receives an Object representing a boolean and returns it as a Boolean.
+    If the provided booleanToConvert can not be casted into a Boolean, null is returned and details
+    are logged.
+     */
+    protected static Boolean convertObjectToBoolean(Object booleanToConvert) {
+        try {
+            return (Boolean) booleanToConvert;
+        } catch (ClassCastException exception) {
+            String error_msg = "Encountered a casting error, expected to get an object that can be " +
+                    "casted into a boolean. Received object: " + booleanToConvert;
+            logger.atInfo().withCause(exception).log(error_msg);
+        }
+        return null;
+    }
+
+    /*
+    This function receives an Object and returns it as a HashMap<String, Object>.
+    If the provided mapToConvert can not be casted into a  HashMap<String, Object>, null is returned
+    and details are logged.
+     */
+    protected static HashMap<String, Object> convertObjectToMap(Object mapToConvert) {
+        try {
+            return (HashMap) mapToConvert;
+        } catch (ClassCastException exception) {
+            String error_msg = "Encountered a casting error, expected to get an object that can be " +
+                    "casted into a HashMap<String, Object>. Received object: " + mapToConvert;
+            logger.atInfo().withCause(exception).log(error_msg);
+        }
+        return null;
     }
 }

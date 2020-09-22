@@ -55,9 +55,9 @@ public class InstanceComputeObject extends AssetObject {
             setAssetTypeEnum(AssetType.INSTANCE_COMPUTE_ASSET);
 
             // Set specific asset type fields
-            specificObjectClass.description = (String) assetProperties.get("description");
-            specificObjectClass.canIpForward = (Boolean) assetProperties.get("canIpForward");
-            specificObjectClass.cpuPlatform = (String) assetProperties.get("cpuPlatform");
+            specificObjectClass.description = convertObjectToString(assetProperties.get("description"));
+            specificObjectClass.canIpForward = convertObjectToBoolean(assetProperties.get("canIpForward"));
+            specificObjectClass.cpuPlatform = convertObjectToString(assetProperties.get("cpuPlatform"));
 
             return super.build();
         }
