@@ -1,8 +1,8 @@
-package ResourceDiscovery;
+package com.google.cloudassets.discovery;
 
-import ResourceDiscovery.ProjectObjects.ProjectAssetsMapper;
-import ResourceDiscovery.ProjectObjects.ProjectConfig;
-import ResourceDiscovery.ProjectObjects.ProjectMutationsList;
+import com.google.cloudassets.discovery.projectobjects.ProjectAssetsMapper;
+import com.google.cloudassets.discovery.projectobjects.ProjectConfig;
+import com.google.cloudassets.discovery.projectobjects.ProjectMutationsList;
 import com.google.api.gax.longrunning.OperationFuture;
 import com.google.cloud.spanner.*;
 import com.google.common.flogger.FluentLogger;
@@ -11,8 +11,10 @@ import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
 
-import java.io.FileReader;
+import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -30,7 +32,7 @@ public class Main {
                                                         + "FROM information_schema.tables AS t "
                                                         + "WHERE t.TABLE_NAME like '%Assets'";
 
-    private static final String PROJECTS_ID_FILEPATH = "src/main/resources/ProjectIds.txt";
+    private static final String PROJECTS_ID_FILEPATH = "/ProjectIds.txt";
 
     private static final JSONParser jsonParser = new JSONParser();
     private static final FluentLogger logger = FluentLogger.forEnclosingClass();
@@ -72,7 +74,7 @@ public class Main {
     This function updates in out spanner db all of the assets for all of the relevant projects.
      */
     private static void updateProjectsAssets() throws IOException, ParseException {
-        JSONObject projectJson = (JSONObject) jsonParser.parse(new FileReader(PROJECTS_ID_FILEPATH));
+        JSONObject projectJson = getProjectsJson();
         for (Object key : projectJson.keySet()) {
             String accountId = (String) key;
             String projectId = (String) projectJson.get(key);
@@ -88,6 +90,16 @@ public class Main {
             deleteProjectAssets(accountId, projectId);
             dbClient.write(mutationsToAdd);
         }
+    }
+
+    /*
+    This function retrieves the project ids for which this process should run and returns it as a
+    JSON in which the key is the workspace id and the value is the project id.
+     */
+    private static JSONObject getProjectsJson() throws IOException, ParseException {
+        InputStream in = Main.class.getResourceAsStream(PROJECTS_ID_FILEPATH);
+        BufferedReader reader = new BufferedReader(new InputStreamReader(in));
+        return (JSONObject) jsonParser.parse(reader);
     }
 
     /*
