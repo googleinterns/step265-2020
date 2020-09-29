@@ -10,7 +10,8 @@
     1. Implement an inner Builder class which extends the BaseBuilder with the following functions:
         getSpecificClass, getSpecificClassBuilder, constructor and build.
         
-        <addr> public static class Builder extends BaseBuilder<NewObject, Builder> {
+        ```java 
+                public static class Builder extends BaseBuilder<NewObject, Builder> {
                        /*
                        This function returns a new NewObject.
                         */
@@ -44,7 +45,7 @@
                            return super.build();
                        }
                    }
-        </addr>
+        ```
 1. Add any asset specific fields to the new asset object class you created and make sure to also
 implement public getters for these new fields.
 1. Add a new const to the enum AssetTypes class by the following convention:
@@ -62,7 +63,7 @@ asset attributes which are not covered in the Main_Assets table, and that fine) 
 
 ## Spanner DB Tables:
 ### Adding a new asset table:
-[Please follow the steps as mentioned in the last section above.]()
+Please follow the steps as mentioned in the last section above.
 ### Updating the structure of an existing asset table:
 1. In the AssetTables enum class you should add the relevant fields into the relevant create table query
 1. If you added a new field or removed one (and not only changed its type):
