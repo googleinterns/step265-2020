@@ -1,8 +1,8 @@
-package ResourceDiscovery;
+package com.google.cloudassets.discovery;
 
-import ResourceDiscovery.ProjectObjects.ProjectAssetsMapper;
-import ResourceDiscovery.ProjectObjects.ProjectConfig;
-import ResourceDiscovery.ProjectObjects.ProjectMutationsList;
+import com.google.cloudassets.discovery.projectobjects.ProjectAssetsMapper;
+import com.google.cloudassets.discovery.projectobjects.ProjectConfig;
+import com.google.cloudassets.discovery.projectobjects.ProjectMutationsList;
 import com.google.api.gax.longrunning.OperationFuture;
 import com.google.cloud.spanner.*;
 import com.google.common.flogger.FluentLogger;
@@ -11,8 +11,10 @@ import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
 
-import java.io.FileReader;
+import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -30,7 +32,7 @@ public class Main {
                                                         + "FROM information_schema.tables AS t "
                                                         + "WHERE t.TABLE_NAME like '%Assets'";
 
-    private static final String PROJECTS_ID_FILEPATH = "src/main/resources/ProjectIds.txt";
+    private static final String PROJECTS_ID_FILEPATH = "/ProjectIds.txt";
 
     private static final JSONParser jsonParser = new JSONParser();
     private static final FluentLogger logger = FluentLogger.forEnclosingClass();
@@ -55,7 +57,7 @@ public class Main {
             createTablesIfNotExist();
 
             // Use spanner DatabaseClient
-            updateProjectsAssets();
+            updateAllProjectsAssets();
 
         } catch (ParseException exception) {
             String error_msg = "Encountered an ParseException while parsing " + PROJECTS_ID_FILEPATH;
@@ -71,23 +73,40 @@ public class Main {
     /*
     This function updates in out spanner db all of the assets for all of the relevant projects.
      */
-    private static void updateProjectsAssets() throws IOException, ParseException {
-        JSONObject projectJson = (JSONObject) jsonParser.parse(new FileReader(PROJECTS_ID_FILEPATH));
+    private static void updateAllProjectsAssets() throws IOException, ParseException {
+        JSONObject projectJson = getProjectsJson();
         for (Object key : projectJson.keySet()) {
-            String accountId = (String) key;
+            String workspaceId = (String) key;
             String projectId = (String) projectJson.get(key);
 
-            // Update project config and assets
-            ProjectConfig.getInstance().setNewProject(accountId, projectId);
-            ProjectAssetsMapper projectAssets = new ProjectAssetsMapper();
-            ProjectMutationsList projectMutations = new ProjectMutationsList();
-            List<Mutation> mutationsToAdd = projectMutations.getMutationList(projectAssets.getAllAssets());
-
-            // We prepare the insertion of the new assets before the deletion of the old ones so
-            // that we wont have data loss in case of an error.
-            deleteProjectAssets(accountId, projectId);
-            dbClient.write(mutationsToAdd);
+            updateProjectAssets(workspaceId, projectId);
         }
+    }
+
+    /*
+    This function receives a specific workspace ID & project ID and updates all of its assets information.
+     */
+    private static void updateProjectAssets(String workspaceId, String projectId) {
+        // Update project config and assets
+        ProjectConfig.getInstance().setNewProject(workspaceId, projectId);
+        ProjectAssetsMapper projectAssets = new ProjectAssetsMapper();
+        ProjectMutationsList projectMutations = new ProjectMutationsList();
+        List<Mutation> mutationsToAdd = projectMutations.getMutationList(projectAssets.getAllAssets());
+
+        // We prepare the insertion of the new assets before the deletion of the old ones so
+        // that we wont have data loss in case of an error.
+        deleteProjectAssets(workspaceId, projectId);
+        dbClient.write(mutationsToAdd);
+    }
+
+    /*
+    This function retrieves the project ids for which this process should run and returns it as a
+    JSON in which the key is the workspace id and the value is the project id.
+     */
+    private static JSONObject getProjectsJson() throws IOException, ParseException {
+        InputStream in = Main.class.getResourceAsStream(PROJECTS_ID_FILEPATH);
+        BufferedReader reader = new BufferedReader(new InputStreamReader(in));
+        return (JSONObject) jsonParser.parse(reader);
     }
 
     /*
@@ -95,14 +114,14 @@ public class Main {
     that already existed before this process began to run (no need to delete from tables that were
     just created by this process).
      */
-    private static void deleteProjectAssets(String accountId, String projectId) {
+    private static void deleteProjectAssets(String workspaceId, String projectId) {
         List<Mutation> deleteMutations = new ArrayList<>();
 
         for (AssetTable table : AssetTable.values()) {
             String tableName = table.getTableName();
             // Only delete values from tables that existed before this process ran
             if (existingTableNames.contains(tableName)) {
-                Key projectKey = Key.of(accountId, projectId);
+                Key projectKey = Key.of(workspaceId, projectId);
                 deleteMutations.add(Mutation.delete(tableName, KeySet.range(KeyRange.closedClosed(projectKey, projectKey))));
             }
         }

@@ -1,6 +1,6 @@
-package ResourceDiscovery.AssetObjects;
+package com.google.cloudassets.discovery.assetobjects;
 
-import ResourceDiscovery.AssetType;
+import com.google.cloudassets.discovery.AssetKind;
 
 import java.util.HashMap;
 import java.util.List;
@@ -45,9 +45,8 @@ public class TopicPubSubObject extends AssetObject {
          */
         public TopicPubSubObject build() {
             // Set AssetObject fields
-            setKind(TOPIC_KIND);
+            setKind(AssetKind.TOPIC_PUB_SUB_ASSET);
             setName(assetProperties.get("name"));
-            setAssetTypeEnum(AssetType.TOPIC_PUB_SUB_ASSET);
 
             // Set specific asset type fields
             HashMap<String, Object> messageStoragePolicyMap = convertObjectToMap(assetProperties.get("messageStoragePolicy"));

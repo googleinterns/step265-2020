@@ -1,6 +1,6 @@
-package ResourceDiscovery.AssetObjects;
+package com.google.cloudassets.discovery.assetobjects;
 
-import ResourceDiscovery.AssetType;
+import com.google.cloudassets.discovery.AssetKind;
 
 import java.util.Map;
 import java.lang.String;
@@ -9,8 +9,6 @@ import java.lang.String;
  * The InstanceComputeObject class represents a VM instance asset in Google Cloud Compute.
  */
 public class InstanceComputeObject extends AssetObject {
-    private static final String INSTANCE_KIND = "compute#instance";
-
     private String description;
     private Boolean canIpForward;
     private String cpuPlatform;
@@ -47,14 +45,13 @@ public class InstanceComputeObject extends AssetObject {
          */
         public InstanceComputeObject build() {
             // Set AssetObject fields
-            setKind(INSTANCE_KIND);
+            setKind(AssetKind.INSTANCE_COMPUTE_ASSET);
             setName(assetProperties.get("name"));
             setId(assetProperties.get("id"));
             setType(getLastSeg(assetProperties.get("machineType")));
             setLocation(getLastSeg(assetProperties.get("zone")));
             setCreationTime(convertStringToDate(assetProperties.get("creationTimestamp")));
             setStatus(assetProperties.get("status"));
-            setAssetTypeEnum(AssetType.INSTANCE_COMPUTE_ASSET);
 
             // Set specific asset type fields
             specificObjectClass.description = convertObjectToString(assetProperties.get("description"));

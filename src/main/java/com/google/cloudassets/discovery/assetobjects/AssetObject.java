@@ -1,7 +1,7 @@
-package ResourceDiscovery.AssetObjects;
+package com.google.cloudassets.discovery.assetobjects;
 
-import ResourceDiscovery.AssetType;
-import ResourceDiscovery.ProjectObjects.ProjectConfig;
+import com.google.cloudassets.discovery.AssetKind;
+import com.google.cloudassets.discovery.projectobjects.ProjectConfig;
 import com.google.cloud.Timestamp;
 import com.google.common.flogger.FluentLogger;
 
@@ -22,9 +22,11 @@ import java.util.stream.Collectors;
  */
 abstract public class AssetObject {
     // Asset primary keys
-    public String accountId = ProjectConfig.getInstance().getAccountId();
+    public String workspaceId = ProjectConfig.getInstance().getWorkspaceId();
     public String projectId = ProjectConfig.getInstance().getProjectId();
-    protected String kind;
+    // This field stores an enum representing the specific asset kind, but in the DB it is stored
+    // as a string.
+    protected AssetKind kind;
     protected String name;
 
     // Asset additional data
@@ -33,11 +35,6 @@ abstract public class AssetObject {
     protected String location;
     protected Timestamp creationTime;
     protected String status;
-
-    // This field corresponds with the "kind" field as they both indicate the asset specific type,
-    // the "kind" field is usually provided by the asset api and therefore we needed the
-    // "assetTypeEnum" field as well which is fully in our control and not prone to unexpected changes.
-    protected AssetType assetTypeEnum;
 
     private static final FluentLogger logger = FluentLogger.forEnclosingClass();
     private static final Pattern LAST_SEGMENT_PATTERN = Pattern.compile("/?([^/]*$)");
@@ -63,10 +60,10 @@ abstract public class AssetObject {
         }
 
         /*
-        Set the kind field of this object with the provided string and return its specific Builder.
+        Set the kind field of this object with the provided AssetKind and return its specific Builder.
         */
         public B setKind(Object kind) {
-            specificObjectClass.kind = (String) kind;
+            specificObjectClass.kind = (AssetKind) kind;
             return specificObjectClassBuilder;
         }
 
@@ -119,14 +116,6 @@ abstract public class AssetObject {
         }
 
         /*
-        Set the status assetTypeEnum of this object with the provided enum and return its specific Builder.
-        */
-        public B setAssetTypeEnum(AssetType assetType) {
-            specificObjectClass.assetTypeEnum = assetType;
-            return specificObjectClassBuilder;
-        }
-
-        /*
         This function returns the specific asset object.
          */
         public T build() {
@@ -135,8 +124,8 @@ abstract public class AssetObject {
     }
 
     // AssetObject Class Getters
-    public String getAccountId() {
-        return this.accountId;
+    public String getWorkspaceId() {
+        return this.workspaceId;
     }
 
     public String getProjectId() {
@@ -144,6 +133,10 @@ abstract public class AssetObject {
     }
 
     public String getKind() {
+        return this.kind.toString();
+    }
+
+    public AssetKind getKindEnum() {
         return this.kind;
     }
 
@@ -169,10 +162,6 @@ abstract public class AssetObject {
 
     public String getStatus() {
         return this.status;
-    }
-
-    public AssetType getAssetTypeEnum() {
-        return this.assetTypeEnum;
     }
 
     /*

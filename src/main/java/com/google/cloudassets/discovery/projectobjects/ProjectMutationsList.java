@@ -1,7 +1,7 @@
-package ResourceDiscovery.ProjectObjects;
+package com.google.cloudassets.discovery.projectobjects;
 
-import ResourceDiscovery.AssetObjects.*;
-import ResourceDiscovery.AssetTable;
+import com.google.cloudassets.discovery.assetobjects.*;
+import com.google.cloudassets.discovery.AssetTable;
 import com.google.cloud.spanner.Mutation;
 import com.google.cloud.spanner.Value;
 
@@ -55,7 +55,7 @@ public class ProjectMutationsList {
      */
     private void addSpecificAssetMutation(AssetObject asset) {
         String tableName;
-        switch (asset.getAssetTypeEnum()) {
+        switch (asset.getKindEnum()) {
             case INSTANCE_COMPUTE_ASSET:
                 tableName = AssetTable.INSTANCE_COMPUTE_TABLE.getTableName();
                 InstanceComputeObject instanceComputeObject = (InstanceComputeObject) asset;
@@ -117,7 +117,7 @@ public class ProjectMutationsList {
      */
     private Mutation.WriteBuilder setCommonColumnValues(String tableName, AssetObject asset) {
         return Mutation.newInsertBuilder(tableName)
-                .set("accountId").to(asset.getAccountId())
+                .set("workspaceId").to(asset.getWorkspaceId())
                 .set("projectId").to(asset.getProjectId())
                 .set("kind").to(asset.getKind())
                 .set("assetName").to(asset.getName())

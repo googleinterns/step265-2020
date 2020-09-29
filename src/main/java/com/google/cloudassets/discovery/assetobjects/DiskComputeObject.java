@@ -1,6 +1,6 @@
-package ResourceDiscovery.AssetObjects;
+package com.google.cloudassets.discovery.assetobjects;
 
-import ResourceDiscovery.AssetType;
+import com.google.cloudassets.discovery.AssetKind;
 import com.google.cloud.Timestamp;
 
 import java.util.List;
@@ -10,8 +10,6 @@ import java.util.Map;
  * The DiskComputeObject class represents a disk asset in Google Cloud Compute.
  */
 public class DiskComputeObject extends AssetObject {
-    private static final String DISK_KIND = "compute#disk";
-
     private int diskSizeGb;
     private Timestamp updatedTime;
     private List<String> licenses;
@@ -48,14 +46,13 @@ public class DiskComputeObject extends AssetObject {
          */
         public DiskComputeObject build() {
             // Set AssetObject fields
-            setKind(DISK_KIND);
+            setKind(AssetKind.DISK_COMPUTE_ASSET);
             setName(assetProperties.get("name"));
             setId(assetProperties.get("id"));
             setType(getLastSeg(assetProperties.get("type")));
             setLocation(getLastSeg(assetProperties.get("zone")));
             setCreationTime(convertStringToDate(assetProperties.get("creationTimestamp")));
             setStatus(assetProperties.get("status"));
-            setAssetTypeEnum(AssetType.DISK_COMPUTE_ASSET);
 
             // Set specific asset type fields
             specificObjectClass.diskSizeGb = convertStringToInt(assetProperties.get("sizeGb"));

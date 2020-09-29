@@ -1,6 +1,6 @@
-package ResourceDiscovery.AssetObjects;
+package com.google.cloudassets.discovery.assetobjects;
 
-import ResourceDiscovery.AssetType;
+import com.google.cloudassets.discovery.AssetKind;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -9,8 +9,6 @@ import java.util.Map;
  * The InstanceCloudSqlObject class represents an instance asset in Google Cloud Sql.
  */
 public class InstanceCloudSqlObject extends AssetObject {
-    private static final String INSTANCE_KIND = "sql#instance";
-
     private String etag;
     private int diskSizeGb;
     private Boolean backupEnabled;
@@ -48,12 +46,11 @@ public class InstanceCloudSqlObject extends AssetObject {
          */
         public InstanceCloudSqlObject build() {
             // Set AssetObject fields
-            setKind(INSTANCE_KIND);
+            setKind(AssetKind.INSTANCE_CLOUD_SQL_ASSET);
             setName(assetProperties.get("name"));
             setType(getLastSeg(assetProperties.get("databaseVersion")));
             setLocation(getLastSeg(assetProperties.get("region")));
             setStatus(assetProperties.get("state"));
-            setAssetTypeEnum(AssetType.INSTANCE_CLOUD_SQL_ASSET);
 
             // Set specific asset type fields
             specificObjectClass.etag = (String) assetProperties.get("etag");

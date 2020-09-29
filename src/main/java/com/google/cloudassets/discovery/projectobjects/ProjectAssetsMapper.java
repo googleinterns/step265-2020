@@ -1,9 +1,9 @@
-package ResourceDiscovery.ProjectObjects;
+package com.google.cloudassets.discovery.projectobjects;
 
-import ResourceDiscovery.AssetObjects.AssetObject;
-import ResourceDiscovery.AssetObjectsFactory;
-import ResourceDiscovery.AssetObjectsList;
-import ResourceDiscovery.AssetType;
+import com.google.cloudassets.discovery.assetobjects.AssetObject;
+import com.google.cloudassets.discovery.AssetObjectsFactory;
+import com.google.cloudassets.discovery.AssetObjectsList;
+import com.google.cloudassets.discovery.AssetKind;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.api.client.googleapis.auth.oauth2.GoogleCredential;
@@ -20,7 +20,7 @@ import java.util.Map;
 
 /**
  * The ProjectAssetsMapper class is in charge of getting all of the different assets for the given
- * account ID & project ID.
+ * workspace ID & project ID.
  */
 public class ProjectAssetsMapper {
     private static final String PROJECT_ID_EXP = "{project_id}";
@@ -32,16 +32,16 @@ public class ProjectAssetsMapper {
 
     private static final FluentLogger logger = FluentLogger.forEnclosingClass();
 
-    private String accountId;
+    private String workspaceId;
     private String projectId;
 
 
     /**
-     * The ProjectAssetsMapper constructor initialized the account ID & project ID of this project
+     * The ProjectAssetsMapper constructor initialized the workspace ID & project ID of this project
      * object.
      */
     public ProjectAssetsMapper() {
-        this.accountId = ProjectConfig.getInstance().getAccountId();
+        this.workspaceId = ProjectConfig.getInstance().getWorkspaceId();
         this.projectId = ProjectConfig.getInstance().getProjectId();
     }
 
@@ -67,20 +67,20 @@ public class ProjectAssetsMapper {
     }
 
     /*
-     * This function creates a list of all of the AssetObjects of a given assetType.
+     * This function creates a list of all of the AssetObjects of a given assetKind.
      * @param assetListUrl - a string representing the url of a certain Google Cloud Api asset list
-     * @param assetType - an enum from the AssetTypes representing the relevant asset type that
+     * @param assetKind - an enum from the AssetKind representing the relevant asset type that
      *                    should be listed.
      * @return
      * If an exception is caught, it logs the details to the logger.
      */
     private void getAssetObjectList(List<AssetObject> assetObjectList, String assetListUrl,
-                                           AssetType assetType) {
+                                           AssetKind assetKind) {
         try {
             AssetObjectsList tempAssetObjectsList = jsonMapper.readValue(getHttpInfo(assetListUrl),
                                                                             AssetObjectsList.class);
              for (Map<String,Object> assetProperties : tempAssetObjectsList.getAssetObjectsList()) {
-                AssetObject assetObject = assetObjectFactory.createAssetObject(assetType,
+                AssetObject assetObject = assetObjectFactory.createAssetObject(assetKind,
                                                                                 assetProperties);
                 assetObjectList.add(assetObject);
             }
@@ -141,10 +141,10 @@ public class ProjectAssetsMapper {
                                         .replace(ZONE_NAME_EXP, zone);
 
             String instanceComputeUrl = computeUrl.replace(ASSET_TYPE_EXP, "instances");
-            getAssetObjectList(assetObjectList, instanceComputeUrl, AssetType.INSTANCE_COMPUTE_ASSET);
+            getAssetObjectList(assetObjectList, instanceComputeUrl, AssetKind.INSTANCE_COMPUTE_ASSET);
 
             String diskComputeUrl = computeUrl.replace(ASSET_TYPE_EXP, "disks");
-            getAssetObjectList(assetObjectList, diskComputeUrl, AssetType.DISK_COMPUTE_ASSET);
+            getAssetObjectList(assetObjectList, diskComputeUrl, AssetKind.DISK_COMPUTE_ASSET);
         }
     }
 
@@ -157,10 +157,10 @@ public class ProjectAssetsMapper {
                             ASSET_TYPE_EXP).replace(PROJECT_ID_EXP, projectId);
 
         String topicPubSubUrl = pubSubUrl.replace(ASSET_TYPE_EXP, "topics");
-        getAssetObjectList(assetObjectList, topicPubSubUrl, AssetType.TOPIC_PUB_SUB_ASSET);
+        getAssetObjectList(assetObjectList, topicPubSubUrl, AssetKind.TOPIC_PUB_SUB_ASSET);
 
         String subscriptionPubSubUrl = pubSubUrl.replace(ASSET_TYPE_EXP, "subscriptions");
-        getAssetObjectList(assetObjectList, subscriptionPubSubUrl, AssetType.SUBSCRIPTION_PUB_SUB_ASSET);
+        getAssetObjectList(assetObjectList, subscriptionPubSubUrl, AssetKind.SUBSCRIPTION_PUB_SUB_ASSET);
     }
 
     /*
@@ -172,7 +172,7 @@ public class ProjectAssetsMapper {
                             "?project=" + PROJECT_ID_EXP).replace(PROJECT_ID_EXP, projectId);
 
         String bucketStorageUrl = storageUrl.replace(ASSET_TYPE_EXP, "b");
-        getAssetObjectList(assetObjectList, bucketStorageUrl, AssetType.BUCKET_STORAGE_ASSET);
+        getAssetObjectList(assetObjectList, bucketStorageUrl, AssetKind.BUCKET_STORAGE_ASSET);
     }
 
     /*
@@ -184,6 +184,6 @@ public class ProjectAssetsMapper {
                             PROJECT_ID_EXP + "/" + ASSET_TYPE_EXP).replace(PROJECT_ID_EXP, projectId);
 
         String instanceCloudSqlUrl = cloudSqlUrl.replace(ASSET_TYPE_EXP, "instances");
-        getAssetObjectList(assetObjectList, instanceCloudSqlUrl, AssetType.INSTANCE_CLOUD_SQL_ASSET);
+        getAssetObjectList(assetObjectList, instanceCloudSqlUrl, AssetKind.INSTANCE_CLOUD_SQL_ASSET);
     }
 }

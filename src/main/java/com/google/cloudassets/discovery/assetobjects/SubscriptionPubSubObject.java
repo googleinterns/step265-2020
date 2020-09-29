@@ -1,6 +1,6 @@
-package ResourceDiscovery.AssetObjects;
+package com.google.cloudassets.discovery.assetobjects;
 
-import ResourceDiscovery.AssetType;
+import com.google.cloudassets.discovery.AssetKind;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -9,8 +9,6 @@ import java.util.Map;
  * The SubscriptionPubSubObject class represents the subscription asset in Google Cloud Pub Sub.
  */
 public class SubscriptionPubSubObject extends AssetObject {
-    private static final String SUBSCRIPTION_KIND = "pubsub#subscription";
-
     private String topic;
     private String ttl;
 
@@ -45,9 +43,8 @@ public class SubscriptionPubSubObject extends AssetObject {
          */
         public SubscriptionPubSubObject build() {
             // Set AssetObject fields
-            setKind(SUBSCRIPTION_KIND);
+            setKind(AssetKind.SUBSCRIPTION_PUB_SUB_ASSET);
             setName(assetProperties.get("name"));
-            setAssetTypeEnum(AssetType.SUBSCRIPTION_PUB_SUB_ASSET);
 
             // Set specific asset type fields
             specificObjectClass.topic = convertObjectToString(assetProperties.get("topic"));

@@ -1,6 +1,6 @@
-package ResourceDiscovery.AssetObjects;
+package com.google.cloudassets.discovery.assetobjects;
 
-import ResourceDiscovery.AssetType;
+import com.google.cloudassets.discovery.AssetKind;
 import com.google.cloud.Timestamp;
 
 import java.util.Map;
@@ -9,8 +9,6 @@ import java.util.Map;
  * The BucketStorageObject class represents the bucket asset in Google Cloud Storage.
  */
 public class BucketStorageObject extends AssetObject {
-    private static final String BUCKET_KIND = "storage#bucket";
-
     private String storageClass;
     private Timestamp updatedTime;
 
@@ -46,12 +44,11 @@ public class BucketStorageObject extends AssetObject {
          */
         public BucketStorageObject build() {
             // Set AssetObject fields
-            setKind(BUCKET_KIND);
+            setKind(AssetKind.BUCKET_STORAGE_ASSET);
             setName(assetProperties.get("name"));
             setId(assetProperties.get("id"));
             setLocation(getLastSeg(assetProperties.get("location")));
             setCreationTime(convertStringToDate(assetProperties.get("timeCreated")));
-            setAssetTypeEnum(AssetType.BUCKET_STORAGE_ASSET);
 
             // Set specific asset type fields
             specificObjectClass.storageClass = convertObjectToString(assetProperties.get("storageClass"));
