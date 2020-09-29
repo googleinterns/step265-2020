@@ -5,7 +5,7 @@ package com.google.cloudassets.discovery.projectobjects;
  */
 public class ProjectConfig {
     private static ProjectConfig projectConfigInstance = null;
-    private String accountId;
+    private String workspaceId;
     private String projectId;
 
     /**
@@ -20,21 +20,21 @@ public class ProjectConfig {
     }
 
     /**
-     * This setter function updates the accountId and projectId for the current project.
-     * @param account - a string representing the account id.
+     * This setter function updates the workspaceId and projectId for the current project.
+     * @param workspace - a string representing the workspace id.
      * @param project - a string representing the project id.
      */
-    public void setNewProject(String account, String project) {
-        this.accountId = account;
+    public void setNewProject(String workspace, String project) {
+        this.workspaceId = workspace;
         this.projectId = project;
     }
 
     /**
-     * This getter function returns the accountId for the current project.
-     * @return a string representing the account id.
+     * This getter function returns the workspaceId for the current project.
+     * @return a string representing the workspace id.
      */
-    public String getAccountId() {
-        return this.accountId;
+    public String getWorkspaceId() {
+        return this.workspaceId;
     }
 
     /**

@@ -76,26 +76,26 @@ public class Main {
     private static void updateAllProjectsAssets() throws IOException, ParseException {
         JSONObject projectJson = getProjectsJson();
         for (Object key : projectJson.keySet()) {
-            String accountId = (String) key;
+            String workspaceId = (String) key;
             String projectId = (String) projectJson.get(key);
 
-            updateProjectAssets(accountId, projectId);
+            updateProjectAssets(workspaceId, projectId);
         }
     }
 
     /*
-    This function receives a specific account ID & project ID and updates all of its assets information.
+    This function receives a specific workspace ID & project ID and updates all of its assets information.
      */
-    private static void updateProjectAssets(String accountId, String projectId) {
+    private static void updateProjectAssets(String workspaceId, String projectId) {
         // Update project config and assets
-        ProjectConfig.getInstance().setNewProject(accountId, projectId);
+        ProjectConfig.getInstance().setNewProject(workspaceId, projectId);
         ProjectAssetsMapper projectAssets = new ProjectAssetsMapper();
         ProjectMutationsList projectMutations = new ProjectMutationsList();
         List<Mutation> mutationsToAdd = projectMutations.getMutationList(projectAssets.getAllAssets());
 
         // We prepare the insertion of the new assets before the deletion of the old ones so
         // that we wont have data loss in case of an error.
-        deleteProjectAssets(accountId, projectId);
+        deleteProjectAssets(workspaceId, projectId);
         dbClient.write(mutationsToAdd);
     }
 
@@ -114,14 +114,14 @@ public class Main {
     that already existed before this process began to run (no need to delete from tables that were
     just created by this process).
      */
-    private static void deleteProjectAssets(String accountId, String projectId) {
+    private static void deleteProjectAssets(String workspaceId, String projectId) {
         List<Mutation> deleteMutations = new ArrayList<>();
 
         for (AssetTable table : AssetTable.values()) {
             String tableName = table.getTableName();
             // Only delete values from tables that existed before this process ran
             if (existingTableNames.contains(tableName)) {
-                Key projectKey = Key.of(accountId, projectId);
+                Key projectKey = Key.of(workspaceId, projectId);
                 deleteMutations.add(Mutation.delete(tableName, KeySet.range(KeyRange.closedClosed(projectKey, projectKey))));
             }
         }

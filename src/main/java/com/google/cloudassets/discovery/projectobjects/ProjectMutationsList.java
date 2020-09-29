@@ -8,8 +8,6 @@ import com.google.cloud.spanner.Value;
 import java.util.ArrayList;
 import java.util.List;
 
-import static com.google.cloudassets.discovery.AssetKind.*;
-
 /**
  * The ProjectMutationsList is in charge of converting an AssetObject list (which can be generated
  * from the ProjectAssetsMapper class) into a Mutation list which contains all the assets of a
@@ -119,7 +117,7 @@ public class ProjectMutationsList {
      */
     private Mutation.WriteBuilder setCommonColumnValues(String tableName, AssetObject asset) {
         return Mutation.newInsertBuilder(tableName)
-                .set("accountId").to(asset.getAccountId())
+                .set("workspaceId").to(asset.getWorkspaceId())
                 .set("projectId").to(asset.getProjectId())
                 .set("kind").to(asset.getKind())
                 .set("assetName").to(asset.getName())

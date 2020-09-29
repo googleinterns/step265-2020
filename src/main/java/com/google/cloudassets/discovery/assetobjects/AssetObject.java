@@ -22,7 +22,7 @@ import java.util.stream.Collectors;
  */
 abstract public class AssetObject {
     // Asset primary keys
-    public String accountId = ProjectConfig.getInstance().getAccountId();
+    public String workspaceId = ProjectConfig.getInstance().getWorkspaceId();
     public String projectId = ProjectConfig.getInstance().getProjectId();
     // This field stores an enum representing the specific asset kind, but in the DB it is stored
     // as a string.
@@ -124,8 +124,8 @@ abstract public class AssetObject {
     }
 
     // AssetObject Class Getters
-    public String getAccountId() {
-        return this.accountId;
+    public String getWorkspaceId() {
+        return this.workspaceId;
     }
 
     public String getProjectId() {

@@ -20,7 +20,7 @@ import java.util.Map;
 
 /**
  * The ProjectAssetsMapper class is in charge of getting all of the different assets for the given
- * account ID & project ID.
+ * workspace ID & project ID.
  */
 public class ProjectAssetsMapper {
     private static final String PROJECT_ID_EXP = "{project_id}";
@@ -32,16 +32,16 @@ public class ProjectAssetsMapper {
 
     private static final FluentLogger logger = FluentLogger.forEnclosingClass();
 
-    private String accountId;
+    private String workspaceId;
     private String projectId;
 
 
     /**
-     * The ProjectAssetsMapper constructor initialized the account ID & project ID of this project
+     * The ProjectAssetsMapper constructor initialized the workspace ID & project ID of this project
      * object.
      */
     public ProjectAssetsMapper() {
-        this.accountId = ProjectConfig.getInstance().getAccountId();
+        this.workspaceId = ProjectConfig.getInstance().getWorkspaceId();
         this.projectId = ProjectConfig.getInstance().getProjectId();
     }
 

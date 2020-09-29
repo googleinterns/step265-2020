@@ -80,7 +80,7 @@ public enum AssetTable {
      */
     private static String getCommonColumnsString(String tblName) {
         return "CREATE TABLE " + tblName + " (" +
-                " accountId STRING(MAX) NOT NULL," +
+                " workspaceId STRING(MAX) NOT NULL," +
                 " projectId STRING(MAX) NOT NULL," +
                 " kind STRING(MAX) NOT NULL," +
                 " assetName STRING(MAX) NOT NULL," +
@@ -92,7 +92,7 @@ public enum AssetTable {
     be used after the statement of last column wanted for the asset table.
      */
     private static String getPrimaryKeysStatementString() {
-        return ") PRIMARY KEY (accountId, projectId, assetName, kind)";
+        return ") PRIMARY KEY (workspaceId, projectId, assetName, kind)";
     }
 
     /*
