@@ -57,7 +57,7 @@ public class Main {
             createTablesIfNotExist();
 
             // Use spanner DatabaseClient
-            updateProjectsAssets();
+            updateAllProjectsAssets();
 
         } catch (ParseException exception) {
             String error_msg = "Encountered an ParseException while parsing " + PROJECTS_ID_FILEPATH;
@@ -73,23 +73,30 @@ public class Main {
     /*
     This function updates in out spanner db all of the assets for all of the relevant projects.
      */
-    private static void updateProjectsAssets() throws IOException, ParseException {
+    private static void updateAllProjectsAssets() throws IOException, ParseException {
         JSONObject projectJson = getProjectsJson();
         for (Object key : projectJson.keySet()) {
             String accountId = (String) key;
             String projectId = (String) projectJson.get(key);
 
-            // Update project config and assets
-            ProjectConfig.getInstance().setNewProject(accountId, projectId);
-            ProjectAssetsMapper projectAssets = new ProjectAssetsMapper();
-            ProjectMutationsList projectMutations = new ProjectMutationsList();
-            List<Mutation> mutationsToAdd = projectMutations.getMutationList(projectAssets.getAllAssets());
-
-            // We prepare the insertion of the new assets before the deletion of the old ones so
-            // that we wont have data loss in case of an error.
-            deleteProjectAssets(accountId, projectId);
-            dbClient.write(mutationsToAdd);
+            updateProjectAssets(accountId, projectId);
         }
+    }
+
+    /*
+    This function receives a specific account ID & project ID and updates all of its assets information.
+     */
+    private static void updateProjectAssets(String accountId, String projectId) {
+        // Update project config and assets
+        ProjectConfig.getInstance().setNewProject(accountId, projectId);
+        ProjectAssetsMapper projectAssets = new ProjectAssetsMapper();
+        ProjectMutationsList projectMutations = new ProjectMutationsList();
+        List<Mutation> mutationsToAdd = projectMutations.getMutationList(projectAssets.getAllAssets());
+
+        // We prepare the insertion of the new assets before the deletion of the old ones so
+        // that we wont have data loss in case of an error.
+        deleteProjectAssets(accountId, projectId);
+        dbClient.write(mutationsToAdd);
     }
 
     /*
