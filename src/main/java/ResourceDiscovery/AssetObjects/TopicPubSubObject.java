@@ -1,9 +1,18 @@
 package ResourceDiscovery.AssetObjects;
 
+import ResourceDiscovery.AssetType;
+
+import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
+/**
+ * The TopicPubSubObject class represents the topic asset in Google Cloud Pub Sub.
+ */
 public class TopicPubSubObject extends AssetObject {
-    private static final String TOPIC_TYPE = "pubsub#topic";
+    private static final String TOPIC_KIND = "pubsub#topic";
+
+    private List<String> allowedPersistenceRegions;
 
     public static class Builder extends BaseBuilder<TopicPubSubObject, TopicPubSubObject.Builder> {
         /*
@@ -22,11 +31,11 @@ public class TopicPubSubObject extends AssetObject {
 
         /**
          * This function returns a Builder object for the TopicPubSubObject class.
-         * @param assetObjectsMap - a Map<String,String> which contains all of the relevant data for
+         * @param assetProperties - a Map<String,String> which contains all of the relevant data for
          *                          this TopicPubSubObject.
          */
-        public Builder(Map<String,String> assetObjectsMap) {
-            super(assetObjectsMap);
+        public Builder(Map<String,Object> assetProperties) {
+            super(assetProperties);
         }
 
         /**
@@ -35,10 +44,19 @@ public class TopicPubSubObject extends AssetObject {
          * @return the newly initialized TopicPubSubObject
          */
         public TopicPubSubObject build() {
-            // set kind manually as this asset does not return it
-            setKind(TOPIC_TYPE);
-            setName(assetObjectsMap.get("name"));
+            // Set AssetObject fields
+            setKind(TOPIC_KIND);
+            setName(assetProperties.get("name"));
+            setAssetTypeEnum(AssetType.TOPIC_PUB_SUB_ASSET);
+
+            // Set specific asset type fields
+            HashMap<String, Object> messageStoragePolicyMap = convertObjectToMap(assetProperties.get("messageStoragePolicy"));
+            specificObjectClass.allowedPersistenceRegions = convertListToLastSegList(messageStoragePolicyMap.get("allowedPersistenceRegions"));
             return super.build();
         }
+    }
+
+    public List<String> getAllowedPersistenceRegions() {
+        return this.allowedPersistenceRegions;
     }
 }

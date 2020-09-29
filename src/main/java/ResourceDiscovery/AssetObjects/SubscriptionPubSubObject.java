@@ -1,9 +1,18 @@
 package ResourceDiscovery.AssetObjects;
 
+import ResourceDiscovery.AssetType;
+
+import java.util.HashMap;
 import java.util.Map;
 
+/**
+ * The SubscriptionPubSubObject class represents the subscription asset in Google Cloud Pub Sub.
+ */
 public class SubscriptionPubSubObject extends AssetObject {
-    private static final String SUBSCRIPTION_TYPE = "pubsub#subscription";
+    private static final String SUBSCRIPTION_KIND = "pubsub#subscription";
+
+    private String topic;
+    private String ttl;
 
     public static class Builder extends BaseBuilder<SubscriptionPubSubObject, SubscriptionPubSubObject.Builder> {
         /*
@@ -22,11 +31,11 @@ public class SubscriptionPubSubObject extends AssetObject {
 
         /**
          * This function returns a Builder object for the SubscriptionPubSubObject class.
-         * @param assetObjectsMap - a Map<String,String> which contains all of the relevant data for
+         * @param assetProperties - a Map<String,String> which contains all of the relevant data for
          *                          this SubscriptionPubSubObject.
          */
-        public Builder(Map<String,String> assetObjectsMap) {
-            super(assetObjectsMap);
+        public Builder(Map<String,Object> assetProperties) {
+            super(assetProperties);
         }
 
         /**
@@ -35,10 +44,24 @@ public class SubscriptionPubSubObject extends AssetObject {
          * @return the newly initialized SubscriptionPubSubObject
          */
         public SubscriptionPubSubObject build() {
-            // set kind manually as this asset does not return it
-            setKind(SUBSCRIPTION_TYPE);
-            setName(assetObjectsMap.get("name"));
+            // Set AssetObject fields
+            setKind(SUBSCRIPTION_KIND);
+            setName(assetProperties.get("name"));
+            setAssetTypeEnum(AssetType.SUBSCRIPTION_PUB_SUB_ASSET);
+
+            // Set specific asset type fields
+            specificObjectClass.topic = convertObjectToString(assetProperties.get("topic"));
+            HashMap<String, Object> expirationPolicyMap = convertObjectToMap(assetProperties.get("expirationPolicy"));
+            specificObjectClass.ttl = convertObjectToString(expirationPolicyMap.get("ttl"));
             return super.build();
         }
+    }
+
+    public String getTopic() {
+        return this.topic;
+    }
+
+    public String getTtl() {
+        return this.ttl;
     }
 }

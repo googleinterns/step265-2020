@@ -1,11 +1,9 @@
 package ResourceDiscovery.ProjectObjects;
 
-
 import ResourceDiscovery.AssetObjects.AssetObject;
 import ResourceDiscovery.AssetObjectsFactory;
 import ResourceDiscovery.AssetObjectsList;
-import ResourceDiscovery.AssetTypes;
-import ResourceDiscovery.SpannerTemplateAssets;
+import ResourceDiscovery.AssetType;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.api.client.googleapis.auth.oauth2.GoogleCredential;
@@ -14,16 +12,17 @@ import com.google.api.client.http.HttpRequest;
 import com.google.api.client.http.HttpRequestFactory;
 import com.google.api.client.http.javanet.NetHttpTransport;
 import com.google.common.flogger.FluentLogger;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
 
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-@Component
-public class ProjectAssetsUpdater {
+/**
+ * The ProjectAssetsMapper class is in charge of getting all of the different assets for the given
+ * account ID & project ID.
+ */
+public class ProjectAssetsMapper {
     private static final String PROJECT_ID_EXP = "{project_id}";
     private static final String ZONE_NAME_EXP = "{zone_name}";
     private static final String ASSET_TYPE_EXP = "{asset_type}";
@@ -36,29 +35,14 @@ public class ProjectAssetsUpdater {
     private String accountId;
     private String projectId;
 
-    @Autowired
-    SpannerTemplateAssets spannerTemplateAssets;
 
     /**
-     * This function creates adds all of the assets of the project to the relevant spanner tables.
+     * The ProjectAssetsMapper constructor initialized the account ID & project ID of this project
+     * object.
      */
-    public void updateAssets() {
-        accountId = ProjectConfig.getInstance().getAccountId();
-        projectId = ProjectConfig.getInstance().getProjectId();
-
-        List<AssetObject> assetObjectList = getAllAssets();
-
-        spannerTemplateAssets.deleteProjectDataFromTable(accountId, projectId);
-
-        for (AssetObject asset : assetObjectList) {
-            try {
-                spannerTemplateAssets.insertAssetToTable(asset);
-            } catch (Exception exception) {
-                String error_msg = "Encountered error while trying to add to spanner the asset: "
-                        + asset.getName() + " of kind: " + asset.getKind();
-                logger.atInfo().withCause(exception).log(error_msg);
-            }
-        }
+    public ProjectAssetsMapper() {
+        this.accountId = ProjectConfig.getInstance().getAccountId();
+        this.projectId = ProjectConfig.getInstance().getProjectId();
     }
 
     /*
@@ -91,13 +75,13 @@ public class ProjectAssetsUpdater {
      * If an exception is caught, it logs the details to the logger.
      */
     private void getAssetObjectList(List<AssetObject> assetObjectList, String assetListUrl,
-                                           AssetTypes assetType) {
+                                           AssetType assetType) {
         try {
             AssetObjectsList tempAssetObjectsList = jsonMapper.readValue(getHttpInfo(assetListUrl),
                                                                             AssetObjectsList.class);
-             for (Map<String, String> assetObjectsMap : tempAssetObjectsList.getAssetObjectsList()) {
+             for (Map<String,Object> assetProperties : tempAssetObjectsList.getAssetObjectsList()) {
                 AssetObject assetObject = assetObjectFactory.createAssetObject(assetType,
-                                                                                assetObjectsMap);
+                                                                                assetProperties);
                 assetObjectList.add(assetObject);
             }
         } catch (IOException exception) {
@@ -157,10 +141,10 @@ public class ProjectAssetsUpdater {
                                         .replace(ZONE_NAME_EXP, zone);
 
             String instanceComputeUrl = computeUrl.replace(ASSET_TYPE_EXP, "instances");
-            getAssetObjectList(assetObjectList, instanceComputeUrl, AssetTypes.INSTANCE_COMPUTE_ASSET);
+            getAssetObjectList(assetObjectList, instanceComputeUrl, AssetType.INSTANCE_COMPUTE_ASSET);
 
             String diskComputeUrl = computeUrl.replace(ASSET_TYPE_EXP, "disks");
-            getAssetObjectList(assetObjectList, diskComputeUrl, AssetTypes.DISK_COMPUTE_ASSET);
+            getAssetObjectList(assetObjectList, diskComputeUrl, AssetType.DISK_COMPUTE_ASSET);
         }
     }
 
@@ -173,10 +157,10 @@ public class ProjectAssetsUpdater {
                             ASSET_TYPE_EXP).replace(PROJECT_ID_EXP, projectId);
 
         String topicPubSubUrl = pubSubUrl.replace(ASSET_TYPE_EXP, "topics");
-        getAssetObjectList(assetObjectList, topicPubSubUrl, AssetTypes.TOPIC_PUB_SUB_ASSET);
+        getAssetObjectList(assetObjectList, topicPubSubUrl, AssetType.TOPIC_PUB_SUB_ASSET);
 
         String subscriptionPubSubUrl = pubSubUrl.replace(ASSET_TYPE_EXP, "subscriptions");
-        getAssetObjectList(assetObjectList, subscriptionPubSubUrl, AssetTypes.SUBSCRIPTION_PUB_SUB_ASSET);
+        getAssetObjectList(assetObjectList, subscriptionPubSubUrl, AssetType.SUBSCRIPTION_PUB_SUB_ASSET);
     }
 
     /*
@@ -188,7 +172,7 @@ public class ProjectAssetsUpdater {
                             "?project=" + PROJECT_ID_EXP).replace(PROJECT_ID_EXP, projectId);
 
         String bucketStorageUrl = storageUrl.replace(ASSET_TYPE_EXP, "b");
-        getAssetObjectList(assetObjectList, bucketStorageUrl, AssetTypes.BUCKET_STORAGE_ASSET);
+        getAssetObjectList(assetObjectList, bucketStorageUrl, AssetType.BUCKET_STORAGE_ASSET);
     }
 
     /*
@@ -200,6 +184,6 @@ public class ProjectAssetsUpdater {
                             PROJECT_ID_EXP + "/" + ASSET_TYPE_EXP).replace(PROJECT_ID_EXP, projectId);
 
         String instanceCloudSqlUrl = cloudSqlUrl.replace(ASSET_TYPE_EXP, "instances");
-        getAssetObjectList(assetObjectList, instanceCloudSqlUrl, AssetTypes.INSTANCE_CLOUD_SQL_ASSET);
+        getAssetObjectList(assetObjectList, instanceCloudSqlUrl, AssetType.INSTANCE_CLOUD_SQL_ASSET);
     }
 }

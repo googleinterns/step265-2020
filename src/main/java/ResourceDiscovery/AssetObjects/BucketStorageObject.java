@@ -1,8 +1,19 @@
 package ResourceDiscovery.AssetObjects;
 
+import ResourceDiscovery.AssetType;
+import com.google.cloud.Timestamp;
+
 import java.util.Map;
 
+/**
+ * The BucketStorageObject class represents the bucket asset in Google Cloud Storage.
+ */
 public class BucketStorageObject extends AssetObject {
+    private static final String BUCKET_KIND = "storage#bucket";
+
+    private String storageClass;
+    private Timestamp updatedTime;
+
     public static class Builder extends BaseBuilder<BucketStorageObject, BucketStorageObject.Builder> {
         /*
         This function returns a new BucketStorageObject.
@@ -20,26 +31,41 @@ public class BucketStorageObject extends AssetObject {
 
         /**
          * This function returns a Builder object for the BucketStorageObject class.
-         * @param assetObjectsMap - a Map<String,String> which contains all of the relevant data for
+         * @param assetProperties - a Map<String,String> which contains all of the relevant data for
          *                          this BucketStorageObject.
          */
-        public Builder(Map<String,String> assetObjectsMap) {
-            super(assetObjectsMap);
+        public Builder(Map<String,Object> assetProperties) {
+            super(assetProperties);
         }
 
         /**
          * This function sets the relevant fields of the BucketStorageObject.
-         * Fields that should be initialized for this object are: kind, name, id, zone and
+         * Fields that should be initialized for this object are: kind, name, id, location and
          * creationTime.
          * @return the newly initialized BucketStorageObject
          */
         public BucketStorageObject build() {
-            setKind(assetObjectsMap.get("kind"));
-            setName(assetObjectsMap.get("name"));
-            setId(assetObjectsMap.get("id"));
-            setZone(getLastSeg(assetObjectsMap.get("location")));
-            setCreationTime(convertStringToDate(assetObjectsMap.get("timeCreated")));
+            // Set AssetObject fields
+            setKind(BUCKET_KIND);
+            setName(assetProperties.get("name"));
+            setId(assetProperties.get("id"));
+            setLocation(getLastSeg(assetProperties.get("location")));
+            setCreationTime(convertStringToDate(assetProperties.get("timeCreated")));
+            setAssetTypeEnum(AssetType.BUCKET_STORAGE_ASSET);
+
+            // Set specific asset type fields
+            specificObjectClass.storageClass = convertObjectToString(assetProperties.get("storageClass"));
+            specificObjectClass.updatedTime = convertStringToDate(assetProperties.get("updated"));
+
             return super.build();
         }
+    }
+
+    public String getStorageClass() {
+        return this.storageClass;
+    }
+
+    public Timestamp getUpdatedTime() {
+        return this.updatedTime;
     }
 }

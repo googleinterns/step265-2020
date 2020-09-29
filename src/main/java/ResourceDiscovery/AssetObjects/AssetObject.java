@@ -1,49 +1,50 @@
 package ResourceDiscovery.AssetObjects;
 
+import ResourceDiscovery.AssetType;
 import ResourceDiscovery.ProjectObjects.ProjectConfig;
+import com.google.cloud.Timestamp;
 import com.google.common.flogger.FluentLogger;
-import org.springframework.cloud.gcp.data.spanner.core.mapping.Column;
-import org.springframework.cloud.gcp.data.spanner.core.mapping.NotMapped;
-import org.springframework.cloud.gcp.data.spanner.core.mapping.PrimaryKey;
-import org.springframework.cloud.gcp.data.spanner.core.mapping.Table;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
-@Table(name = "Assets")
+/**
+ * The AssetObject class is an abstract class which is the parent of all of the specific asset
+ * object classes. This class provides setters and getters to all of the common fields of the
+ * asset objects. In addition it provides some helper functions for specific type parsing and
+ * conversions which are used in several asset object classes (such as a convertStringToDate function).
+ */
 abstract public class AssetObject {
-    @PrimaryKey(keyOrder = 1)
-    private String accountId = ProjectConfig.getInstance().getAccountId();
-    @PrimaryKey(keyOrder = 2)
-    private String projectId = ProjectConfig.getInstance().getProjectId();
-    // We are using both the asset name and kind in order to ensure uniqueness
-    @PrimaryKey(keyOrder = 4)
+    // Asset primary keys
+    public String accountId = ProjectConfig.getInstance().getAccountId();
+    public String projectId = ProjectConfig.getInstance().getProjectId();
     protected String kind;
-    @PrimaryKey(keyOrder = 3)
-    @Column(name = "assetName")
     protected String name;
 
-    @Column(name = "assetId")
+    // Asset additional data
     protected String id;
-    @Column(name = "assetType")
     protected String type;
-    protected String zone;
-    protected Date creationTime;
+    protected String location;
+    protected Timestamp creationTime;
     protected String status;
 
-    @NotMapped
+    // This field corresponds with the "kind" field as they both indicate the asset specific type,
+    // the "kind" field is usually provided by the asset api and therefore we needed the
+    // "assetTypeEnum" field as well which is fully in our control and not prone to unexpected changes.
+    protected AssetType assetTypeEnum;
+
     private static final FluentLogger logger = FluentLogger.forEnclosingClass();
-    @NotMapped
-    private static final Pattern LAST_SEGMENT_PATTERN = Pattern.compile(".*/");
-    @NotMapped
+    private static final Pattern LAST_SEGMENT_PATTERN = Pattern.compile("/?([^/]*$)");
     private static final SimpleDateFormat DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
 
     protected abstract static class BaseBuilder<T extends AssetObject, B extends BaseBuilder> {
-        protected Map<String,String> assetObjectsMap;
+        protected Map<String,Object> assetProperties;
         protected T specificObjectClass;
         protected B specificObjectClassBuilder;
 
@@ -55,56 +56,56 @@ abstract public class AssetObject {
          * object.
          * @param assetMap - a Map<String,String> of the relevant asset properties.
          */
-        protected BaseBuilder(Map<String,String> assetMap) {
+        protected BaseBuilder(Map<String,Object> assetMap) {
             specificObjectClass = getSpecificClass();
             specificObjectClassBuilder = getSpecificClassBuilder();
-            assetObjectsMap = assetMap;
+            assetProperties = assetMap;
         }
 
         /*
         Set the kind field of this object with the provided string and return its specific Builder.
         */
-        public B setKind(String kind) {
-            specificObjectClass.kind = kind;
+        public B setKind(Object kind) {
+            specificObjectClass.kind = (String) kind;
             return specificObjectClassBuilder;
         }
 
         /*
         Set the name field of this object with the provided string and return its specific Builder.
         */
-        public B setName(String name) {
-            specificObjectClass.name = name;
+        public B setName(Object name) {
+            specificObjectClass.name = (String) name;
             return specificObjectClassBuilder;
         }
 
         /*
         Set the id field of this object with the provided string and return its specific Builder.
         */
-        public B setId(String id) {
-            specificObjectClass.id = id;
+        public B setId(Object id) {
+            specificObjectClass.id = (String) id;
             return specificObjectClassBuilder;
         }
 
         /*
         Set the type field of this object with the provided string and return its specific Builder.
         */
-        public B setType(String type) {
-            specificObjectClass.type = type;
+        public B setType(Object type) {
+            specificObjectClass.type = (String) type;
             return specificObjectClassBuilder;
         }
 
         /*
-        Set the zone field of this object with the provided string and return its specific Builder.
+        Set the location field of this object with the provided string and return its specific Builder.
         */
-        public B setZone(String zone) {
-            specificObjectClass.zone = zone;
+        public B setLocation(Object location) {
+            specificObjectClass.location = (String) location;
             return specificObjectClassBuilder;
         }
 
         /*
         Set the creationTime field of this object with the provided string and return its specific Builder.
         */
-        public B setCreationTime(Date creationTime) {
+        public B setCreationTime(Timestamp creationTime) {
             specificObjectClass.creationTime = creationTime;
             return specificObjectClassBuilder;
         }
@@ -112,8 +113,16 @@ abstract public class AssetObject {
         /*
         Set the status field of this object with the provided string and return its specific Builder.
         */
-        public B setStatus(String status) {
-            specificObjectClass.status = status;
+        public B setStatus(Object status) {
+            specificObjectClass.status = (String) status;
+            return specificObjectClassBuilder;
+        }
+
+        /*
+        Set the status assetTypeEnum of this object with the provided enum and return its specific Builder.
+        */
+        public B setAssetTypeEnum(AssetType assetType) {
+            specificObjectClass.assetTypeEnum = assetType;
             return specificObjectClassBuilder;
         }
 
@@ -126,60 +135,44 @@ abstract public class AssetObject {
     }
 
     // AssetObject Class Getters
-    /**
-     * Get the kind field of this object (the kind of Google Cloud Asset).
-     * @return A string representing the kind of this Asset Object.
-     */
+    public String getAccountId() {
+        return this.accountId;
+    }
+
+    public String getProjectId() {
+        return this.projectId;
+    }
+
     public String getKind() {
         return this.kind;
     }
 
-    /**
-     * Get the name field of this object.
-     * @return A string representing the name of this Asset Object.
-     */
     public String getName() {
         return this.name;
     }
 
-    /**
-     * Get the id field of this object.
-     * @return A string representing the id of this Asset Object.
-     */
     public String getId() {
         return this.id;
     }
 
-    /**
-     * Get the type field of this object.
-     * @return A string representing the type of this Asset Object.
-     */
     public String getType() {
         return this.type;
     }
 
-    /**
-     * Get the zone field of this object.
-     * @return A string representing the zone of this Asset Object.
-     */
-    public String getZone() {
-        return this.zone;
+    public String getLocation() {
+        return this.location;
     }
 
-    /**
-     * Get the creationTime field of this object.
-     * @return A Date object representing the creation time of this Asset Object.
-     */
-    public Date getCreationTime() {
+    public Timestamp getCreationTime() {
         return this.creationTime;
     }
 
-    /**
-     * Get the status field of this object.
-     * @return A string representing the status of this Asset Object.
-     */
     public String getStatus() {
         return this.status;
+    }
+
+    public AssetType getAssetTypeEnum() {
+        return this.assetTypeEnum;
     }
 
     /*
@@ -187,12 +180,36 @@ abstract public class AssetObject {
      * char in the url.
      * If the provided string does not match that pattern the original string is returned.
      */
-    protected static String getLastSeg(String url) {
-        Matcher matcher = LAST_SEGMENT_PATTERN.matcher(url);
-        if (matcher.find()) {
-            return matcher.replaceAll("");
+    protected static String getLastSeg(Object url) {
+        try {
+            String urlToParse = (String) url;
+            Matcher matcher = LAST_SEGMENT_PATTERN.matcher(urlToParse);
+            if (matcher.find()) {
+                // Return the grouped part of the regex (not including the last "/" char)
+                return matcher.group(1);
+            }
+        } catch (ClassCastException exception) {
+            String error_msg = "Encountered a casting error, expected to get an object that can be " +
+                    "casted into a string. Received object: " + url;
+            logger.atInfo().withCause(exception).log(error_msg);
         }
-        return url;
+        return null;
+    }
+
+    /*
+     * This function receives a list of strings representing urls and returns a list of strings
+     * with the last segment for each url.
+     */
+    protected static List<String> convertListToLastSegList(Object urlsObject) {
+        try {
+            List<String> urlsList = (List<String>) urlsObject;
+            return urlsList.stream().map(AssetObject::getLastSeg).collect(Collectors.toList());
+        } catch (ClassCastException exception) {
+            String error_msg = "Encountered a casting error, expected to get an object that can be " +
+                    "casted into a list of strings. Received object: " + urlsObject;
+            logger.atInfo().withCause(exception).log(error_msg);
+        }
+        return null;
     }
 
     /*
@@ -200,12 +217,83 @@ abstract public class AssetObject {
     The provided dateString should be in the following format: yyyy-MM-ddTHH:mm:ss
     If the provided dateString does not match this format null is returned and details are logged.
      */
-    protected static Date convertStringToDate(String dateString) {
+    protected static Timestamp convertStringToDate(Object dateString) {
         try {
-            return DATE_FORMAT.parse(dateString);
+            return Timestamp.of(DATE_FORMAT.parse((String) dateString));
         } catch (ParseException exception) {
             String error_msg = "Encountered a date parsing error. Dates should be in " +
                                 "yyyy-MM-ddTHH:mm:ss format, provided date: " + dateString;
+            logger.atInfo().withCause(exception).log(error_msg);
+        } catch (ClassCastException exception) {
+            String error_msg = "Encountered a casting error, expected to get an object that can be " +
+                    "casted into a string. Received object: " + dateString;
+            logger.atInfo().withCause(exception).log(error_msg);
+        }
+        return null;
+    }
+
+    /*
+    This function receives a string representing an int and returns it as an Integer.
+    If the provided intString does not match this format null is returned and details are logged.
+     */
+    protected static Integer convertStringToInt(Object intString) {
+        try {
+            return Integer.valueOf((String) intString);
+        } catch (ClassCastException exception) {
+            String error_msg = "Encountered a casting error, expected to get an object that can be " +
+                                "casted into a string. Received object: " + intString;
+            logger.atInfo().withCause(exception).log(error_msg);
+        } catch (NumberFormatException exception) {
+            String error_msg = "Encountered a formatting error, expected to get an object that can be " +
+                                "casted into an Integer. Received object: " + intString;
+            logger.atInfo().withCause(exception).log(error_msg);
+        }
+        return null;
+    }
+
+    /*
+    This function receives an Object representing a string and returns it as a String.
+    If the provided stringToConvert can not be casted into a String, null is returned and details
+    are logged.
+     */
+    protected static String convertObjectToString(Object stringToConvert) {
+        try {
+            return (String) stringToConvert;
+        } catch (ClassCastException exception) {
+            String error_msg = "Encountered a casting error, expected to get an object that can be " +
+                    "casted into a string. Received object: " + stringToConvert;
+            logger.atInfo().withCause(exception).log(error_msg);
+        }
+        return null;
+    }
+
+    /*
+    This function receives an Object representing a boolean and returns it as a Boolean.
+    If the provided booleanToConvert can not be casted into a Boolean, null is returned and details
+    are logged.
+     */
+    protected static Boolean convertObjectToBoolean(Object booleanToConvert) {
+        try {
+            return (Boolean) booleanToConvert;
+        } catch (ClassCastException exception) {
+            String error_msg = "Encountered a casting error, expected to get an object that can be " +
+                    "casted into a boolean. Received object: " + booleanToConvert;
+            logger.atInfo().withCause(exception).log(error_msg);
+        }
+        return null;
+    }
+
+    /*
+    This function receives an Object and returns it as a HashMap<String, Object>.
+    If the provided mapToConvert can not be casted into a  HashMap<String, Object>, null is returned
+    and details are logged.
+     */
+    protected static HashMap<String, Object> convertObjectToMap(Object mapToConvert) {
+        try {
+            return (HashMap<String, Object>) mapToConvert;
+        } catch (ClassCastException exception) {
+            String error_msg = "Encountered a casting error, expected to get an object that can be " +
+                    "casted into a HashMap<String, Object>. Received object: " + mapToConvert;
             logger.atInfo().withCause(exception).log(error_msg);
         }
         return null;

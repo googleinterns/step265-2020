@@ -1,8 +1,20 @@
 package ResourceDiscovery.AssetObjects;
 
-import java.util.Map;
+import ResourceDiscovery.AssetType;
 
+import java.util.Map;
+import java.lang.String;
+
+/**
+ * The InstanceComputeObject class represents a VM instance asset in Google Cloud Compute.
+ */
 public class InstanceComputeObject extends AssetObject {
+    private static final String INSTANCE_KIND = "compute#instance";
+
+    private String description;
+    private Boolean canIpForward;
+    private String cpuPlatform;
+
     public static class Builder extends BaseBuilder<InstanceComputeObject, Builder> {
         /*
         This function returns a new InstanceComputeObject.
@@ -20,28 +32,48 @@ public class InstanceComputeObject extends AssetObject {
 
         /**
          * This function returns a Builder object for the InstanceComputeObject class.
-         * @param assetObjectsMap - a Map<String,String> which contains all of the relevant data for
+         * @param assetProperties - a Map<String,String> which contains all of the relevant data for
          *                          this InstanceComputeObject.
          */
-        public Builder(Map<String,String> assetObjectsMap) {
-            super(assetObjectsMap);
+        public Builder(Map<String,Object> assetProperties) {
+            super(assetProperties);
         }
 
         /**
          * This function sets the relevant fields of the InstanceComputeObject.
-         * Fields that should be initialized for this object are: kind, name, id, type, zone,
+         * Fields that should be initialized for this object are: kind, name, id, type, location,
          * creationTime and status.
          * @return the newly initialized InstanceComputeObject
          */
         public InstanceComputeObject build() {
-            setKind(assetObjectsMap.get("kind"));
-            setName(assetObjectsMap.get("name"));
-            setId(assetObjectsMap.get("id"));
-            setType(getLastSeg(assetObjectsMap.get("machineType")));
-            setZone(getLastSeg(assetObjectsMap.get("zone")));
-            setCreationTime(convertStringToDate(assetObjectsMap.get("creationTimestamp")));
-            setStatus(assetObjectsMap.get("status"));
+            // Set AssetObject fields
+            setKind(INSTANCE_KIND);
+            setName(assetProperties.get("name"));
+            setId(assetProperties.get("id"));
+            setType(getLastSeg(assetProperties.get("machineType")));
+            setLocation(getLastSeg(assetProperties.get("zone")));
+            setCreationTime(convertStringToDate(assetProperties.get("creationTimestamp")));
+            setStatus(assetProperties.get("status"));
+            setAssetTypeEnum(AssetType.INSTANCE_COMPUTE_ASSET);
+
+            // Set specific asset type fields
+            specificObjectClass.description = convertObjectToString(assetProperties.get("description"));
+            specificObjectClass.canIpForward = convertObjectToBoolean(assetProperties.get("canIpForward"));
+            specificObjectClass.cpuPlatform = convertObjectToString(assetProperties.get("cpuPlatform"));
+
             return super.build();
         }
+    }
+
+    public String getDescription() {
+        return this.description;
+    }
+
+    public Boolean getCanIpForward() {
+        return this.canIpForward;
+    }
+
+    public String getCpuPlatform() {
+        return this.cpuPlatform;
     }
 }
