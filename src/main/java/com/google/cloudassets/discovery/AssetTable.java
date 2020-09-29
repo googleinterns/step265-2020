@@ -1,4 +1,4 @@
-package ResourceDiscovery;
+package com.google.cloudassets.discovery;
 
 /**
  * This enum class contains all of the tables that should be created for this project together with

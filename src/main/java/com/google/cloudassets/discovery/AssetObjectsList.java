@@ -1,4 +1,4 @@
-package ResourceDiscovery;
+package com.google.cloudassets.discovery;
 
 import com.fasterxml.jackson.annotation.JsonAlias;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;

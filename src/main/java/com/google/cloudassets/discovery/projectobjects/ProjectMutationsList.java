@@ -1,7 +1,7 @@
-package ResourceDiscovery.ProjectObjects;
+package com.google.cloudassets.discovery.projectobjects;
 
-import ResourceDiscovery.AssetObjects.*;
-import ResourceDiscovery.AssetTable;
+import com.google.cloudassets.discovery.assetobjects.*;
+import com.google.cloudassets.discovery.AssetTable;
 import com.google.cloud.spanner.Mutation;
 import com.google.cloud.spanner.Value;
 

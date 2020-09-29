@@ -1,7 +1,7 @@
-package ResourceDiscovery.AssetObjects;
+package com.google.cloudassets.discovery.assetobjects;
 
-import ResourceDiscovery.AssetType;
-import ResourceDiscovery.ProjectObjects.ProjectConfig;
+import com.google.cloudassets.discovery.AssetType;
+import com.google.cloudassets.discovery.projectobjects.ProjectConfig;
 import com.google.cloud.Timestamp;
 import com.google.common.flogger.FluentLogger;
 

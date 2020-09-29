@@ -1,9 +1,9 @@
-package ResourceDiscovery.ProjectObjects;
+package com.google.cloudassets.discovery.projectobjects;
 
-import ResourceDiscovery.AssetObjects.AssetObject;
-import ResourceDiscovery.AssetObjectsFactory;
-import ResourceDiscovery.AssetObjectsList;
-import ResourceDiscovery.AssetType;
+import com.google.cloudassets.discovery.assetobjects.AssetObject;
+import com.google.cloudassets.discovery.AssetObjectsFactory;
+import com.google.cloudassets.discovery.AssetObjectsList;
+import com.google.cloudassets.discovery.AssetType;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.api.client.googleapis.auth.oauth2.GoogleCredential;

@@ -1,4 +1,4 @@
-package ResourceDiscovery;
+package com.google.cloudassets.discovery;
 
 public enum AssetType {
     INSTANCE_COMPUTE_ASSET,

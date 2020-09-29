@@ -1,6 +1,6 @@
-package ResourceDiscovery.AssetObjects;
+package com.google.cloudassets.discovery.assetobjects;
 
-import ResourceDiscovery.AssetType;
+import com.google.cloudassets.discovery.AssetType;
 import com.google.cloud.Timestamp;
 
 import java.util.Map;

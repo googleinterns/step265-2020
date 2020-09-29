@@ -1,6 +1,6 @@
-package ResourceDiscovery;
+package com.google.cloudassets.discovery;
 
-import ResourceDiscovery.AssetObjects.*;
+import com.google.cloudassets.discovery.assetobjects.*;
 
 import java.util.Map;
 

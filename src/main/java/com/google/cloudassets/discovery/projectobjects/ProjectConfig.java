@@ -1,4 +1,4 @@
-package ResourceDiscovery.ProjectObjects;
+package com.google.cloudassets.discovery.projectobjects;
 
 /**
  * The ProjectConfig class provides setters and getters for a certain project configurations.
