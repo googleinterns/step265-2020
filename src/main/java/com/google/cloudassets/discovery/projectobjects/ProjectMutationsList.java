@@ -8,6 +8,8 @@ import com.google.cloud.spanner.Value;
 import java.util.ArrayList;
 import java.util.List;
 
+import static com.google.cloudassets.discovery.AssetKind.*;
+
 /**
  * The ProjectMutationsList is in charge of converting an AssetObject list (which can be generated
  * from the ProjectAssetsMapper class) into a Mutation list which contains all the assets of a
@@ -55,7 +57,7 @@ public class ProjectMutationsList {
      */
     private void addSpecificAssetMutation(AssetObject asset) {
         String tableName;
-        switch (asset.getAssetTypeEnum()) {
+        switch (asset.getKindEnum()) {
             case INSTANCE_COMPUTE_ASSET:
                 tableName = AssetTable.INSTANCE_COMPUTE_TABLE.getTableName();
                 InstanceComputeObject instanceComputeObject = (InstanceComputeObject) asset;

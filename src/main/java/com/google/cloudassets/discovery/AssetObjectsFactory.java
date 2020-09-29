@@ -5,18 +5,18 @@ import com.google.cloudassets.discovery.assetobjects.*;
 import java.util.Map;
 
 /**
- * The AssetObjectsFactory is in charge of creating a specific AssetObject based on its assetType.
+ * The AssetObjectsFactory is in charge of creating a specific AssetObject based on its AssetKind.
  */
 public class AssetObjectsFactory {
     /**
-     * This function is in charge of creating a specific AssetObject based on the provided assetTypeEnum
+     * This function is in charge of creating a specific AssetObject based on the provided assetKind
      * from the provided assetProperties.
-     * @param assetTypeEnum - an enum which indicates which type of AssetObject should be created.
+     * @param assetKind - an enum which indicates which type of AssetObject should be created.
      * @param assetProperties - A map which contains the attributes of the AssetObject to be created.
      * @return an object of one of the classes the extends the AssetObject class.
      */
-    public AssetObject createAssetObject(AssetType assetTypeEnum, Map<String, Object> assetProperties) {
-        switch (assetTypeEnum) {
+    public AssetObject createAssetObject(AssetKind assetKind, Map<String, Object> assetProperties) {
+        switch (assetKind) {
             case INSTANCE_COMPUTE_ASSET:
                 return new InstanceComputeObject.Builder(assetProperties).build();
             case DISK_COMPUTE_ASSET:

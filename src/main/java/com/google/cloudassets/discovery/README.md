@@ -6,11 +6,7 @@
     1. Extend the abstract AssetObject class (which will provide your asset with the following 
        fields: kind, name, id, type, location, creationTime and status).
     1. **Important** - the name and kind fields most have valid data as they are part of the primary 
-        keys in the assets tables. The kind attribute should be added manually (as it does not exist 
-        for all of the asset types and we relay on its values in several places so we don't want it 
-        to be changed unexpectedly). If a "kind" field exists for a given asset you can use that value, 
-        otherwise follow this convention:  
-        {GENERAL_ASSET_TYPE}#{SPECIFIC_ASSET_TYPE} (for example: compute#disk) 
+        keys in the assets tables.
     1. Implement an inner Builder class which extends the BaseBuilder with the following functions:
         getSpecificClass, getSpecificClassBuilder, constructor and build.
         
@@ -52,14 +48,20 @@
         ```
 1. Add any asset specific fields to the new asset object class you created and make sure to also
 implement public getters for these new fields.
-1. Add a new const to the enum AssetTypes class by the following convention:
-    {SPECIFIC_ASSET_TYPE}_{GENERAL_ASSET_TYPE}_ASSET (for example: DISK_COMPUTE_ASSET)
+1. Add a new const to the enum AssetKind class by the following convention:
+    {SPECIFIC_ASSET_KIND}_{GENERAL_ASSET_KIND}_ASSET (for example: DISK_COMPUTE_ASSET)
+    * The 'kind' attribute of the asset objects is added from this enum class. It is provided upon
+    the enum initialization and should follow this convention:
+        {GENERAL_ASSET_KIND}#{SPECIFIC_ASSET_KIND} (for example: compute#disk)
+    Please note that some of the assets have a 'kind' attribute and if so it can be used to set the
+    kind for a new asset we support.
+           
 1. Add its creation to the AssetObjectsFactory (to the createAssetObject function).
 1. Add its creation to the getAllAssets function in the ProjectAssetsMapper class.
 1. Add a relevant asset table in the spanner db if needed (sometimes there aren't any new interesting
 asset attributes which are not covered in the Main_Assets table, and that fine) by following these steps:
     1. In the AssetTables enum class add a new enum by the following convention:
-    {SPECIFIC_ASSET_TYPE}_{GENERAL_ASSET_TYPE}_TABLE (for example: DISK_COMPUTE_TABLE)
+    {SPECIFIC_ASSET_KIND}_{GENERAL_ASSET_KIND}_TABLE (for example: DISK_COMPUTE_TABLE)
     Initialize it with the table name and a create table query (please use the provided helper
     functions whenever possible).
     1. In the ProjectMutationsList class you should add a new case statement in the addSpecificAssetMutation
@@ -71,7 +73,7 @@ Please follow the steps as mentioned in the last section above.
 ### Updating the structure of an existing asset table:
 1. In the AssetTables enum class you should add the relevant fields into the relevant create table query
 1. If you added a new field or removed one (and not only changed its type):
-    1. In the specific asset type class (in the ResourceDiscovery.AssetObjects package) you should:
+    1. In the specific asset kind class (in the ResourceDiscovery.AssetObjects package) you should:
         1. add/remove the field
         1. add/remove its value setting from the Builder.build() function
         1. add a getter function
