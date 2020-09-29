@@ -9,7 +9,7 @@ import java.util.Map;
  * The SubscriptionPubSubObject class represents the subscription asset in Google Cloud Pub Sub.
  */
 public class SubscriptionPubSubObject extends AssetObject {
-    private static final String SUBSCRIPTION_TYPE = "pubsub#subscription";
+    private static final String SUBSCRIPTION_KIND = "pubsub#subscription";
 
     private String topic;
     private String ttl;
@@ -45,8 +45,7 @@ public class SubscriptionPubSubObject extends AssetObject {
          */
         public SubscriptionPubSubObject build() {
             // Set AssetObject fields
-            // Set kind field manually as this asset does not return it
-            setKind(SUBSCRIPTION_TYPE);
+            setKind(SUBSCRIPTION_KIND);
             setName(assetProperties.get("name"));
             setAssetTypeEnum(AssetType.SUBSCRIPTION_PUB_SUB_ASSET);
 

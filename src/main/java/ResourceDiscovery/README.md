@@ -6,7 +6,11 @@
     1. Extend the abstract AssetObject class (which will provide your asset with the following 
        fields: kind, name, id, type, location, creationTime and status).
     1. **Important** - the name and kind fields most have valid data as they are part of the primary 
-        keys in the assets tables. If there is no kind attribute you can add it based on the asset type. 
+        keys in the assets tables. The kind attribute should be added manually (as it does not exist 
+        for all of the asset types and we relay on its values in several places so we don't want it 
+        to be changed unexpectedly). If a "kind" field exists for a given asset you can use that value, 
+        otherwise follow this convention:  
+        {GENERAL_ASSET_TYPE}#{SPECIFIC_ASSET_TYPE} (for example: compute#disk) 
     1. Implement an inner Builder class which extends the BaseBuilder with the following functions:
         getSpecificClass, getSpecificClassBuilder, constructor and build.
         

@@ -9,6 +9,8 @@ import java.util.Map;
  * The InstanceCloudSqlObject class represents an instance asset in Google Cloud Sql.
  */
 public class InstanceCloudSqlObject extends AssetObject {
+    private static final String INSTANCE_KIND = "sql#instance";
+
     private String etag;
     private int diskSizeGb;
     private Boolean backupEnabled;
@@ -46,7 +48,7 @@ public class InstanceCloudSqlObject extends AssetObject {
          */
         public InstanceCloudSqlObject build() {
             // Set AssetObject fields
-            setKind(assetProperties.get("kind"));
+            setKind(INSTANCE_KIND);
             setName(assetProperties.get("name"));
             setType(getLastSeg(assetProperties.get("databaseVersion")));
             setLocation(getLastSeg(assetProperties.get("region")));

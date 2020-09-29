@@ -9,6 +9,8 @@ import java.lang.String;
  * The InstanceComputeObject class represents a VM instance asset in Google Cloud Compute.
  */
 public class InstanceComputeObject extends AssetObject {
+    private static final String INSTANCE_KIND = "compute#instance";
+
     private String description;
     private Boolean canIpForward;
     private String cpuPlatform;
@@ -45,7 +47,7 @@ public class InstanceComputeObject extends AssetObject {
          */
         public InstanceComputeObject build() {
             // Set AssetObject fields
-            setKind(assetProperties.get("kind"));
+            setKind(INSTANCE_KIND);
             setName(assetProperties.get("name"));
             setId(assetProperties.get("id"));
             setType(getLastSeg(assetProperties.get("machineType")));

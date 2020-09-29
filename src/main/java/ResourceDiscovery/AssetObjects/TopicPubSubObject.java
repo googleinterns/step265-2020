@@ -10,7 +10,7 @@ import java.util.Map;
  * The TopicPubSubObject class represents the topic asset in Google Cloud Pub Sub.
  */
 public class TopicPubSubObject extends AssetObject {
-    private static final String TOPIC_TYPE = "pubsub#topic";
+    private static final String TOPIC_KIND = "pubsub#topic";
 
     private List<String> allowedPersistenceRegions;
 
@@ -45,8 +45,7 @@ public class TopicPubSubObject extends AssetObject {
          */
         public TopicPubSubObject build() {
             // Set AssetObject fields
-            // Set kind field manually as this asset does not return it
-            setKind(TOPIC_TYPE);
+            setKind(TOPIC_KIND);
             setName(assetProperties.get("name"));
             setAssetTypeEnum(AssetType.TOPIC_PUB_SUB_ASSET);
 

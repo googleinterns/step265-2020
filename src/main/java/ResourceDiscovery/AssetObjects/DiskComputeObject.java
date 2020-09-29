@@ -10,6 +10,8 @@ import java.util.Map;
  * The DiskComputeObject class represents a disk asset in Google Cloud Compute.
  */
 public class DiskComputeObject extends AssetObject {
+    private static final String DISK_KIND = "compute#disk";
+
     private int diskSizeGb;
     private Timestamp updatedTime;
     private List<String> licenses;
@@ -46,7 +48,7 @@ public class DiskComputeObject extends AssetObject {
          */
         public DiskComputeObject build() {
             // Set AssetObject fields
-            setKind(assetProperties.get("kind"));
+            setKind(DISK_KIND);
             setName(assetProperties.get("name"));
             setId(assetProperties.get("id"));
             setType(getLastSeg(assetProperties.get("type")));

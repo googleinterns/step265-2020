@@ -9,6 +9,8 @@ import java.util.Map;
  * The BucketStorageObject class represents the bucket asset in Google Cloud Storage.
  */
 public class BucketStorageObject extends AssetObject {
+    private static final String BUCKET_KIND = "storage#bucket";
+
     private String storageClass;
     private Timestamp updatedTime;
 
@@ -44,7 +46,7 @@ public class BucketStorageObject extends AssetObject {
          */
         public BucketStorageObject build() {
             // Set AssetObject fields
-            setKind(assetProperties.get("kind"));
+            setKind(BUCKET_KIND);
             setName(assetProperties.get("name"));
             setId(assetProperties.get("id"));
             setLocation(getLastSeg(assetProperties.get("location")));
