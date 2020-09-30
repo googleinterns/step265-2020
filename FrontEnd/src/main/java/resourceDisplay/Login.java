@@ -1,5 +1,6 @@
-package resourceDisplay;
+package configuration;
 
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.http.HttpStatus;
@@ -11,14 +12,32 @@ import org.springframework.security.web.authentication.HttpStatusEntryPoint;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.session.jdbc.config.annotation.web.http.EnableJdbcHttpSession;
+import org.springframework.boot.CommandLineRunner;
+import org.springframework.beans.factory.annotation.Autowired;
 
+import java.util.ArrayList;
 import java.util.Collections;
+import java.util.List;
 import java.util.Map;
 
-@SpringBootApplication
-@EnableJdbcHttpSession
-@RestController
-public class Login extends WebSecurityConfigurerAdapter {
+//@SpringBootApplication
+@EnableJdbcHttpSession(maxInactiveIntervalInSeconds=3600)
+//@RestController
+public class Login extends WebSecurityConfigurerAdapter /*implements CommandLineRunner*/ {
+
+    //@Autowired SpannerRepositorySample spannerRepositorySample;
+/*
+    @GetMapping("/test")
+    public String test(@AuthenticationPrincipal OAuth2User principal) {
+        int i;
+        TestAsset[] testarray = new TestAsset[10];
+
+        for (i = 0; i <=10; i++) {
+            testarray[i].setAccountId(Integer.toString(i)));
+        }
+
+        model.addAttribute("students", students);
+    }
 
     @GetMapping("/user")
     public Map<String, Object> user(@AuthenticationPrincipal OAuth2User principal) {
@@ -26,6 +45,7 @@ public class Login extends WebSecurityConfigurerAdapter {
     }
 
     @GetMapping("/all")
+    //@CrossOrigin(origins = "http://localhost:4200") //for angular
     public Map<String, Object> all(@AuthenticationPrincipal OAuth2User principal) {
         return Collections.singletonMap("name", principal);
     }
@@ -46,6 +66,12 @@ public class Login extends WebSecurityConfigurerAdapter {
         SpringApplication.run(Login.class, args);
     }
 
+
+    public void run(String... args) {
+        //spannerRepositorySample.runRepositoryExample();
+
+    }
+*/
 
     @Override
     protected void configure(HttpSecurity http) throws Exception {

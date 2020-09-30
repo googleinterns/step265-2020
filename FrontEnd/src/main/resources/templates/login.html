@@ -1,4 +1,5 @@
-<!doctype html>
+<!DOCTYPE HTML>
+<html xmlns:th="https://www.thymeleaf.org">
 <html lang="en">
 <head>
     <meta charset="utf-8"/>
@@ -24,6 +25,7 @@
 <div class="container authenticated" style="display:none">
     Logged in as: <span id="user"></span>
 </div>
+
 
 <script type="text/javascript">
     $.get("/user", function(data) {
