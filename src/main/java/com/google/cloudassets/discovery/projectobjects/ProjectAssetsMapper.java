@@ -31,17 +31,14 @@ public class ProjectAssetsMapper {
 
     private static final FluentLogger logger = FluentLogger.forEnclosingClass();
 
-    private String workspaceId;
-    private String projectId;
-
+    private final ProjectConfig projectConfig;
 
     /**
-     * The ProjectAssetsMapper constructor initialized the workspace ID & project ID of this project
-     * object.
+     * The ProjectAssetsMapper constructor initialized the relevant project configurations.
+     * @param config the relevant project configurations.
      */
-    public ProjectAssetsMapper() {
-        this.workspaceId = ProjectConfig.getInstance().getWorkspaceId();
-        this.projectId = ProjectConfig.getInstance().getProjectId();
+    public ProjectAssetsMapper(ProjectConfig config) {
+        this.projectConfig = config;
     }
 
     /*
@@ -82,7 +79,8 @@ public class ProjectAssetsMapper {
                                                                             AssetObjectsList.class);
              for (Map<String,Object> assetProperties : tempAssetObjectsList.getAssetObjectsList()) {
                 AssetObject assetObject = assetObjectFactory.createAssetObject(assetKind,
-                                                                                assetProperties);
+                                                                                assetProperties,
+                                                                                projectConfig);
                 assetObjectList.add(assetObject);
             }
         } catch (IOException exception) {
@@ -134,7 +132,7 @@ public class ProjectAssetsMapper {
      */
     private void getAllComputeAssets(List<AssetObject> assetObjectList) {
         String zonesComputeUrl = ("https://compute.googleapis.com/compute/v1/projects/" +
-                                    PROJECT_ID_EXP + "/zones").replace(PROJECT_ID_EXP, projectId);
+                                    PROJECT_ID_EXP + "/zones").replace(PROJECT_ID_EXP, projectConfig.getProjectId());
         List<String> zonesList = getZonesList(zonesComputeUrl);
 
         for (String zone : zonesList) {
@@ -155,7 +153,7 @@ public class ProjectAssetsMapper {
      */
     private void getAllPubSubAssets(List<AssetObject> assetObjectList) {
         String pubSubUrl = ("https://pubsub.googleapis.com/v1/projects/" + PROJECT_ID_EXP + "/" +
-                            ASSET_TYPE_EXP).replace(PROJECT_ID_EXP, projectId);
+                            ASSET_TYPE_EXP).replace(PROJECT_ID_EXP, projectConfig.getProjectId());
 
         String topicPubSubUrl = pubSubUrl.replace(ASSET_TYPE_EXP, "topics");
         getAssetObjectList(assetObjectList, topicPubSubUrl, AssetKind.TOPIC_PUB_SUB_ASSET);
@@ -170,7 +168,7 @@ public class ProjectAssetsMapper {
      */
     private void getAllStorageAssets(List<AssetObject> assetObjectList) {
         String storageUrl = ("https://storage.googleapis.com/storage/v1/" + ASSET_TYPE_EXP +
-                            "?project=" + PROJECT_ID_EXP).replace(PROJECT_ID_EXP, projectId);
+                            "?project=" + PROJECT_ID_EXP).replace(PROJECT_ID_EXP, projectConfig.getProjectId());
 
         String bucketStorageUrl = storageUrl.replace(ASSET_TYPE_EXP, "b");
         getAssetObjectList(assetObjectList, bucketStorageUrl, AssetKind.BUCKET_STORAGE_ASSET);
@@ -182,7 +180,7 @@ public class ProjectAssetsMapper {
      */
     private void getAllCloudSqlAssets(List<AssetObject> assetObjectList) {
         String cloudSqlUrl = ("https://sqladmin.googleapis.com/sql/v1beta4/projects/" +
-                            PROJECT_ID_EXP + "/" + ASSET_TYPE_EXP).replace(PROJECT_ID_EXP, projectId);
+                            PROJECT_ID_EXP + "/" + ASSET_TYPE_EXP).replace(PROJECT_ID_EXP, projectConfig.getProjectId());
 
         String instanceCloudSqlUrl = cloudSqlUrl.replace(ASSET_TYPE_EXP, "instances");
         getAssetObjectList(assetObjectList, instanceCloudSqlUrl, AssetKind.INSTANCE_CLOUD_SQL_ASSET);
