@@ -1,15 +1,14 @@
 package com.google.cloudassets.discovery.projectobjects;
 
+import com.google.api.client.http.*;
+import com.google.auth.http.HttpCredentialsAdapter;
+import com.google.auth.oauth2.GoogleCredentials;
 import com.google.cloudassets.discovery.assetobjects.AssetObject;
 import com.google.cloudassets.discovery.AssetObjectsFactory;
 import com.google.cloudassets.discovery.AssetObjectsList;
 import com.google.cloudassets.discovery.AssetKind;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.google.api.client.googleapis.auth.oauth2.GoogleCredential;
-import com.google.api.client.http.GenericUrl;
-import com.google.api.client.http.HttpRequest;
-import com.google.api.client.http.HttpRequestFactory;
 import com.google.api.client.http.javanet.NetHttpTransport;
 import com.google.common.flogger.FluentLogger;
 
@@ -54,10 +53,12 @@ public class ProjectAssetsMapper {
      */
     private String getHttpInfo(String assetListUrl) {
         try {
-            GoogleCredential credential = GoogleCredential.getApplicationDefault();
-            HttpRequestFactory requestFactory = new NetHttpTransport().createRequestFactory(credential);
+            GoogleCredentials credentials = GoogleCredentials.getApplicationDefault();
+            HttpRequestInitializer requestInitializer = new HttpCredentialsAdapter(credentials);
+            HttpTransport requestFactory = new NetHttpTransport();
 
-            HttpRequest request = requestFactory.buildGetRequest(new GenericUrl(assetListUrl));
+            HttpRequest request = requestFactory.createRequestFactory(requestInitializer)
+                                                .buildGetRequest(new GenericUrl(assetListUrl));
             return request.execute().parseAsString();
         } catch (IOException exception) {
             String error_msg = "Encountered an IOException. Provided url was: " + assetListUrl;
