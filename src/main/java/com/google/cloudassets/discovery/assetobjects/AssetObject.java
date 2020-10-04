@@ -22,8 +22,8 @@ import java.util.stream.Collectors;
  */
 abstract public class AssetObject {
     // Asset primary keys
-    public String workspaceId;
-    public String projectId;
+    protected String workspaceId;
+    protected String projectId;
     // This field stores an enum representing the specific asset kind, but in the DB it is stored
     // as a string.
     protected AssetKind kind;
