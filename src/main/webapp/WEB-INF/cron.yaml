@@ -1,5 +1,0 @@
-cron:
-  - description: "daily asset scraping"
-    url: /requests
-    schedule: every 24 hours
-    target: resource-discovery-backend

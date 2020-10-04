@@ -88,8 +88,7 @@ public class Main {
      */
     private static void updateProjectAssets(String workspaceId, String projectId) {
         // Update project config and assets
-        ProjectConfig.getInstance().setNewProject(workspaceId, projectId);
-        ProjectAssetsMapper projectAssets = new ProjectAssetsMapper();
+        ProjectAssetsMapper projectAssets = new ProjectAssetsMapper(new ProjectConfig(workspaceId, projectId));
         ProjectMutationsList projectMutations = new ProjectMutationsList();
         List<Mutation> mutationsToAdd = projectMutations.getMutationList(projectAssets.getAllAssets());
 

@@ -22,8 +22,8 @@ import java.util.stream.Collectors;
  */
 abstract public class AssetObject {
     // Asset primary keys
-    public String workspaceId = ProjectConfig.getInstance().getWorkspaceId();
-    public String projectId = ProjectConfig.getInstance().getProjectId();
+    protected String workspaceId;
+    protected String projectId;
     // This field stores an enum representing the specific asset kind, but in the DB it is stored
     // as a string.
     protected AssetKind kind;
@@ -52,9 +52,13 @@ abstract public class AssetObject {
          * The constructor of the BaseBuilder class which set the relevant objects for the specific
          * object.
          * @param assetMap - a Map<String,String> of the relevant asset properties.
+         * @param projectConfig - the relevant project configurations for this asset.
          */
-        protected BaseBuilder(Map<String,Object> assetMap) {
+        protected BaseBuilder(Map<String,Object> assetMap, ProjectConfig projectConfig) {
             specificObjectClass = getSpecificClass();
+            specificObjectClass.workspaceId = projectConfig.getWorkspaceId();
+            specificObjectClass.projectId = projectConfig.getProjectId();
+
             specificObjectClassBuilder = getSpecificClassBuilder();
             assetProperties = assetMap;
         }

@@ -1,6 +1,7 @@
 package com.google.cloudassets.discovery.assetobjects;
 
 import com.google.cloudassets.discovery.AssetKind;
+import com.google.cloudassets.discovery.projectobjects.ProjectConfig;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -31,9 +32,10 @@ public class SubscriptionPubSubObject extends AssetObject {
          * This function returns a Builder object for the SubscriptionPubSubObject class.
          * @param assetProperties - a Map<String,String> which contains all of the relevant data for
          *                          this SubscriptionPubSubObject.
+         * @param projectConfig - the relevant project configurations for this asset.
          */
-        public Builder(Map<String,Object> assetProperties) {
-            super(assetProperties);
+        public Builder(Map<String,Object> assetProperties, ProjectConfig projectConfig) {
+            super(assetProperties, projectConfig);
         }
 
         /**

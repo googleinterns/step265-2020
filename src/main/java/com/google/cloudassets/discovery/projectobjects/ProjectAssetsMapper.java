@@ -1,15 +1,17 @@
 package com.google.cloudassets.discovery.projectobjects;
 
+import com.google.api.client.http.GenericUrl;
+import com.google.api.client.http.HttpRequest;
+import com.google.api.client.http.HttpRequestInitializer;
+import com.google.api.client.http.HttpTransport;
+import com.google.auth.http.HttpCredentialsAdapter;
+import com.google.auth.oauth2.GoogleCredentials;
 import com.google.cloudassets.discovery.assetobjects.AssetObject;
 import com.google.cloudassets.discovery.AssetObjectsFactory;
 import com.google.cloudassets.discovery.AssetObjectsList;
 import com.google.cloudassets.discovery.AssetKind;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.google.api.client.googleapis.auth.oauth2.GoogleCredential;
-import com.google.api.client.http.GenericUrl;
-import com.google.api.client.http.HttpRequest;
-import com.google.api.client.http.HttpRequestFactory;
 import com.google.api.client.http.javanet.NetHttpTransport;
 import com.google.common.flogger.FluentLogger;
 
@@ -32,17 +34,14 @@ public class ProjectAssetsMapper {
 
     private static final FluentLogger logger = FluentLogger.forEnclosingClass();
 
-    private String workspaceId;
-    private String projectId;
-
+    private final ProjectConfig projectConfig;
 
     /**
-     * The ProjectAssetsMapper constructor initialized the workspace ID & project ID of this project
-     * object.
+     * The ProjectAssetsMapper constructor initialized the relevant project configurations.
+     * @param config the relevant project configurations.
      */
-    public ProjectAssetsMapper() {
-        this.workspaceId = ProjectConfig.getInstance().getWorkspaceId();
-        this.projectId = ProjectConfig.getInstance().getProjectId();
+    public ProjectAssetsMapper(ProjectConfig config) {
+        this.projectConfig = config;
     }
 
     /*
@@ -54,10 +53,12 @@ public class ProjectAssetsMapper {
      */
     private String getHttpInfo(String assetListUrl) {
         try {
-            GoogleCredential credential = GoogleCredential.getApplicationDefault();
-            HttpRequestFactory requestFactory = new NetHttpTransport().createRequestFactory(credential);
+            GoogleCredentials credentials = GoogleCredentials.getApplicationDefault();
+            HttpRequestInitializer requestInitializer = new HttpCredentialsAdapter(credentials);
+            HttpTransport requestFactory = new NetHttpTransport();
 
-            HttpRequest request = requestFactory.buildGetRequest(new GenericUrl(assetListUrl));
+            HttpRequest request = requestFactory.createRequestFactory(requestInitializer)
+                                                .buildGetRequest(new GenericUrl(assetListUrl));
             return request.execute().parseAsString();
         } catch (IOException exception) {
             String error_msg = "Encountered an IOException. Provided url was: " + assetListUrl;
@@ -81,7 +82,8 @@ public class ProjectAssetsMapper {
                                                                             AssetObjectsList.class);
              for (Map<String,Object> assetProperties : tempAssetObjectsList.getAssetObjectsList()) {
                 AssetObject assetObject = assetObjectFactory.createAssetObject(assetKind,
-                                                                                assetProperties);
+                                                                                assetProperties,
+                                                                                projectConfig);
                 assetObjectList.add(assetObject);
             }
         } catch (IOException exception) {
@@ -133,7 +135,7 @@ public class ProjectAssetsMapper {
      */
     private void getAllComputeAssets(List<AssetObject> assetObjectList) {
         String zonesComputeUrl = ("https://compute.googleapis.com/compute/v1/projects/" +
-                                    PROJECT_ID_EXP + "/zones").replace(PROJECT_ID_EXP, projectId);
+                                    PROJECT_ID_EXP + "/zones").replace(PROJECT_ID_EXP, projectConfig.getProjectId());
         List<String> zonesList = getZonesList(zonesComputeUrl);
 
         for (String zone : zonesList) {
@@ -154,7 +156,7 @@ public class ProjectAssetsMapper {
      */
     private void getAllPubSubAssets(List<AssetObject> assetObjectList) {
         String pubSubUrl = ("https://pubsub.googleapis.com/v1/projects/" + PROJECT_ID_EXP + "/" +
-                            ASSET_TYPE_EXP).replace(PROJECT_ID_EXP, projectId);
+                            ASSET_TYPE_EXP).replace(PROJECT_ID_EXP, projectConfig.getProjectId());
 
         String topicPubSubUrl = pubSubUrl.replace(ASSET_TYPE_EXP, "topics");
         getAssetObjectList(assetObjectList, topicPubSubUrl, AssetKind.TOPIC_PUB_SUB_ASSET);
@@ -169,7 +171,7 @@ public class ProjectAssetsMapper {
      */
     private void getAllStorageAssets(List<AssetObject> assetObjectList) {
         String storageUrl = ("https://storage.googleapis.com/storage/v1/" + ASSET_TYPE_EXP +
-                            "?project=" + PROJECT_ID_EXP).replace(PROJECT_ID_EXP, projectId);
+                            "?project=" + PROJECT_ID_EXP).replace(PROJECT_ID_EXP, projectConfig.getProjectId());
 
         String bucketStorageUrl = storageUrl.replace(ASSET_TYPE_EXP, "b");
         getAssetObjectList(assetObjectList, bucketStorageUrl, AssetKind.BUCKET_STORAGE_ASSET);
@@ -181,7 +183,7 @@ public class ProjectAssetsMapper {
      */
     private void getAllCloudSqlAssets(List<AssetObject> assetObjectList) {
         String cloudSqlUrl = ("https://sqladmin.googleapis.com/sql/v1beta4/projects/" +
-                            PROJECT_ID_EXP + "/" + ASSET_TYPE_EXP).replace(PROJECT_ID_EXP, projectId);
+                            PROJECT_ID_EXP + "/" + ASSET_TYPE_EXP).replace(PROJECT_ID_EXP, projectConfig.getProjectId());
 
         String instanceCloudSqlUrl = cloudSqlUrl.replace(ASSET_TYPE_EXP, "instances");
         getAssetObjectList(assetObjectList, instanceCloudSqlUrl, AssetKind.INSTANCE_CLOUD_SQL_ASSET);

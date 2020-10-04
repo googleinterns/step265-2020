@@ -30,9 +30,10 @@
                         * This function returns a Builder object for the NewObject class.
                         * @param assetProperties - a Map<String,String> which contains all of the relevant data for
                         *                          this NewObject.
+                        * @param projectConfig - the relevant project configurations for this asset.   
                         */
-                       public Builder(Map<String,String> assetProperties) {
-                           super(assetProperties);
+                       public Builder(Map<String,String> assetProperties, ProjectConfig projectConfig) {
+                           super(assetProperties, projectConfig);
                        }
                
                        /**
