@@ -37,7 +37,6 @@ public class Main {
     private static ReadOnlyTransaction readFromDb;
     private static List<String> existingTableNames;
 
-
     /**
      * This function initializes all of the mapping and updating of all of the assets for each
      * of the projects in the ProjectId.txt file.
