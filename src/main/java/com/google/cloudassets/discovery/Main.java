@@ -162,12 +162,12 @@ public class Main {
      */
     private static List<String> getExistingTableNames() {
         Statement statement = Statement.newBuilder(GET_TABLES_LIST_QUERY).build();
-        List<String> existingTableNames = new ArrayList<>();
+        List<String> tableNames = new ArrayList<>();
 
         ResultSet resultSet = readFromDb.executeQuery(statement);
         while (resultSet.next()) {
-            existingTableNames.add(resultSet.getString("table_name"));
+            tableNames.add(resultSet.getString("table_name"));
         }
-        return existingTableNames;
+        return tableNames;
     }
 }
