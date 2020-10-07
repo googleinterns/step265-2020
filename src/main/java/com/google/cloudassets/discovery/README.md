@@ -4,7 +4,7 @@
 1. You should create a new class for the new asset and place it in the AssetObjects folder 
 1. The class should:
     1. Extend the abstract AssetObject class (which will provide your asset with the following 
-       fields: kind, name, id, type, location, creationTime and status).
+       fields: kind, name, id, location, creationTime and status).
     1. **Important** - the name and kind fields most have valid data as they are part of the primary 
         keys in the assets tables.
     1. Implement an inner Builder class which extends the BaseBuilder with the following functions:

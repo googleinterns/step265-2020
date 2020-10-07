@@ -8,7 +8,6 @@ public enum AssetTable {
     // MAIN_TABLE must be first as all other tables have an interleaved relationship with this table
     MAIN_TABLE("Main_Assets", getCommonColumnsString("Main_Assets") +
             " assetId STRING(MAX)," +
-            " assetType STRING(MAX)," +
             " creationTime TIMESTAMP," +
             " status STRING(MAX)," +
             " location STRING(MAX)," +
@@ -23,6 +22,7 @@ public enum AssetTable {
             " diskSizeGb INT64," +
             " updatedTime TIMESTAMP," +
             " licenses ARRAY<STRING(MAX)>," +
+            " type STRING(MAX)," +
             getInterleavedString()),
 
     INSTANCE_CLOUD_SQL_TABLE("Instance_Cloud_Sql_Assets",   getCommonColumnsString("Instance_Cloud_Sql_Assets") +
@@ -31,12 +31,14 @@ public enum AssetTable {
             " backupEnabled BOOL," +
             " replicationType STRING(MAX)," +
             " activationPolicy STRING(MAX)," +
+            " databaseVersion STRING(MAX)," +
             getInterleavedString()),
 
     INSTANCE_COMPUTE_TABLE("Instance_Compute_Assets", getCommonColumnsString("Instance_Compute_Assets") +
             " description STRING(MAX)," +
             " canIpForward BOOL," +
             " cpuPlatform STRING(MAX)," +
+            " machineType STRING(MAX)," +
             getInterleavedString()),
 
     SUBSCRIPTION_PUB_SUB_TABLE("Subscription_Pub_Sub_Assets", getCommonColumnsString("Subscription_Pub_Sub_Assets") +

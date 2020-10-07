@@ -14,6 +14,7 @@ public class DiskComputeObject extends AssetObject {
     private int diskSizeGb;
     private Timestamp updatedTime;
     private List<String> licenses;
+    private String type;
 
     public static class Builder extends BaseBuilder<DiskComputeObject, DiskComputeObject.Builder> {
         /*
@@ -42,7 +43,7 @@ public class DiskComputeObject extends AssetObject {
 
         /**
          * This function sets the relevant fields of the DiskComputeObject.
-         * Fields that should be initialized for this object are: kind, name, id, type, location,
+         * Fields that should be initialized for this object are: kind, name, id, location,
          * creationTime and status.
          * @return the newly initialized DiskComputeObject
          */
@@ -51,7 +52,6 @@ public class DiskComputeObject extends AssetObject {
             setKind(AssetKind.DISK_COMPUTE_ASSET);
             setName(assetProperties.get("name"));
             setId(assetProperties.get("id"));
-            setType(getLastSeg(assetProperties.get("type")));
             setLocation(getLastSeg(assetProperties.get("zone")));
             setCreationTime(convertStringToDate(assetProperties.get("creationTimestamp")));
             setStatus(assetProperties.get("status"));
@@ -60,6 +60,7 @@ public class DiskComputeObject extends AssetObject {
             specificObjectClass.diskSizeGb = convertStringToInt(assetProperties.get("sizeGb"));
             specificObjectClass.updatedTime = convertStringToDate(assetProperties.get("lastAttachTimestamp"));
             specificObjectClass.licenses = convertListToLastSegList(assetProperties.get("licenses"));
+            specificObjectClass.type = getLastSeg(assetProperties.get("type"));
 
             return super.build();
         }
@@ -75,5 +76,9 @@ public class DiskComputeObject extends AssetObject {
 
     public List<String> getLicenses() {
         return this.licenses;
+    }
+
+    public String getType() {
+        return this.type;
     }
 }

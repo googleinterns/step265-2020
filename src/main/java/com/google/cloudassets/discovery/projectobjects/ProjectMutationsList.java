@@ -36,7 +36,6 @@ public class ProjectMutationsList {
             this.mutations.add(
                     setCommonColumnValues(tableName, asset)
                     .set("assetId").to(asset.getId())
-                    .set("assetType").to(asset.getType())
                     .set("creationTime").to(asset.getCreationTime())
                     .set("status").to(asset.getStatus())
                     .set("location").to(asset.getLocation())
@@ -50,7 +49,7 @@ public class ProjectMutationsList {
     }
 
     /*
-    This function adds a new Mutation to the mutations list based on the specific assetType of the
+    This function adds a new Mutation to the mutations list based on the specific AssetKind of the
     provided AssetObject.
      */
     private void addSpecificAssetMutation(AssetObject asset) {
@@ -63,6 +62,7 @@ public class ProjectMutationsList {
                                 .set("description").to(instanceComputeObject.getDescription())
                                 .set("canIpForward").to(instanceComputeObject.getCanIpForward())
                                 .set("cpuPlatform").to(instanceComputeObject.getCpuPlatform())
+                                .set("machineType").to(instanceComputeObject.getMachineType())
                                 .build());
                 break;
             case DISK_COMPUTE_ASSET:
@@ -72,6 +72,7 @@ public class ProjectMutationsList {
                                 .set("diskSizeGb").to(diskComputeObject.getDiskSizeGb())
                                 .set("updatedTime").to(diskComputeObject.getUpdatedTime())
                                 .set("licenses").to(Value.stringArray(diskComputeObject.getLicenses()))
+                                .set("type").to(diskComputeObject.getType())
                                 .build());
                 break;
             case BUCKET_STORAGE_ASSET:
@@ -91,6 +92,7 @@ public class ProjectMutationsList {
                                 .set("backupEnabled").to(instanceCloudSqlObject.getBackupEnabled())
                                 .set("replicationType").to(instanceCloudSqlObject.getReplicationType())
                                 .set("activationPolicy").to(instanceCloudSqlObject.getActivationPolicy())
+                                .set("databaseVersion").to(instanceCloudSqlObject.getDatabaseVersion())
                                 .build());
                 break;
             case SUBSCRIPTION_PUB_SUB_ASSET:

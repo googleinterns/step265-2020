@@ -31,7 +31,6 @@ abstract public class AssetObject {
 
     // Asset additional data
     protected String id;
-    protected String type;
     protected String location;
     protected Timestamp creationTime;
     protected String status;
@@ -75,7 +74,7 @@ abstract public class AssetObject {
         Set the name field of this object with the provided string and return its specific Builder.
         */
         public B setName(Object name) {
-            specificObjectClass.name = (String) name;
+            specificObjectClass.name = convertObjectToString(name);
             return specificObjectClassBuilder;
         }
 
@@ -83,15 +82,7 @@ abstract public class AssetObject {
         Set the id field of this object with the provided string and return its specific Builder.
         */
         public B setId(Object id) {
-            specificObjectClass.id = (String) id;
-            return specificObjectClassBuilder;
-        }
-
-        /*
-        Set the type field of this object with the provided string and return its specific Builder.
-        */
-        public B setType(Object type) {
-            specificObjectClass.type = (String) type;
+            specificObjectClass.id = convertObjectToString(id);
             return specificObjectClassBuilder;
         }
 
@@ -99,7 +90,7 @@ abstract public class AssetObject {
         Set the location field of this object with the provided string and return its specific Builder.
         */
         public B setLocation(Object location) {
-            specificObjectClass.location = (String) location;
+            specificObjectClass.location = convertObjectToString(location);
             return specificObjectClassBuilder;
         }
 
@@ -115,7 +106,7 @@ abstract public class AssetObject {
         Set the status field of this object with the provided string and return its specific Builder.
         */
         public B setStatus(Object status) {
-            specificObjectClass.status = (String) status;
+            specificObjectClass.status = convertObjectToString(status);
             return specificObjectClassBuilder;
         }
 
@@ -150,10 +141,6 @@ abstract public class AssetObject {
 
     public String getId() {
         return this.id;
-    }
-
-    public String getType() {
-        return this.type;
     }
 
     public String getLocation() {
