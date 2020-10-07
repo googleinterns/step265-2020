@@ -7,14 +7,8 @@ import com.google.api.gax.longrunning.OperationFuture;
 import com.google.cloud.spanner.*;
 import com.google.common.flogger.FluentLogger;
 import com.google.spanner.admin.database.v1.UpdateDatabaseDdlMetadata;
-import org.json.simple.JSONObject;
-import org.json.simple.parser.JSONParser;
-import org.json.simple.parser.ParseException;
+import org.apache.commons.lang3.tuple.Pair;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -31,17 +25,17 @@ public class Main {
     private static final String GET_TABLES_LIST_QUERY = "SELECT t.table_name "
                                                         + "FROM information_schema.tables AS t "
                                                         + "WHERE t.TABLE_NAME like '%Assets'";
+    private static final String GET_PROJECTS_LIST_QUERY = "SELECT t.workspaceId, t.projectId "
+                                                        + "FROM Workspace_Project_Table AS t "
+                                                        + "WHERE t.isActive = True";
 
-    private static final String PROJECTS_ID_FILEPATH = "/ProjectIds.txt";
-
-    private static final JSONParser jsonParser = new JSONParser();
     private static final FluentLogger logger = FluentLogger.forEnclosingClass();
 
     private static Spanner spanner;
     private static DatabaseId db;
     private static DatabaseClient dbClient;
+    private static ReadOnlyTransaction readFromDb;
     private static List<String> existingTableNames;
-
 
     /**
      * This function initializes all of the mapping and updating of all of the assets for each
@@ -50,34 +44,27 @@ public class Main {
     public static void main(String[] args) {
         SpannerOptions options = SpannerOptions.newBuilder().setProjectId(SPANNER_PROJECT_ID).build();
         spanner = options.getService();
-        try {
-            // Create spanner DatabaseClient
-            db = DatabaseId.of(SPANNER_PROJECT_ID, SPANNER_INSTANCE_ID, SPANNER_DATABASE_ID);
-            dbClient = spanner.getDatabaseClient(db);
-            createTablesIfNotExist();
 
-            // Use spanner DatabaseClient
-            updateAllProjectsAssets();
+        // Create spanner DatabaseClient
+        db = DatabaseId.of(SPANNER_PROJECT_ID, SPANNER_INSTANCE_ID, SPANNER_DATABASE_ID);
+        dbClient = spanner.getDatabaseClient(db);
+        readFromDb = dbClient.readOnlyTransaction();
+        createTablesIfNotExist();
 
-        } catch (ParseException exception) {
-            String error_msg = "Encountered an ParseException while parsing " + PROJECTS_ID_FILEPATH;
-            logger.atInfo().withCause(exception).log(error_msg);
-        } catch (IOException exception) {
-            String error_msg = "Encountered an IOException while reading " + PROJECTS_ID_FILEPATH;
-            logger.atInfo().withCause(exception).log(error_msg);
-        } finally {
-            spanner.close();
-        }
+        // Use spanner DatabaseClient
+        updateAllProjectsAssets();
+
+        readFromDb.close();
+        spanner.close();
     }
 
     /*
     This function updates in out spanner db all of the assets for all of the relevant projects.
      */
-    private static void updateAllProjectsAssets() throws IOException, ParseException {
-        JSONObject projectJson = getProjectsJson();
-        for (Object key : projectJson.keySet()) {
-            String workspaceId = (String) key;
-            String projectId = (String) projectJson.get(key);
+    private static void updateAllProjectsAssets() {
+        for (Pair<String, String> pair : getProjectsList()) {
+            String workspaceId = pair.getKey();
+            String projectId = pair.getValue();
 
             updateProjectAssets(workspaceId, projectId);
         }
@@ -100,12 +87,17 @@ public class Main {
 
     /*
     This function retrieves the project ids for which this process should run and returns it as a
-    JSON in which the key is the workspace id and the value is the project id.
+    List of Pairs in which the key is the workspace id and the value is the project id.
      */
-    private static JSONObject getProjectsJson() throws IOException, ParseException {
-        InputStream in = Main.class.getResourceAsStream(PROJECTS_ID_FILEPATH);
-        BufferedReader reader = new BufferedReader(new InputStreamReader(in));
-        return (JSONObject) jsonParser.parse(reader);
+    private static List<Pair<String, String>> getProjectsList() {
+        Statement statement = Statement.newBuilder(GET_PROJECTS_LIST_QUERY).build();
+        List<Pair<String, String>> projectsList = new ArrayList<>();
+
+        ResultSet resultSet = readFromDb.executeQuery(statement);
+        while (resultSet.next()) {
+            projectsList.add(Pair.of(resultSet.getString("workspaceId"), resultSet.getString("projectId")));
+        }
+        return projectsList;
     }
 
     /*
@@ -140,14 +132,14 @@ public class Main {
             }
         }
 
-        ExecuteTablesCreation(tablesToCreateQueries);
+        executeTablesCreation(tablesToCreateQueries);
     }
 
     /*
     This function executes the tables creation in our spanner db based on the create table queries
     provided in the tablesToCreateQueries list.
      */
-    private static void ExecuteTablesCreation(List<String> tablesToCreateQueries) {
+    private static void executeTablesCreation(List<String> tablesToCreateQueries) {
         // Create asset tables only if there are new ones
         if (tablesToCreateQueries.size() > 0) {
             DatabaseAdminClient dbAdminClient = spanner.getDatabaseAdminClient();
@@ -169,17 +161,12 @@ public class Main {
      */
     private static List<String> getExistingTableNames() {
         Statement statement = Statement.newBuilder(GET_TABLES_LIST_QUERY).build();
-        List<String> existingTableNames = new ArrayList<>();
+        List<String> tableNames = new ArrayList<>();
 
-        try (ResultSet resultSet = dbClient.singleUse().executeQuery(statement)) {
-            while (resultSet.next()) {
-                existingTableNames.add(resultSet.getString("table_name"));
-            }
-        } catch (Exception exception) {
-            String error_msg = "Encountered an exception while trying to retrieve all of the" +
-                                " asset table names in spanner db.";
-            logger.atInfo().withCause(exception).log(error_msg);
+        ResultSet resultSet = readFromDb.executeQuery(statement);
+        while (resultSet.next()) {
+            tableNames.add(resultSet.getString("table_name"));
         }
-        return existingTableNames;
+        return tableNames;
     }
 }

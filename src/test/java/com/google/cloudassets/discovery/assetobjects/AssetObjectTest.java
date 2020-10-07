@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
 
 public class AssetObjectTest {
     /**
@@ -15,7 +16,7 @@ public class AssetObjectTest {
      */
     @Test
     public void testGetLastSegBoolean() {
-        assertEquals(null, AssetObject.getLastSeg(true));
+        assertNull(AssetObject.getLastSeg(true));
     }
 
     /**
@@ -35,7 +36,7 @@ public class AssetObjectTest {
      */
     @Test
     public void testConvertListToLastSegListBoolean() {
-        assertEquals(null, AssetObject.convertListToLastSegList(true));
+        assertNull(AssetObject.convertListToLastSegList(true));
     }
 
     /**
@@ -45,7 +46,7 @@ public class AssetObjectTest {
      */
     @Test
     public void testConvertListToLastSegListString() {
-        assertEquals(null, AssetObject.convertListToLastSegList("not a list"));
+        assertNull(AssetObject.convertListToLastSegList("not a list"));
     }
 
     /**
@@ -57,7 +58,7 @@ public class AssetObjectTest {
     public void testConvertListToLastSegListBooleanList() {
         List<Boolean> invalidInput = new ArrayList<>();
         invalidInput.add(true);
-        assertEquals(null, AssetObject.convertListToLastSegList(invalidInput));
+        assertNull(AssetObject.convertListToLastSegList(invalidInput));
     }
 
     /**
@@ -90,7 +91,7 @@ public class AssetObjectTest {
      */
     @Test
     public void testConvertStringToDateBoolean() {
-        assertEquals(null, AssetObject.convertStringToDate(true));
+        assertNull(AssetObject.convertStringToDate(true));
     }
 
     /**
@@ -100,7 +101,7 @@ public class AssetObjectTest {
      */
     @Test
     public void testConvertStringToDateString() {
-        assertEquals(null, AssetObject.convertStringToDate("2020-02-02"));
+        assertNull(AssetObject.convertStringToDate("2020-02-02"));
     }
 
     /**
@@ -110,7 +111,7 @@ public class AssetObjectTest {
      */
     @Test
     public void testConvertStringToIntBoolean() {
-        assertEquals(null, AssetObject.convertStringToInt(true));
+        assertNull(AssetObject.convertStringToInt(true));
     }
 
     /**
@@ -120,7 +121,7 @@ public class AssetObjectTest {
      */
     @Test
     public void testConvertStringToIntString() {
-        assertEquals(null, AssetObject.convertStringToInt("not a number"));
+        assertNull(AssetObject.convertStringToInt("not a number"));
     }
 
     /**
@@ -139,7 +140,7 @@ public class AssetObjectTest {
      */
     @Test
     public void testConvertObjectToStringBoolean() {
-        assertEquals(null, AssetObject.convertObjectToString(true));
+        assertNull(AssetObject.convertObjectToString(true));
     }
 
     /**
@@ -149,7 +150,7 @@ public class AssetObjectTest {
      */
     @Test
     public void testConvertObjectToBooleanString() {
-        assertEquals(null, AssetObject.convertObjectToBoolean("invalid"));
+        assertNull(AssetObject.convertObjectToBoolean("invalid"));
     }
 
     /**
@@ -159,6 +160,6 @@ public class AssetObjectTest {
      */
     @Test
     public void testConvertObjectToMapString() {
-        assertEquals(null, AssetObject.convertObjectToMap("invalid"));
+        assertNull(AssetObject.convertObjectToMap("invalid"));
     }
 }
