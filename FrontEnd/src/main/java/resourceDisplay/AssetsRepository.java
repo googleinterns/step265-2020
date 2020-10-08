@@ -8,83 +8,38 @@ import java.util.List;
  * This Class does all DB access
  */
 public class AssetsRepository {
-    /**
-     * This is just for testing the function that returns assets by type
-     * @return a list of TestAsset objects
-     */
-    public List<TestAsset> executeAllAssetsQuery(Statement statement, DatabaseClient dbClient){
-       List<TestAsset> allAssets = new ArrayList<>();
-        try (ResultSet resultSet = dbClient.singleUse().executeQuery(statement)) {
-            while (resultSet.next()) {
-                TestAsset asset = new TestAsset();
-                if (!resultSet.isNull("assetName")){
-                    asset.setName(resultSet.getString("assetName"));
-                }
-                if (!resultSet.isNull("kind")){
-                    asset.setKind(resultSet.getString("kind"));
-                }
-                if (!resultSet.isNull("location")){
-                    asset.setZone(resultSet.getString("location"));
-                }
-                if (!resultSet.isNull("creationTime")){
-                    asset.setCreationTime(resultSet.getTimestamp("creationTime"));
-                }
-                if (!resultSet.isNull("status")){
-                    asset.setStatus(resultSet.getString("status"));
-                }
-                allAssets.add(asset);
-            }
-            return allAssets;
-        }
-    }
-    /**
-     * This is used to return all the distinct statuses in a project/workspace (at the moment workspaceID)
-     * @param dbClient - A client for connection to the DB
-     * @param workspaceId - The ID of the wanted workspace
-     * @return a list of strings holding the different statuses in a project/workspace
-     */
-    public List<String> getStatusList(DatabaseClient dbClient, String workspaceId) {
-        List<String> statusList = new ArrayList<>();
-        Statement statement =
-                Statement.newBuilder(
-                        "SELECT DISTINCT status FROM Main_Assets "
-                                + "WHERE workspaceId = @workspaceId")
-                        .bind("workspaceId")
-                        .to(workspaceId)
-                        .build();
-        try (ResultSet resultSet = dbClient.singleUse().executeQuery(statement)) {
-            while (resultSet.next()) {
-                if (!resultSet.isNull("status")) {
-                    statusList.add(resultSet.getString("status"));
-                }
-            }
-        }
-        return statusList;
-    }
-    /**
-     * This is used to return all the distinct locations in a project/workspace (at the moment workspaceID)
-     * @param dbClient - A client for connection to the DB
-     * @param workspaceId - The ID of the wanted workspace
-     * @return a list of strings holding the different locations in a project/workspace
-     */
-    public List<String> getLocationList(DatabaseClient dbClient, String workspaceId) {
-        List<String> locationList = new ArrayList<>();
-        Statement statement =
-                Statement.newBuilder(
-                        "SELECT DISTINCT location FROM Main_Assets "
-                        + "WHERE workspaceId = @workspaceId")
-                        .bind("workspaceId")
+
+    public List<String> getFilterList(DatabaseClient dbClient, String workspaceId, String filterType) {
+        List<String> filterList = new ArrayList<>();
+        String statementString = "SELECT DISTINCT ";
+        statementString += filterType;
+        statementString += " FROM Main_Assets WHERE workspaceId = @workspaceId";
+        Statement statement = Statement.newBuilder(statementString)
+                .bind("workspaceId")
                 .to(workspaceId)
                 .build();
         try (ResultSet resultSet = dbClient.singleUse().executeQuery(statement)) {
             while (resultSet.next()) {
-                if (!resultSet.isNull("location")) {
-                    locationList.add(resultSet.getString("location"));
+                if (filterType.equals("status")){
+                    if (!resultSet.isNull("status")) {
+                        filterList.add(resultSet.getString("status"));
+                    }
+                }
+                else if (filterType.equals("location")){
+                    if (!resultSet.isNull("location")) {
+                        filterList.add(resultSet.getString("location"));
+                    }
+                }
+                else { // the filterType is kind
+                    if (!resultSet.isNull("kind")) {
+                        filterList.add(resultSet.getString("kind"));
+                    }
                 }
             }
         }
-        return locationList;
+        return filterList;
     }
+
     /**
      * This is used to execute a query that was built dynamically and column types are unknown and return a list of data
      * @param statement - A statement that holds the query
@@ -105,6 +60,10 @@ public class AssetsRepository {
                             case ARRAY :
                                 //todo
                                 // maybe need specific array type from table (or maybe we can get from type field)
+                                String arrayType = columnTypes.get(i);
+                                if (arrayType.equals("ARRAY<STRING(MAX)>")) {
+                                    row.add(String.valueOf(resultSet.getStringList(columnNames.get(i))));
+                                }
                                 break;
                             case BOOL:
                                 row.add(String.valueOf(resultSet.getBoolean(columnNames.get(i))));
@@ -128,7 +87,7 @@ public class AssetsRepository {
                                 row.add(resultSet.getString(columnNames.get(i)));
                                 break;
                             case STRUCT:
-                                //todo?
+                                //not used at the moment
                                 break;
                             case TIMESTAMP:
                                 row.add(String.valueOf(resultSet.getTimestamp(columnNames.get(i))));
@@ -144,6 +103,81 @@ public class AssetsRepository {
             return allAssets;
         }
     }
+
+    /**
+     * This is used specifically to build a query for filtering by Kind because we need to use a join
+     * @param dbClient - A client for connection to the DB
+     * @param columnDisplays - A list of strings to display as column headers to fill
+     * @param columnNames - A list of column names to fill
+     * @param columnTypes - A list of column types to fill
+     * @param kind - Holds the kind of asset we want to filter by
+     * @param strResult - Holds the query built so far by the function that called this function
+     * @return statement that holds the query to execute
+     */
+    public String buildQueryForKind(DatabaseClient dbClient, List<String> columnDisplays, List<String> columnNames, List<String> columnTypes, String kind, String strResult){
+        String statementString = "";
+        Statement statement1 =
+                Statement.newBuilder(
+                        "SELECT columnName, columnDisplayName, columnType FROM Asset_Tables_Config "
+                                + "WHERE assetTableName = 'Main_Assets' "
+                                + "and toDisplay = True")
+                        .build();
+        try (ResultSet resultSet1 = dbClient.singleUse().executeQuery(statement1)) {
+            while (resultSet1.next()) {
+                String str = resultSet1.getString("columnName");
+                String display = resultSet1.getString("columnDisplayName");
+                String type = resultSet1.getString("columnType");
+                strResult += ", ";
+                strResult += "Main_Assets.";
+                strResult += str;
+                columnDisplays.add(display);
+                columnNames.add(str);
+                columnTypes.add(type);
+            }
+        }
+        Statement statement2 =
+                Statement.newBuilder(
+                        "SELECT DISTINCT assetTableName FROM Asset_Tables_Config "
+                                + "WHERE assetKind = @assetKind")
+                        .bind("assetKind")
+                        .to(kind)
+                        .build();
+        try (ResultSet resultSet2 = dbClient.singleUse().executeQuery(statement2)) {
+            while (resultSet2.next()) {
+                if (!resultSet2.isNull("assetTableName")) {
+                    String tableName = resultSet2.getString("assetTableName");
+                    Statement statement3 =
+                            Statement.newBuilder(
+                                    "SELECT columnName, columnDisplayName, columnType FROM Asset_Tables_Config "
+                                            + "WHERE assetTableName = @tableName "
+                                            + "and toDisplay = True")
+                                    .bind("tableName")
+                                    .to(tableName)
+                                    .build();
+                    try (ResultSet resultSet3 = dbClient.singleUse().executeQuery(statement3)) {
+                        while (resultSet3.next()) {
+                            String str = resultSet3.getString("columnName");
+                            String display = resultSet3.getString("columnDisplayName");
+                            String type = resultSet3.getString("columnType");
+                            strResult += ", ";
+                            strResult += tableName;
+                            strResult += ".";
+                            strResult += str;
+                            columnDisplays.add(display);
+                            columnNames.add(str);
+                            columnTypes.add(type);
+                        }
+                    }
+                    statementString = "SELECT ";
+                    statementString += strResult;
+                    statementString += " FROM Main_Assets JOIN ";
+                    statementString += tableName;
+                }
+            }
+        }
+        return statementString;
+    }
+
     /**
      * This is used to create query dynamically
      * @param dbClient - A client for connection to the DB
@@ -154,7 +188,7 @@ public class AssetsRepository {
      * @param filterType - The type of filter the query needs to execute
      * @return statement that holds the query to execute
      */
-    public String createQueryAndDisplayNameList(DatabaseClient dbClient, String tableName, List<String> columnDisplays, List<String> columnNames, List<String> columnTypes, String filterType){
+    public String createQueryAndDisplayNameList(DatabaseClient dbClient, String tableName, List<String> columnDisplays, List<String> columnNames, List<String> columnTypes, String filterType, String kind) {
         /* this part we do for all tables*/
         Statement statement1 =
                 Statement.newBuilder(
@@ -164,6 +198,8 @@ public class AssetsRepository {
                         .build();
         String strResult = "";
         boolean isFirst = true;
+        boolean isFirstUsingForKind = true;
+        String using = " USING (";
         try (ResultSet resultSet1 = dbClient.singleUse().executeQuery(statement1)) {
             while (resultSet1.next()) {
                 String str = resultSet1.getString("columnName");
@@ -175,6 +211,16 @@ public class AssetsRepository {
                 else{
                     strResult += ", ";
                 }
+                if(filterType.equals("kind")) {
+                    strResult += "Main_Assets.";
+                    if(isFirstUsingForKind) {
+                        isFirstUsingForKind = false;
+                    }
+                    else{
+                        using += ", ";
+                    }
+                    using += str;
+                }
                 strResult += str;
                 columnDisplays.add(display);
                 columnNames.add(str);
@@ -182,47 +228,50 @@ public class AssetsRepository {
             }
         }
         /* this part gets columns for the specific table*/
-        Statement statement2 =
-                Statement.newBuilder(
-                        "SELECT columnName, columnDisplayName, columnType FROM Asset_Tables_Config "
-                                + "WHERE assetTableName = @tableName "
-                                + "and toDisplay = True")
-                        .bind("tableName")
-                        .to(tableName)
-                        .build();
-        try (ResultSet resultSet2 = dbClient.singleUse().executeQuery(statement2)) {
-            while (resultSet2.next()) {
-                String str = resultSet2.getString("columnName");
-                String display = resultSet2.getString("columnDisplayName");
-                String type = resultSet2.getString("columnType");
-                if(isFirst) {
-                    isFirst = false;
+        String statementString;
+        if (filterType.equals("kind")) {
+            statementString = buildQueryForKind(dbClient, columnDisplays, columnNames, columnTypes, kind, strResult);
+            statementString += using;
+            statementString += ")";
+        }
+        else {
+            Statement statement2 =
+                    Statement.newBuilder(
+                            "SELECT columnName, columnDisplayName, columnType FROM Asset_Tables_Config "
+                                    + "WHERE assetTableName = @tableName "
+                                    + "and toDisplay = True")
+                            .bind("tableName")
+                            .to(tableName)
+                            .build();
+            try (ResultSet resultSet2 = dbClient.singleUse().executeQuery(statement2)) {
+                while (resultSet2.next()) {
+                    String str = resultSet2.getString("columnName");
+                    String display = resultSet2.getString("columnDisplayName");
+                    String type = resultSet2.getString("columnType");
+                    if (isFirst) {
+                        isFirst = false;
+                    } else {
+                        strResult += ", ";
+                    }
+                    strResult += str;
+                    columnDisplays.add(display);
+                    columnNames.add(str);
+                    columnTypes.add(type);
                 }
-                else{
-                    strResult += ", ";
-                }
-                strResult += str;
-                columnDisplays.add(display);
-                columnNames.add(str);
-                columnTypes.add(type);
             }
-        }
-        String statementString = "SELECT ";
-        statementString += strResult;
-        statementString += " FROM ";
-        statementString += tableName;
-        if(filterType == "location") {
-            statementString += " WHERE location = @location";
-        }
-        else if(filterType == "status") {
-            statementString += " WHERE status = @status";
-        }
-        else if(filterType == "kind") {
-            //todo maybe need more specific things for kind!!!!
-            statementString += " WHERE kind = @kind";
+            statementString = "SELECT ";
+            statementString += strResult;
+            statementString += " FROM ";
+            statementString += tableName;
+            if (filterType.equals("location")) {
+                statementString += " WHERE location = @location";
+            } else if (filterType.equals("status")) {
+                statementString += " WHERE status = @status";
+            }
         }
         return statementString;
     }
+
     /**
      * This builds and executes the query for all assets
      * @param dbClient - A client for connection to the DB
@@ -233,10 +282,11 @@ public class AssetsRepository {
         List<String> columnNames= new ArrayList<>();
         List<String> columnTypes= new ArrayList<>();
         Statement statement;
-        String statementString = createQueryAndDisplayNameList(dbClient, "Main_Assets", columnDisplays, columnNames, columnTypes, "none");
+        String statementString = createQueryAndDisplayNameList(dbClient, "Main_Assets", columnDisplays, columnNames, columnTypes, "none", "all");
         statement = Statement.newBuilder(statementString).build();
         return executeQueryAndReturnList(statement, dbClient, columnNames, columnTypes);
     }
+
     /**
      * This builds and executes the query with status filter
      * @param dbClient - A client for connection to the DB
@@ -245,24 +295,14 @@ public class AssetsRepository {
      * @return a list os lists where each row holds information of one asset in strings (to use in template)
      */
     public List<List<String>> getAssetsByStatus(DatabaseClient dbClient, List<String> columnDisplays, String status) {
-
-        /*List<TestAsset> allAssets = new ArrayList<>();
-        Statement statement =
-                Statement.newBuilder(
-                        "SELECT assetName, kind, location, creationTime, status "
-                                + "FROM Main_Assets "
-                                + "WHERE status = @status")
-                        .bind("status")
-                        .to(status)
-                        .build();
-        return executeAllAssetsQuery(statement, dbClient);*/
         List<String> columnNames= new ArrayList<>();
         List<String> columnTypes= new ArrayList<>();
         Statement statement;
-        String statementString = createQueryAndDisplayNameList(dbClient, "Main_Assets", columnDisplays, columnNames, columnTypes, "status");
+        String statementString = createQueryAndDisplayNameList(dbClient, "Main_Assets", columnDisplays, columnNames, columnTypes, "status", "all");
         statement = Statement.newBuilder(statementString).bind("status").to(status).build();
         return executeQueryAndReturnList(statement, dbClient, columnNames, columnTypes);
     }
+
     /**
      * This builds and executes the query with kind (type of asset) filter
      * @param dbClient - A client for connection to the DB
@@ -270,19 +310,15 @@ public class AssetsRepository {
      * @param kind - The wanted status from the user
      * @return a list os lists where each row holds information of one asset in strings (to use in template)
      */
-    public List<TestAsset> getAssetByKind(DatabaseClient dbClient, List<String> columnDisplays, String kind) {
-        // not done
-        List<TestAsset> allAssetsOfType = new ArrayList<>();
-        Statement statement =
-                Statement.newBuilder(
-                        "SELECT assetName, kind, location , creationTime, status "
-                                + "FROM Main_Assets "
-                                + "WHERE kind = @kind")
-                        .bind("kind")
-                        .to(kind)
-                        .build();
-        return executeAllAssetsQuery(statement, dbClient);
+    public List<List<String>>  getAssetByKind(DatabaseClient dbClient, List<String> columnDisplays, String kind) {
+        List<String> columnNames= new ArrayList<>();
+        List<String> columnTypes= new ArrayList<>();
+        Statement statement;
+        String statementString = createQueryAndDisplayNameList(dbClient, "Main_Assets", columnDisplays, columnNames, columnTypes, "kind", kind);
+        statement = Statement.newBuilder(statementString).build();
+        return executeQueryAndReturnList(statement, dbClient, columnNames, columnTypes);
     }
+
     /**
      * This builds and executes the query with status filter
      * @param dbClient - A client for connection to the DB
@@ -291,20 +327,10 @@ public class AssetsRepository {
      * @return a list os lists where each row holds information of one asset in strings (to use in template)
      */
     public List<List<String>> getAssetsByLocation(DatabaseClient dbClient, List<String> columnDisplays, String location) {
-        /*List<TestAsset> allAssetsOfType = new ArrayList<>();
-        Statement statement =
-                Statement.newBuilder(
-                        "SELECT assetName, kind, location , creationTime, status "
-                                + "FROM Main_Assets "
-                                + "WHERE location = @location")
-                        .bind("location")
-                        .to(location)
-                        .build();
-        return executeAllAssetsQuery(statement, dbClient);*/
         List<String> columnNames= new ArrayList<>();
         List<String> columnTypes= new ArrayList<>();
         Statement statement;
-        String statementString = createQueryAndDisplayNameList(dbClient, "Main_Assets", columnDisplays, columnNames, columnTypes, "location");
+        String statementString = createQueryAndDisplayNameList(dbClient, "Main_Assets", columnDisplays, columnNames, columnTypes, "location", "all");
         statement = Statement.newBuilder(statementString).bind("location").to(location).build();
         return executeQueryAndReturnList(statement, dbClient, columnNames, columnTypes);
     }

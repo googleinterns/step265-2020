@@ -33,6 +33,7 @@ public class IndexController {
     public String login() {
         return "login";
     }
+
     /**
      * This is the page you get to when after log-in that holds all different mappings
      * @return the index template
@@ -41,6 +42,7 @@ public class IndexController {
     public String index() {
         return "index";
     }
+
     /**
      * This page returns all the assets in the DB
      * @param principal - Used to check authentication
@@ -69,17 +71,25 @@ public class IndexController {
      * @return the bykind template
      */
     @GetMapping("/bykind")
-    public String getByType(@AuthenticationPrincipal OAuth2User principal, Model model) {
+    public String getByKind(@AuthenticationPrincipal OAuth2User principal, Model model, @ModelAttribute KindObject kindObject) {
         SpannerOptions options = SpannerOptions.newBuilder().setProjectId(SPANNER_PROJECT_ID).build();
         spanner = options.getService();
-        // create spanner DatabaseClient
         db = DatabaseId.of(SPANNER_PROJECT_ID, SPANNER_INSTANCE_ID, SPANNER_DATABASE_ID);
         dbClient = spanner.getDatabaseClient(db);
         AssetsRepository assets = new AssetsRepository();
+        model.addAttribute("kindObject", kindObject);
+        List<String> kindList = assets.getFilterList(dbClient, "noasan", "kind");
+        model.addAttribute("kindList", kindList);
         List<String> displayNames = new ArrayList<>();
-        List<TestAsset> resultTable = assets.getAssetByKind(dbClient, displayNames, "compute#disk");
+        String kind = kindObject.getKind();
+        if(kind != null){
+            List<List<String>> resultTable = assets.getAssetByKind(dbClient, displayNames, kind);
+            model.addAttribute("displayNames", displayNames);
+            model.addAttribute("allAssets", resultTable);
+        }
         return "bykind";
     }
+
     /**
      * This page returns assets by status
      * @param principal - Used to check authentication
@@ -96,7 +106,7 @@ public class IndexController {
         AssetsRepository assets = new AssetsRepository();
         model.addAttribute("statusObject", statusObject);
         /* This workspaceID is temporary until we add user/workspace/project table*/
-        List<String> statusList = assets.getStatusList(dbClient, "noasan");
+        List<String> statusList = assets.getFilterList(dbClient, "noasan", "status");
         model.addAttribute("statusList", statusList);
         List<String> displayNames = new ArrayList<>();
         List<List<String>> resultTable = assets.getAssetsByStatus(dbClient, displayNames, statusObject.getStatus());
@@ -120,7 +130,7 @@ public class IndexController {
         AssetsRepository assets = new AssetsRepository();
         model.addAttribute("locationObject", locationObject);
         /* This workspaceID is temporary until we add user/workspace/project table*/
-        List<String> locationList = assets.getLocationList(dbClient, "noasan");
+        List<String> locationList = assets.getFilterList(dbClient, "noasan", "location");
         model.addAttribute("locationList", locationList);
         List<String> displayNames = new ArrayList<>();
         List<List<String>> resultTable = assets.getAssetsByLocation(dbClient, displayNames, locationObject.getLocation());
