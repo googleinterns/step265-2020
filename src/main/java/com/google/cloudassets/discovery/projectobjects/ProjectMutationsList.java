@@ -1,7 +1,7 @@
 package com.google.cloudassets.discovery.projectobjects;
 
+import com.google.cloudassets.discovery.AssetKind;
 import com.google.cloudassets.discovery.assetobjects.*;
-import com.google.cloudassets.discovery.AssetTable;
 import com.google.cloud.spanner.Mutation;
 import com.google.cloud.spanner.Value;
 
@@ -32,7 +32,7 @@ public class ProjectMutationsList {
      */
     public List<Mutation> getMutationList(List<AssetObject> assetObjectList) {
         for (AssetObject asset : assetObjectList) {
-            String tableName = AssetTable.MAIN_TABLE.getTableName();
+            String tableName = AssetKind.getMainTableName();
             this.mutations.add(
                     setCommonColumnValues(tableName, asset)
                     .set("assetId").to(asset.getId())
@@ -53,10 +53,9 @@ public class ProjectMutationsList {
     provided AssetObject.
      */
     private void addSpecificAssetMutation(AssetObject asset) {
-        String tableName;
+        String tableName = asset.getKindEnum().getAssetTableName();
         switch (asset.getKindEnum()) {
             case INSTANCE_COMPUTE_ASSET:
-                tableName = AssetTable.INSTANCE_COMPUTE_TABLE.getTableName();
                 InstanceComputeObject instanceComputeObject = (InstanceComputeObject) asset;
                 this.mutations.add(setCommonColumnValues(tableName, asset)
                                 .set("description").to(instanceComputeObject.getDescription())
@@ -66,7 +65,6 @@ public class ProjectMutationsList {
                                 .build());
                 break;
             case DISK_COMPUTE_ASSET:
-                tableName = AssetTable.DISK_COMPUTE_TABLE.getTableName();
                 DiskComputeObject diskComputeObject = (DiskComputeObject) asset;
                 this.mutations.add(setCommonColumnValues(tableName, asset)
                                 .set("diskSizeGb").to(diskComputeObject.getDiskSizeGb())
@@ -76,7 +74,6 @@ public class ProjectMutationsList {
                                 .build());
                 break;
             case BUCKET_STORAGE_ASSET:
-                tableName = AssetTable.BUCKET_STORAGE_TABLE.getTableName();
                 BucketStorageObject bucketStorageObject = (BucketStorageObject) asset;
                 this.mutations.add(setCommonColumnValues(tableName, asset)
                                 .set("storageClass").to(bucketStorageObject.getStorageClass())
@@ -84,7 +81,6 @@ public class ProjectMutationsList {
                                 .build());
                 break;
             case INSTANCE_CLOUD_SQL_ASSET:
-                tableName = AssetTable.INSTANCE_CLOUD_SQL_TABLE.getTableName();
                 InstanceCloudSqlObject instanceCloudSqlObject = (InstanceCloudSqlObject) asset;
                 this.mutations.add(setCommonColumnValues(tableName, asset)
                                 .set("etag").to(instanceCloudSqlObject.getEtag())
@@ -96,7 +92,6 @@ public class ProjectMutationsList {
                                 .build());
                 break;
             case SUBSCRIPTION_PUB_SUB_ASSET:
-                tableName = AssetTable.SUBSCRIPTION_PUB_SUB_TABLE.getTableName();
                 SubscriptionPubSubObject subscriptionPubSubObject = (SubscriptionPubSubObject) asset;
                 this.mutations.add(setCommonColumnValues(tableName, asset)
                         .set("topic").to(subscriptionPubSubObject.getTopic())
@@ -104,7 +99,6 @@ public class ProjectMutationsList {
                         .build());
                 break;
             case TOPIC_PUB_SUB_ASSET:
-                tableName = AssetTable.TOPIC_PUB_SUB_TABLE.getTableName();
                 TopicPubSubObject topicPubSubObject = (TopicPubSubObject) asset;
                 this.mutations.add(setCommonColumnValues(tableName, asset)
                         .set("allowedPersistenceRegions").to(Value.stringArray(topicPubSubObject.getAllowedPersistenceRegions()))
