@@ -6,6 +6,7 @@ import com.google.api.client.http.HttpRequestInitializer;
 import com.google.api.client.http.HttpTransport;
 import com.google.auth.http.HttpCredentialsAdapter;
 import com.google.auth.oauth2.GoogleCredentials;
+import com.google.cloudassets.discovery.ApiDetails;
 import com.google.cloudassets.discovery.assetobjects.AssetObject;
 import com.google.cloudassets.discovery.AssetObjectsFactory;
 import com.google.cloudassets.discovery.AssetObjectsList;
@@ -28,6 +29,7 @@ public class ProjectAssetsMapper {
     private static final String PROJECT_ID_EXP = "{project_id}";
     private static final String ZONE_NAME_EXP = "{zone_name}";
     private static final String ASSET_TYPE_EXP = "{asset_type}";
+    private static final String API_ENABLED_STR = "ENABLED";
 
     private static final ObjectMapper jsonMapper = new ObjectMapper();
     private static final AssetObjectsFactory assetObjectFactory = new AssetObjectsFactory();
@@ -130,62 +132,95 @@ public class ProjectAssetsMapper {
     }
 
     /*
+    This function gets a String representing a specific apiService and checks whether or not it is
+    enabled in this project.
+     */
+    private Boolean isApiEnabled(String apiService) {
+        String url = ("https://serviceusage.googleapis.com/v1/projects/" + PROJECT_ID_EXP + "/services/"
+                    + apiService).replace(PROJECT_ID_EXP, projectConfig.getProjectId());
+        try {
+            ApiDetails apiDetails = jsonMapper.readValue(getHttpInfo(url), ApiDetails.class);
+            if (apiDetails.getApiState().equals(API_ENABLED_STR)) {
+                return Boolean.TRUE;
+            }
+            return Boolean.FALSE;
+        } catch (IOException exception) {
+            String error_msg = "Encountered an IOException while calling jsonMapper.readValue(). " +
+                    "Provided url was: " + apiService;
+            logger.atInfo().withCause(exception).log(error_msg);
+        }
+        return null;
+    }
+
+    /*
     This function returns a list of the different Compute Asset Objects that belong to a
-    specific Google Cloud project.
+    specific Google Cloud project (if the compute API is enabled for this project).
      */
     private void getAllComputeAssets(List<AssetObject> assetObjectList) {
-        String zonesComputeUrl = ("https://compute.googleapis.com/compute/v1/projects/" +
-                                    PROJECT_ID_EXP + "/zones").replace(PROJECT_ID_EXP, projectConfig.getProjectId());
-        List<String> zonesList = getZonesList(zonesComputeUrl);
+        String apiService = "compute.googleapis.com";
+        if (isApiEnabled(apiService)) {
+            String zonesComputeUrl = ("https://" + apiService + "/compute/v1/projects/" +
+                    PROJECT_ID_EXP + "/zones").replace(PROJECT_ID_EXP, projectConfig.getProjectId());
+            List<String> zonesList = getZonesList(zonesComputeUrl);
 
-        for (String zone : zonesList) {
-            String computeUrl = (zonesComputeUrl + "/" + ZONE_NAME_EXP + "/" + ASSET_TYPE_EXP)
-                                        .replace(ZONE_NAME_EXP, zone);
+            for (String zone : zonesList) {
+                String computeUrl = (zonesComputeUrl + "/" + ZONE_NAME_EXP + "/" + ASSET_TYPE_EXP)
+                        .replace(ZONE_NAME_EXP, zone);
 
-            String instanceComputeUrl = computeUrl.replace(ASSET_TYPE_EXP, "instances");
-            getAssetObjectList(assetObjectList, instanceComputeUrl, AssetKind.INSTANCE_COMPUTE_ASSET);
+                String instanceComputeUrl = computeUrl.replace(ASSET_TYPE_EXP, "instances");
+                getAssetObjectList(assetObjectList, instanceComputeUrl, AssetKind.INSTANCE_COMPUTE_ASSET);
 
-            String diskComputeUrl = computeUrl.replace(ASSET_TYPE_EXP, "disks");
-            getAssetObjectList(assetObjectList, diskComputeUrl, AssetKind.DISK_COMPUTE_ASSET);
+                String diskComputeUrl = computeUrl.replace(ASSET_TYPE_EXP, "disks");
+                getAssetObjectList(assetObjectList, diskComputeUrl, AssetKind.DISK_COMPUTE_ASSET);
+            }
         }
     }
 
     /*
     This function returns a list of the different Pub Sub Asset Objects that belong to a
-    specific Google Cloud project.
+    specific Google Cloud project (if the pubsub API is enabled for this project).
      */
     private void getAllPubSubAssets(List<AssetObject> assetObjectList) {
-        String pubSubUrl = ("https://pubsub.googleapis.com/v1/projects/" + PROJECT_ID_EXP + "/" +
-                            ASSET_TYPE_EXP).replace(PROJECT_ID_EXP, projectConfig.getProjectId());
+        String apiService = "pubsub.googleapis.com";
+        if (isApiEnabled(apiService)) {
+            String pubSubUrl = ("https://" + apiService + "/v1/projects/" + PROJECT_ID_EXP + "/" +
+                    ASSET_TYPE_EXP).replace(PROJECT_ID_EXP, projectConfig.getProjectId());
 
-        String topicPubSubUrl = pubSubUrl.replace(ASSET_TYPE_EXP, "topics");
-        getAssetObjectList(assetObjectList, topicPubSubUrl, AssetKind.TOPIC_PUB_SUB_ASSET);
+            String topicPubSubUrl = pubSubUrl.replace(ASSET_TYPE_EXP, "topics");
+            getAssetObjectList(assetObjectList, topicPubSubUrl, AssetKind.TOPIC_PUB_SUB_ASSET);
 
-        String subscriptionPubSubUrl = pubSubUrl.replace(ASSET_TYPE_EXP, "subscriptions");
-        getAssetObjectList(assetObjectList, subscriptionPubSubUrl, AssetKind.SUBSCRIPTION_PUB_SUB_ASSET);
+            String subscriptionPubSubUrl = pubSubUrl.replace(ASSET_TYPE_EXP, "subscriptions");
+            getAssetObjectList(assetObjectList, subscriptionPubSubUrl, AssetKind.SUBSCRIPTION_PUB_SUB_ASSET);
+        }
     }
 
     /*
     This function returns a list of the different Storage Asset Objects that belong to a
-    specific Google Cloud project.
+    specific Google Cloud project (if the storage API is enabled for this project).
      */
     private void getAllStorageAssets(List<AssetObject> assetObjectList) {
-        String storageUrl = ("https://storage.googleapis.com/storage/v1/" + ASSET_TYPE_EXP +
-                            "?project=" + PROJECT_ID_EXP).replace(PROJECT_ID_EXP, projectConfig.getProjectId());
+        String apiService = "storage.googleapis.com";
+        if (isApiEnabled(apiService)) {
+            String storageUrl = ("https://" + apiService + "/storage/v1/" + ASSET_TYPE_EXP +
+                    "?project=" + PROJECT_ID_EXP).replace(PROJECT_ID_EXP, projectConfig.getProjectId());
 
-        String bucketStorageUrl = storageUrl.replace(ASSET_TYPE_EXP, "b");
-        getAssetObjectList(assetObjectList, bucketStorageUrl, AssetKind.BUCKET_STORAGE_ASSET);
+            String bucketStorageUrl = storageUrl.replace(ASSET_TYPE_EXP, "b");
+            getAssetObjectList(assetObjectList, bucketStorageUrl, AssetKind.BUCKET_STORAGE_ASSET);
+        }
     }
 
     /*
     This function returns a list of the different Cloud Sql Asset Objects that belong to a
-    specific Google Cloud project.
+    specific Google Cloud project (if the sqladmin API is enabled for this project).
      */
     private void getAllCloudSqlAssets(List<AssetObject> assetObjectList) {
-        String cloudSqlUrl = ("https://sqladmin.googleapis.com/sql/v1beta4/projects/" +
-                            PROJECT_ID_EXP + "/" + ASSET_TYPE_EXP).replace(PROJECT_ID_EXP, projectConfig.getProjectId());
+        String apiService = "sqladmin.googleapis.com";
+        if (isApiEnabled(apiService)) {
+            String cloudSqlUrl = ("https://" + apiService + "/sql/v1beta4/projects/" +
+                    PROJECT_ID_EXP + "/" + ASSET_TYPE_EXP).replace(PROJECT_ID_EXP, projectConfig.getProjectId());
 
-        String instanceCloudSqlUrl = cloudSqlUrl.replace(ASSET_TYPE_EXP, "instances");
-        getAssetObjectList(assetObjectList, instanceCloudSqlUrl, AssetKind.INSTANCE_CLOUD_SQL_ASSET);
+            String instanceCloudSqlUrl = cloudSqlUrl.replace(ASSET_TYPE_EXP, "instances");
+            getAssetObjectList(assetObjectList, instanceCloudSqlUrl, AssetKind.INSTANCE_CLOUD_SQL_ASSET);
+        }
     }
 }
