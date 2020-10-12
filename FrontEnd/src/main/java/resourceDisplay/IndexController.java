@@ -27,6 +27,7 @@ public class IndexController {
 
     /**
      * This is the url you get to when you log-in
+     *
      * @return the login template
      */
     @GetMapping("/")
@@ -36,6 +37,7 @@ public class IndexController {
 
     /**
      * This is the page you get to when after log-in that holds all different mappings
+     *
      * @return the index template
      */
     @GetMapping("/index")
@@ -45,45 +47,53 @@ public class IndexController {
 
     /**
      * This page returns all the assets in the DB
+     *
      * @param principal - Used to check authentication
-     * @param model - Used to show table to user
+     * @param model     - Used to show table to user
      * @return the allassets template
      */
     @GetMapping("/allassets")
     public String getAll(@AuthenticationPrincipal OAuth2User principal, Model model) {
-        SpannerOptions options = SpannerOptions.newBuilder().setProjectId(SPANNER_PROJECT_ID).build();
+        SpannerOptions options =
+                SpannerOptions.newBuilder().setProjectId(SPANNER_PROJECT_ID).build();
         spanner = options.getService();
-            db = DatabaseId.of(SPANNER_PROJECT_ID, SPANNER_INSTANCE_ID, SPANNER_DATABASE_ID);
-            dbClient = spanner.getDatabaseClient(db);
+        db = DatabaseId.of(SPANNER_PROJECT_ID, SPANNER_INSTANCE_ID, SPANNER_DATABASE_ID);
+        dbClient = spanner.getDatabaseClient(db);
         AssetsRepository assets = new AssetsRepository();
         List<String> displayNames = new ArrayList<>();
+        //TODO use workspaceID from user/workspace/project
         List<List<String>> resultTable = assets.getAllAssets(dbClient, displayNames);
         model.addAttribute("displayNames", displayNames);
         model.addAttribute("allAssets", resultTable);
-        return "allAssets";
+        return "allassets";
     }
 
     // todo
+
     /**
      * This page returns assets by kind (with the specific data per asset)
+     *
      * @param principal - Used to check authentication
-     * @param model - Used to show table to user
+     * @param model     - Used to show table to user
      * @return the bykind template
      */
     @GetMapping("/bykind")
-    public String getByKind(@AuthenticationPrincipal OAuth2User principal, Model model, @ModelAttribute KindObject kindObject) {
-        SpannerOptions options = SpannerOptions.newBuilder().setProjectId(SPANNER_PROJECT_ID).build();
+    public String getByKind(@AuthenticationPrincipal OAuth2User principal, Model model,
+                            @ModelAttribute KindObject kindObject) {
+        SpannerOptions options =
+                SpannerOptions.newBuilder().setProjectId(SPANNER_PROJECT_ID).build();
         spanner = options.getService();
         db = DatabaseId.of(SPANNER_PROJECT_ID, SPANNER_INSTANCE_ID, SPANNER_DATABASE_ID);
         dbClient = spanner.getDatabaseClient(db);
         AssetsRepository assets = new AssetsRepository();
         model.addAttribute("kindObject", kindObject);
+        //TODO use real workspaceID from user/workspace/project table this is temporary (using "noasan")
         List<String> kindList = assets.getFilterList(dbClient, "noasan", "kind");
         model.addAttribute("kindList", kindList);
         List<String> displayNames = new ArrayList<>();
         String kind = kindObject.getKind();
-        if(kind != null){
-            List<List<String>> resultTable = assets.getAssetByKind(dbClient, displayNames, kind);
+        if (kind != null) {
+            List<List<String>> resultTable = assets.getAssetsByKind(dbClient, displayNames, kind);
             model.addAttribute("displayNames", displayNames);
             model.addAttribute("allAssets", resultTable);
         }
@@ -92,48 +102,57 @@ public class IndexController {
 
     /**
      * This page returns assets by status
-     * @param principal - Used to check authentication
-     * @param model - Used to show table to user
+     *
+     * @param principal    - Used to check authentication
+     * @param model        - Used to show table to user
      * @param statusObject - Used to get filter from user
      * @return the bystatus template
      */
     @GetMapping("/bystatus")
-    public String getByStatus(@AuthenticationPrincipal OAuth2User principal, Model model, @ModelAttribute StatusObject statusObject) {
-        SpannerOptions options = SpannerOptions.newBuilder().setProjectId(SPANNER_PROJECT_ID).build();
+    public String getByStatus(@AuthenticationPrincipal OAuth2User principal, Model model,
+                              @ModelAttribute StatusObject statusObject) {
+        SpannerOptions options =
+                SpannerOptions.newBuilder().setProjectId(SPANNER_PROJECT_ID).build();
         spanner = options.getService();
         db = DatabaseId.of(SPANNER_PROJECT_ID, SPANNER_INSTANCE_ID, SPANNER_DATABASE_ID);
         dbClient = spanner.getDatabaseClient(db);
         AssetsRepository assets = new AssetsRepository();
         model.addAttribute("statusObject", statusObject);
-        /* This workspaceID is temporary until we add user/workspace/project table*/
+        //TODO use real workspaceID from user/workspace/project table this is temporary (using "noasan")
         List<String> statusList = assets.getFilterList(dbClient, "noasan", "status");
         model.addAttribute("statusList", statusList);
         List<String> displayNames = new ArrayList<>();
-        List<List<String>> resultTable = assets.getAssetsByStatus(dbClient, displayNames, statusObject.getStatus());
+        List<List<String>> resultTable = assets.getAssetsByStatus(dbClient, displayNames,
+                statusObject.getStatus());
         model.addAttribute("displayNames", displayNames);
         model.addAttribute("allAssets", resultTable);
         return "bystatus";
     }
+
     /**
      * This page returns assets by location
-     * @param principal - Used to check authentication
-     * @param model - Used to show table to user
+     *
+     * @param principal      - Used to check authentication
+     * @param model          - Used to show table to user
      * @param locationObject - Used to get filter from user
      * @return the bylocation template
      */
     @GetMapping("/bylocation")
-    public String getByLocation(@AuthenticationPrincipal OAuth2User principal, Model model, @ModelAttribute LocationObject locationObject) {
-        SpannerOptions options = SpannerOptions.newBuilder().setProjectId(SPANNER_PROJECT_ID).build();
+    public String getByLocation(@AuthenticationPrincipal OAuth2User principal, Model model,
+                                @ModelAttribute LocationObject locationObject) {
+        SpannerOptions options =
+                SpannerOptions.newBuilder().setProjectId(SPANNER_PROJECT_ID).build();
         spanner = options.getService();
         db = DatabaseId.of(SPANNER_PROJECT_ID, SPANNER_INSTANCE_ID, SPANNER_DATABASE_ID);
         dbClient = spanner.getDatabaseClient(db);
         AssetsRepository assets = new AssetsRepository();
         model.addAttribute("locationObject", locationObject);
-        /* This workspaceID is temporary until we add user/workspace/project table*/
+        //TODO use real workspaceID from user/workspace/project table this is temporary (using "noasan")
         List<String> locationList = assets.getFilterList(dbClient, "noasan", "location");
         model.addAttribute("locationList", locationList);
         List<String> displayNames = new ArrayList<>();
-        List<List<String>> resultTable = assets.getAssetsByLocation(dbClient, displayNames, locationObject.getLocation());
+        List<List<String>> resultTable = assets.getAssetsByLocation(dbClient, displayNames,
+                locationObject.getLocation());
         model.addAttribute("displayNames", displayNames);
         model.addAttribute("allAssets", resultTable);
         return "bylocation";
