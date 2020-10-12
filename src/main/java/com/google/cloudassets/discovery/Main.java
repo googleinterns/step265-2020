@@ -210,5 +210,4 @@ List of Pairs in which the key is the workspace id and the value is the project 
         Statement statement = Statement.newBuilder(query).build();
         return readFromDb.executeQuery(statement);
     }
-
 }
