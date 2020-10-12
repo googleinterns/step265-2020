@@ -28,9 +28,11 @@ public class Main {
     private static final String GET_TABLES_LIST_QUERY = "SELECT table_name "
                                                         + "FROM information_schema.tables "
                                                         + "WHERE table_name like '%Assets'";
-    private static final String GET_SUPPORTED_TABLES_QUERY = "SELECT DISTINCT assetTableName "
+    // The order by part is important as the main asset table should be created before any other asset table
+    private static final String GET_SUPPORTED_TABLES_QUERY = "SELECT DISTINCT assetTableName, isMainTable "
                                                         + "FROM Asset_Tables_Config "
-                                                        + "WHERE assetTableName != 'forAllAssets'";
+                                                        + "WHERE assetTableName != 'forAllAssets' "
+                                                        + "ORDER BY isMainTable DESC";
 
     private static List<String> existingTableNames;
     private static List<String> newSupportedTableNames;
@@ -163,7 +165,8 @@ List of Pairs in which the key is the workspace id and the value is the project 
                 }
             }
         } catch (NullPointerException exception) {
-            String error_msg = "existingTableNames variable was not initialized.";
+            String error_msg = "existingTableNames variable was not initialized before calling the"
+                            + "setNewSupportedTableNames function.";
             logger.atInfo().withCause(exception).log(error_msg);
         }
     }
