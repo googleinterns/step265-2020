@@ -15,6 +15,7 @@ public class InstanceCloudSqlObject extends AssetObject {
     private Boolean backupEnabled;
     private String replicationType;
     private String activationPolicy;
+    private String databaseVersion;
 
     public static class Builder extends BaseBuilder<InstanceCloudSqlObject, InstanceCloudSqlObject.Builder> {
         /*
@@ -43,20 +44,20 @@ public class InstanceCloudSqlObject extends AssetObject {
 
         /**
          * This function sets the relevant fields of the InstanceCloudSqlObject.
-         * Fields that should be initialized for this object are: kind, name, type, location and status.
+         * Fields that should be initialized for this object are: kind, name, location and status.
          * @return the newly initialized InstanceCloudSqlObject
          */
         public InstanceCloudSqlObject build() {
             // Set AssetObject fields
             setKind(AssetKind.INSTANCE_CLOUD_SQL_ASSET);
             setName(assetProperties.get("name"));
-            setType(getLastSeg(assetProperties.get("databaseVersion")));
             setLocation(getLastSeg(assetProperties.get("region")));
             setStatus(assetProperties.get("state"));
 
             // Set specific asset type fields
             specificObjectClass.etag = (String) assetProperties.get("etag");
             updateFieldsFromSettings();
+            specificObjectClass.databaseVersion = getLastSeg(assetProperties.get("databaseVersion"));
 
             return super.build();
         }
@@ -93,6 +94,10 @@ public class InstanceCloudSqlObject extends AssetObject {
 
     public String getActivationPolicy() {
         return this.activationPolicy;
+    }
+
+    public String getDatabaseVersion() {
+        return this.databaseVersion;
     }
 
 }

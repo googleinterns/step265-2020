@@ -13,6 +13,7 @@ public class InstanceComputeObject extends AssetObject {
     private String description;
     private Boolean canIpForward;
     private String cpuPlatform;
+    private String machineType;
 
     public static class Builder extends BaseBuilder<InstanceComputeObject, Builder> {
         /*
@@ -41,7 +42,7 @@ public class InstanceComputeObject extends AssetObject {
 
         /**
          * This function sets the relevant fields of the InstanceComputeObject.
-         * Fields that should be initialized for this object are: kind, name, id, type, location,
+         * Fields that should be initialized for this object are: kind, name, id, location,
          * creationTime and status.
          * @return the newly initialized InstanceComputeObject
          */
@@ -50,7 +51,6 @@ public class InstanceComputeObject extends AssetObject {
             setKind(AssetKind.INSTANCE_COMPUTE_ASSET);
             setName(assetProperties.get("name"));
             setId(assetProperties.get("id"));
-            setType(getLastSeg(assetProperties.get("machineType")));
             setLocation(getLastSeg(assetProperties.get("zone")));
             setCreationTime(convertStringToDate(assetProperties.get("creationTimestamp")));
             setStatus(assetProperties.get("status"));
@@ -59,6 +59,7 @@ public class InstanceComputeObject extends AssetObject {
             specificObjectClass.description = convertObjectToString(assetProperties.get("description"));
             specificObjectClass.canIpForward = convertObjectToBoolean(assetProperties.get("canIpForward"));
             specificObjectClass.cpuPlatform = convertObjectToString(assetProperties.get("cpuPlatform"));
+            specificObjectClass.machineType = getLastSeg(assetProperties.get("machineType"));
 
             return super.build();
         }
@@ -74,5 +75,9 @@ public class InstanceComputeObject extends AssetObject {
 
     public String getCpuPlatform() {
         return this.cpuPlatform;
+    }
+
+    public String getMachineType() {
+        return this.machineType;
     }
 }
