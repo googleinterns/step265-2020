@@ -74,7 +74,7 @@ abstract public class AssetObject {
         Set the name field of this object with the provided string and return its specific Builder.
         */
         public B setName(Object name) {
-            specificObjectClass.name = convertObjectToString(name);
+            specificObjectClass.name = castToString(name);
             return specificObjectClassBuilder;
         }
 
@@ -82,7 +82,7 @@ abstract public class AssetObject {
         Set the id field of this object with the provided string and return its specific Builder.
         */
         public B setId(Object id) {
-            specificObjectClass.id = convertObjectToString(id);
+            specificObjectClass.id = castToString(id);
             return specificObjectClassBuilder;
         }
 
@@ -90,7 +90,7 @@ abstract public class AssetObject {
         Set the location field of this object with the provided string and return its specific Builder.
         */
         public B setLocation(Object location) {
-            specificObjectClass.location = convertObjectToString(location);
+            specificObjectClass.location = castToString(location);
             return specificObjectClassBuilder;
         }
 
@@ -106,7 +106,7 @@ abstract public class AssetObject {
         Set the status field of this object with the provided string and return its specific Builder.
         */
         public B setStatus(Object status) {
-            specificObjectClass.status = convertObjectToString(status);
+            specificObjectClass.status = castToString(status);
             return specificObjectClassBuilder;
         }
 
@@ -233,15 +233,15 @@ abstract public class AssetObject {
 
     /*
     This function receives an Object representing a string and returns it as a String.
-    If the provided stringToConvert can not be casted into a String, null is returned and details
+    If the provided stringToCast can not be casted into a String, null is returned and details
     are logged.
      */
-    protected static String convertObjectToString(Object stringToConvert) {
+    protected static String castToString(Object stringToCast) {
         try {
-            return (String) stringToConvert;
+            return (String) stringToCast;
         } catch (ClassCastException exception) {
             String error_msg = "Encountered a casting error, expected to get an object that can be " +
-                    "casted into a string. Received object: " + stringToConvert;
+                    "casted into a string. Received object: " + stringToCast;
             logger.atInfo().withCause(exception).log(error_msg);
         }
         return null;
@@ -249,15 +249,15 @@ abstract public class AssetObject {
 
     /*
     This function receives an Object representing a boolean and returns it as a Boolean.
-    If the provided booleanToConvert can not be casted into a Boolean, null is returned and details
+    If the provided booleanToCast can not be casted into a Boolean, null is returned and details
     are logged.
      */
-    protected static Boolean convertObjectToBoolean(Object booleanToConvert) {
+    protected static Boolean castToBoolean(Object booleanToCast) {
         try {
-            return (Boolean) booleanToConvert;
+            return (Boolean) booleanToCast;
         } catch (ClassCastException exception) {
             String error_msg = "Encountered a casting error, expected to get an object that can be " +
-                    "casted into a boolean. Received object: " + booleanToConvert;
+                    "casted into a boolean. Received object: " + booleanToCast;
             logger.atInfo().withCause(exception).log(error_msg);
         }
         return null;
@@ -265,15 +265,15 @@ abstract public class AssetObject {
 
     /*
     This function receives an Object and returns it as a HashMap<String, Object>.
-    If the provided mapToConvert can not be casted into a  HashMap<String, Object>, null is returned
+    If the provided mapToCast can not be casted into a  HashMap<String, Object>, null is returned
     and details are logged.
      */
-    protected static HashMap<String, Object> convertObjectToMap(Object mapToConvert) {
+    protected static HashMap<String, Object> castToMap(Object mapToCast) {
         try {
-            return (HashMap<String, Object>) mapToConvert;
+            return (HashMap<String, Object>) mapToCast;
         } catch (ClassCastException exception) {
             String error_msg = "Encountered a casting error, expected to get an object that can be " +
-                    "casted into a HashMap<String, Object>. Received object: " + mapToConvert;
+                    "casted into a HashMap<String, Object>. Received object: " + mapToCast;
             logger.atInfo().withCause(exception).log(error_msg);
         }
         return null;
