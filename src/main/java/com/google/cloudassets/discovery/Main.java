@@ -198,7 +198,7 @@ List of Pairs in which the key is the workspace id and the value is the project 
         List<String> createTableQueries = new ArrayList<>();
 
         for (String tableName : newSupportedTableNames) {
-            createTableQueries.add(TableCreation.getCreateTableQuery(tableName));
+            createTableQueries.add(TableCreation.getCreateTableStatement(tableName));
         }
         return createTableQueries;
     }

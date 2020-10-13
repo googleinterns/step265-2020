@@ -4,7 +4,7 @@ import com.google.cloud.spanner.ResultSet;
 import static com.google.cloudassets.discovery.Main.executeStringQuery;
 
 /**
- * This class generates an sql create table query for a given table name (based on the
+ * This class generates a DDL create table statement for a given table name (based on the
  * Asset_Tables_Config table).
  */
 public class TableCreation {
@@ -19,15 +19,15 @@ public class TableCreation {
                                                         + "and isPrimaryKey = True "
                                                         + "ORDER BY primaryKeyIndex";
 
-    private static StringBuilder createQuery;
+    private static StringBuilder createStatement;
 
     /**
-     * This function generates an SQL create table query for the given table name.
+     * This function generates an DDL create table statement for the given table name.
      * @param tableName - a string representing the table for which to create the statement.
-     * @return a string of the SQL query.
+     * @return a string of the DDL create table statement.
      */
-    public static String getCreateTableQuery(String tableName) {
-        createQuery = new StringBuilder();
+    public static String getCreateTableStatement(String tableName) {
+        createStatement = new StringBuilder();
         // Add CREATE TABLE statement and common columns
         addCommonColumnsStatement(tableName);
 
@@ -43,66 +43,66 @@ public class TableCreation {
             addInterleavedStatement();
         }
 
-        return createQuery.toString();
+        return createStatement.toString();
     }
 
     /*
-    This function appends a string of the beginning of the create table query for the given table
-    name with the columns that are common for all of the asset tables.
+    This function appends a string of the beginning of the DDL create table statement for the given
+    table name with the columns that are common for all of the asset tables.
      */
     private static void addCommonColumnsStatement(String tableName) {
-        createQuery.append("CREATE TABLE " + tableName + " (");
+        createStatement.append("CREATE TABLE " + tableName + " (");
 
         ResultSet commonConfig = executeStringQuery(GET_TABLES_CONFIG_QUERY + " WHERE assetTableName = 'forAllAssets'");
         addColumnsStatement(commonConfig);
     }
 
     /*
-    This function appends a string representing the columns part of the create table query to the
-    createQuery variable.
+    This function appends a string representing the columns part of the DDL create table statement
+    to the createStatement variable.
      */
     private static void addColumnsStatement(ResultSet tableConfig) {
         while (tableConfig.next()) {
-            createQuery.append(tableConfig.getString("columnName"));
-            createQuery.append(" ");
-            createQuery.append(tableConfig.getString("columnType"));
+            createStatement.append(tableConfig.getString("columnName"));
+            createStatement.append(" ");
+            createStatement.append(tableConfig.getString("columnType"));
             if (tableConfig.getBoolean("isNotNull")) {
-                createQuery.append(" NOT NULL");
+                createStatement.append(" NOT NULL");
             }
             if (tableConfig.getBoolean("allowCommitTimestamp")) {
-                createQuery.append(" OPTIONS (allow_commit_timestamp=true)");
+                createStatement.append(" OPTIONS (allow_commit_timestamp=true)");
             }
-            createQuery.append(", ");
+            createStatement.append(", ");
         }
     }
 
     /*
-    This function appends a string of the primary keys part of the create table query which is
+    This function appends a string of the primary keys part of the DDL create table statement which is
     common to all of the asset tables - should be used after the statement of last column wanted for
     a given table.
      */
     private static void addCommonPrimaryKeysStatement() {
         ResultSet tableConfig = executeStringQuery(GET_COMMON_PRIMARY_KEYS_QUERY);
 
-        createQuery.append(") PRIMARY KEY (");
+        createStatement.append(") PRIMARY KEY (");
 
         while (tableConfig.next()) {
-            createQuery.append(tableConfig.getString("columnName"));
-            createQuery.append(", ");
+            createStatement.append(tableConfig.getString("columnName"));
+            createStatement.append(", ");
         }
-        // Delete the last comma from the createQuery variable
-        if (createQuery.length() > 0) {
-            createQuery.delete(createQuery.length() - 2, createQuery.length());
+        // Delete the last comma from the createStatement variable
+        if (createStatement.length() > 0) {
+            createStatement.delete(createStatement.length() - 2, createStatement.length());
         }
 
-        createQuery.append(")");
+        createStatement.append(")");
     }
 
     /*
-    This function appends a string of the interleave statements part of the create table query -
+    This function appends a string of the interleave statements part of the DDL create table statement -
     should be used after the primary keys statement.
      */
     private static void addInterleavedStatement() {
-        createQuery.append(", INTERLEAVE IN PARENT " + AssetKind.getMainTableName() + " ON DELETE CASCADE");
+        createStatement.append(", INTERLEAVE IN PARENT " + AssetKind.getMainTableName() + " ON DELETE CASCADE");
     }
 }
