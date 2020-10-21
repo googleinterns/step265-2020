@@ -165,9 +165,9 @@ public class Main {
                 }
             }
         } catch (NullPointerException exception) {
-            String error_msg = "existingTableNames variable was not initialized before calling the"
+            String errorMsg = "existingTableNames variable was not initialized before calling the"
                             + "setNewSupportedTableNames function.";
-            logger.atInfo().withCause(exception).log(error_msg);
+            logger.atInfo().withCause(exception).log(errorMsg);
         }
     }
 
@@ -184,8 +184,8 @@ public class Main {
             try {
                 createTables.get();
             } catch (Exception exception) {
-                String error_msg = "Encountered an Exception while creating new asset tables.";
-                logger.atInfo().withCause(exception).log(error_msg);
+                String errorMsg = "Encountered an Exception while creating new asset tables.";
+                logger.atInfo().withCause(exception).log(errorMsg);
             }
         }
     }

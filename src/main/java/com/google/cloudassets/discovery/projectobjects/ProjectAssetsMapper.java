@@ -63,8 +63,8 @@ public class ProjectAssetsMapper {
                                                 .buildGetRequest(new GenericUrl(assetListUrl));
             return request.execute().parseAsString();
         } catch (IOException exception) {
-            String error_msg = "Encountered an IOException. Provided url was: " + assetListUrl;
-            logger.atInfo().withCause(exception).log(error_msg);
+            String errorMsg = "Encountered an IOException. Provided url was: " + assetListUrl;
+            logger.atInfo().withCause(exception).log(errorMsg);
         }
         return null;
     }
@@ -89,9 +89,9 @@ public class ProjectAssetsMapper {
                 assetObjectList.add(assetObject);
             }
         } catch (IOException exception) {
-            String error_msg = "Encountered an IOException while calling jsonMapper.readValue(). " +
+            String errorMsg = "Encountered an IOException while calling jsonMapper.readValue(). " +
                                 "Provided url was: " + assetListUrl;
-            logger.atInfo().withCause(exception).log(error_msg);
+            logger.atInfo().withCause(exception).log(errorMsg);
         }
     }
 
@@ -108,9 +108,9 @@ public class ProjectAssetsMapper {
                 zonesList.add(zoneNode.get("name").toString().replaceAll("\"", ""));
             }
         } catch (IOException exception) {
-            String error_msg = "Encountered an IOException while calling jsonMapper.readTree(). " +
+            String errorMsg = "Encountered an IOException while calling jsonMapper.readTree(). " +
                                 "Provided url was: " + zonesUrl;
-            logger.atInfo().withCause(exception).log(error_msg);
+            logger.atInfo().withCause(exception).log(errorMsg);
         }
         return zonesList;
     }
@@ -145,9 +145,9 @@ public class ProjectAssetsMapper {
             }
             return Boolean.FALSE;
         } catch (IOException exception) {
-            String error_msg = "Encountered an IOException while calling jsonMapper.readValue(). " +
+            String errorMsg = "Encountered an IOException while calling jsonMapper.readValue(). " +
                     "Provided url was: " + apiService;
-            logger.atInfo().withCause(exception).log(error_msg);
+            logger.atInfo().withCause(exception).log(errorMsg);
         }
         return null;
     }

@@ -169,9 +169,9 @@ abstract public class AssetObject {
                 return matcher.group(1);
             }
         } catch (ClassCastException exception) {
-            String error_msg = "Encountered a casting error, expected to get an object that can be " +
+            String errorMsg = "Encountered a casting error, expected to get an object that can be " +
                     "casted into a string. Received object: " + url;
-            logger.atInfo().withCause(exception).log(error_msg);
+            logger.atInfo().withCause(exception).log(errorMsg);
         }
         return null;
     }
@@ -185,9 +185,9 @@ abstract public class AssetObject {
             List<String> urlsList = (List<String>) urlsObject;
             return urlsList.stream().map(AssetObject::getLastSeg).collect(Collectors.toList());
         } catch (ClassCastException exception) {
-            String error_msg = "Encountered a casting error, expected to get an object that can be " +
+            String errorMsg = "Encountered a casting error, expected to get an object that can be " +
                     "casted into a list of strings. Received object: " + urlsObject;
-            logger.atInfo().withCause(exception).log(error_msg);
+            logger.atInfo().withCause(exception).log(errorMsg);
         }
         return null;
     }
@@ -201,13 +201,13 @@ abstract public class AssetObject {
         try {
             return Timestamp.of(DATE_FORMAT.parse((String) dateString));
         } catch (ParseException exception) {
-            String error_msg = "Encountered a date parsing error. Dates should be in " +
+            String errorMsg = "Encountered a date parsing error. Dates should be in " +
                                 "yyyy-MM-ddTHH:mm:ss format, provided date: " + dateString;
-            logger.atInfo().withCause(exception).log(error_msg);
+            logger.atInfo().withCause(exception).log(errorMsg);
         } catch (ClassCastException exception) {
-            String error_msg = "Encountered a casting error, expected to get an object that can be " +
+            String errorMsg = "Encountered a casting error, expected to get an object that can be " +
                     "casted into a string. Received object: " + dateString;
-            logger.atInfo().withCause(exception).log(error_msg);
+            logger.atInfo().withCause(exception).log(errorMsg);
         }
         return null;
     }
@@ -220,13 +220,13 @@ abstract public class AssetObject {
         try {
             return Integer.valueOf((String) intString);
         } catch (ClassCastException exception) {
-            String error_msg = "Encountered a casting error, expected to get an object that can be " +
+            String errorMsg = "Encountered a casting error, expected to get an object that can be " +
                                 "casted into a string. Received object: " + intString;
-            logger.atInfo().withCause(exception).log(error_msg);
+            logger.atInfo().withCause(exception).log(errorMsg);
         } catch (NumberFormatException exception) {
-            String error_msg = "Encountered a formatting error, expected to get an object that can be " +
+            String errorMsg = "Encountered a formatting error, expected to get an object that can be " +
                                 "casted into an Integer. Received object: " + intString;
-            logger.atInfo().withCause(exception).log(error_msg);
+            logger.atInfo().withCause(exception).log(errorMsg);
         }
         return null;
     }
@@ -240,9 +240,9 @@ abstract public class AssetObject {
         try {
             return (String) stringToCast;
         } catch (ClassCastException exception) {
-            String error_msg = "Encountered a casting error, expected to get an object that can be " +
+            String errorMsg = "Encountered a casting error, expected to get an object that can be " +
                     "casted into a string. Received object: " + stringToCast;
-            logger.atInfo().withCause(exception).log(error_msg);
+            logger.atInfo().withCause(exception).log(errorMsg);
         }
         return null;
     }
@@ -256,9 +256,9 @@ abstract public class AssetObject {
         try {
             return (Boolean) booleanToCast;
         } catch (ClassCastException exception) {
-            String error_msg = "Encountered a casting error, expected to get an object that can be " +
+            String errorMsg = "Encountered a casting error, expected to get an object that can be " +
                     "casted into a boolean. Received object: " + booleanToCast;
-            logger.atInfo().withCause(exception).log(error_msg);
+            logger.atInfo().withCause(exception).log(errorMsg);
         }
         return null;
     }
@@ -272,9 +272,9 @@ abstract public class AssetObject {
         try {
             return (HashMap<String, Object>) mapToCast;
         } catch (ClassCastException exception) {
-            String error_msg = "Encountered a casting error, expected to get an object that can be " +
+            String errorMsg = "Encountered a casting error, expected to get an object that can be " +
                     "casted into a HashMap<String, Object>. Received object: " + mapToCast;
-            logger.atInfo().withCause(exception).log(error_msg);
+            logger.atInfo().withCause(exception).log(errorMsg);
         }
         return null;
     }
