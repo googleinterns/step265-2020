@@ -79,9 +79,9 @@ public class Main {
     }
 
     /*
-This function retrieves the project ids for which this process should run and returns it as a
-List of Pairs in which the key is the workspace id and the value is the project id.
- */
+    This function retrieves the project ids for which this process should run and returns it as a
+    List of Pairs in which the key is the workspace id and the value is the project id.
+     */
     private static List<Pair<String, String>> getProjectsList() {
         List<Pair<String, String>> projectsList = new ArrayList<>();
 
@@ -125,8 +125,8 @@ List of Pairs in which the key is the workspace id and the value is the project 
 
     /*
     This function runs all of functions that are responsible for the tables maintenance which are not
-     project specific (finding existing table names, finding and creating newly supported tables).
-     */
+    project specific (finding existing table names, finding and creating newly supported tables).
+    */
     private static void maintainTables() {
         setExistingTableNames();
         // 'existingTableNames' var must be initialized before getNewSupportedTableNames is called
@@ -137,7 +137,7 @@ List of Pairs in which the key is the workspace id and the value is the project 
     /*
     This function updates the existingTableNames variable which is a list of string that represents
     all of the asset tables which currently exist in our spanner db.
-     */
+    */
     private static void setExistingTableNames() {
         existingTableNames = new ArrayList<>();
 
@@ -152,7 +152,7 @@ List of Pairs in which the key is the workspace id and the value is the project 
     all of the asset tables which do not currently exist in our spanner db but were added to the
     Asset_Tables_Config table.
     This function relays on existingTableNames variable being properly initialized.
-     */
+    */
     private static void setNewSupportedTableNames() {
         newSupportedTableNames = new ArrayList<>();
 
@@ -173,7 +173,7 @@ List of Pairs in which the key is the workspace id and the value is the project 
 
     /*
     This function executes the tables creation in our spanner db for tables that do not yet exist.
-     */
+    */
     private static void createTablesIfNotExist() {
         // Create asset tables only if there are new ones
         if (newSupportedTableNames.size() > 0) {
@@ -193,7 +193,7 @@ List of Pairs in which the key is the workspace id and the value is the project 
     /*
     This function returns a list of strings that represent the SQL create table queries to be
     executed in our spanner DB (of the newly added asset kinds).
-     */
+    */
     private static List<String> getCreateTableQueriesList() {
         List<String> createTableQueries = new ArrayList<>();
 
