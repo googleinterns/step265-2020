@@ -135,7 +135,7 @@ public class Main {
     }
 
     /*
-    This function updates the existingTableNames variable which is a list of string that represents
+    This function updates the existingTableNames variable which is a list of strings that represents
     all of the asset tables which currently exist in our spanner db.
     */
     private static void setExistingTableNames() {
@@ -148,10 +148,10 @@ public class Main {
     }
 
     /*
-    This function updates the newSupportedTableNames variable which is a list of string that represents
+    This function updates the newSupportedTableNames variable which is a list of strings that represents
     all of the asset tables which do not currently exist in our spanner db but were added to the
     Asset_Tables_Config table.
-    This function relays on existingTableNames variable being properly initialized.
+    This function relies on existingTableNames variable being properly initialized.
     */
     private static void setNewSupportedTableNames() {
         newSupportedTableNames = new ArrayList<>();
