@@ -22,7 +22,7 @@ public class TableCreation {
     private static StringBuilder createStatement;
 
     /**
-     * This function generates an DDL create table statement for the given table name.
+     * This function returns a DDL create table statement for the given table name.
      * @param tableName - a string representing the table for which to create the statement.
      * @return a string of the DDL create table statement.
      */
