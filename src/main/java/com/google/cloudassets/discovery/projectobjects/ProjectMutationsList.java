@@ -4,6 +4,8 @@ import com.google.cloudassets.discovery.AssetKind;
 import com.google.cloudassets.discovery.assetobjects.*;
 import com.google.cloud.spanner.Mutation;
 import com.google.cloud.spanner.Value;
+import com.google.cloudassets.discovery.exceptions.ConfigTableException;
+import com.google.cloudassets.discovery.exceptions.TableInsertionException;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -29,31 +31,48 @@ public class ProjectMutationsList {
      * @param assetObjectList - a list of AssetObjects to be converted.
      * @return a list of Mutations of the AssetObjects as they should be inserted into the spanner
      * db tables.
+     * @throws TableInsertionException if data could not be inserted to a certain table.
      */
-    public List<Mutation> getMutationList(List<AssetObject> assetObjectList) {
-        for (AssetObject asset : assetObjectList) {
-            String tableName = AssetKind.getMainTableName();
-            this.mutations.add(
-                    setCommonColumnValues(tableName, asset)
-                    .set("assetId").to(asset.getId())
-                    .set("creationTime").to(asset.getCreationTime())
-                    .set("status").to(asset.getStatus())
-                    .set("location").to(asset.getLocation())
-                    .build());
-
-            // It is important that the insertion of the specific asset types happens after the
-            // insertion of the AssetObject as the specific tables are interleaved with MAIN_TABLE.
-            addSpecificAssetMutation(asset);
+    public List<Mutation> getMutationList(List<AssetObject> assetObjectList) throws TableInsertionException {
+        String tableName;
+        try {
+            tableName = AssetKind.getMainTableName();
+        } catch (ConfigTableException exception) {
+            String errorMsg = "Could not insert data into the main table as its name could not be "
+                            + "properly retrieved.";
+            throw new TableInsertionException(errorMsg, exception);
         }
+
+            for (AssetObject asset : assetObjectList) {
+                this.mutations.add(
+                        setCommonColumnValues(tableName, asset)
+                                .set("assetId").to(asset.getId())
+                                .set("creationTime").to(asset.getCreationTime())
+                                .set("status").to(asset.getStatus())
+                                .set("location").to(asset.getLocation())
+                                .build());
+
+                // It is important that the insertion of the specific asset types happens after the
+                // insertion of the AssetObject as the specific tables are interleaved with MAIN_TABLE.
+                addSpecificAssetMutation(asset);
+            }
         return this.mutations;
     }
 
     /*
     This function adds a new Mutation to the mutations list based on the specific AssetKind of the
     provided AssetObject.
+    Throws a TableInsertionException if data could not be inserted to the given asset kind table.
      */
-    private void addSpecificAssetMutation(AssetObject asset) {
-        String tableName = asset.getKindEnum().getAssetTableName();
+    private void addSpecificAssetMutation(AssetObject asset) throws TableInsertionException {
+        String tableName;
+        try {
+            tableName = asset.getKindEnum().getAssetTableName();
+        } catch (ConfigTableException exception) {
+            String errorMsg = "Could not insert data into the following asset kind table: "
+                            + asset.getKindEnum().toString() + ", as its name could not be properly retrieved.";
+            throw new TableInsertionException(errorMsg, exception);
+        }
         switch (asset.getKindEnum()) {
             case INSTANCE_COMPUTE_ASSET:
                 InstanceComputeObject instanceComputeObject = (InstanceComputeObject) asset;

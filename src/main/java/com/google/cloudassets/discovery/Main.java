@@ -1,5 +1,7 @@
 package com.google.cloudassets.discovery;
 
+import com.google.cloudassets.discovery.exceptions.TableCreationException;
+import com.google.cloudassets.discovery.exceptions.TableInsertionException;
 import com.google.cloudassets.discovery.projectobjects.ProjectAssetsMapper;
 import com.google.cloudassets.discovery.projectobjects.ProjectConfig;
 import com.google.cloudassets.discovery.projectobjects.ProjectMutationsList;
@@ -58,8 +60,16 @@ public class Main {
         readFromDb = dbClient.readOnlyTransaction();
 
         // Use spanner DatabaseClient
-        maintainTables();
-        updateAllProjectsAssets();
+        try {
+            maintainTables();
+            updateAllProjectsAssets();
+        } catch (TableCreationException exception) {
+            String errorMsg = "Encountered an error while running table maintenance functions.";
+            logger.atInfo().withCause(exception).log(errorMsg);
+        } catch (TableInsertionException exception) {
+            String errorMsg = "Encountered an error while inserting data into tables.";
+            logger.atInfo().withCause(exception).log(errorMsg);
+        }
 
         // Close spanner DatabaseClient
         readFromDb.close();
@@ -69,7 +79,7 @@ public class Main {
     /*
     This function updates in out spanner db all of the assets for all of the relevant projects.
      */
-    private static void updateAllProjectsAssets() {
+    private static void updateAllProjectsAssets() throws TableInsertionException {
         for (Pair<String, String> pair : getProjectsList()) {
             String workspaceId = pair.getKey();
             String projectId = pair.getValue();
@@ -95,7 +105,7 @@ public class Main {
     /*
     This function receives a specific workspace ID & project ID and updates all of its assets information.
      */
-    private static void updateProjectAssets(String workspaceId, String projectId) {
+    private static void updateProjectAssets(String workspaceId, String projectId) throws TableInsertionException {
         // Update project config and assets
         ProjectAssetsMapper projectAssets = new ProjectAssetsMapper(new ProjectConfig(workspaceId, projectId));
         ProjectMutationsList projectMutations = new ProjectMutationsList();
@@ -127,7 +137,7 @@ public class Main {
     This function runs all of functions that are responsible for the tables maintenance which are not
     project specific (finding existing table names, finding and creating newly supported tables).
     */
-    private static void maintainTables() {
+    private static void maintainTables() throws TableCreationException {
         setExistingTableNames();
         // 'existingTableNames' var must be initialized before getNewSupportedTableNames is called
         setNewSupportedTableNames();
@@ -174,7 +184,7 @@ public class Main {
     /*
     This function executes the tables creation in our spanner db for tables that do not yet exist.
     */
-    private static void createTablesIfNotExist() {
+    private static void createTablesIfNotExist() throws TableCreationException {
         // Create asset tables only if there are new ones
         if (newSupportedTableNames.size() > 0) {
             DatabaseAdminClient dbAdminClient = spanner.getDatabaseAdminClient();
@@ -194,7 +204,7 @@ public class Main {
     This function returns a list of strings that represent the SQL create table queries to be
     executed in our spanner DB (of the newly added asset kinds).
     */
-    private static List<String> getCreateTableQueriesList() {
+    private static List<String> getCreateTableQueriesList() throws TableCreationException {
         List<String> createTableQueries = new ArrayList<>();
 
         for (String tableName : newSupportedTableNames) {

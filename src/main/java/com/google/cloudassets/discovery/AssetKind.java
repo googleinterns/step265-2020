@@ -1,7 +1,7 @@
 package com.google.cloudassets.discovery;
 
 import com.google.cloud.spanner.ResultSet;
-import com.google.common.flogger.FluentLogger;
+import com.google.cloudassets.discovery.exceptions.ConfigTableException;
 
 import static com.google.cloudassets.discovery.Main.executeStringQuery;
 
@@ -16,8 +16,6 @@ public enum AssetKind {
     INSTANCE_COMPUTE_ASSET("compute#instance"),
     SUBSCRIPTION_PUB_SUB_ASSET("pubsub#subscription"),
     TOPIC_PUB_SUB_ASSET("pubsub#topic");
-
-    private static final FluentLogger logger = FluentLogger.forEnclosingClass();
 
     private final String kindString;
 
@@ -38,10 +36,12 @@ public enum AssetKind {
 
     /**
      * @return a string representing the table name of a given asset kind.
+     * @throws ConfigTableException if the asset kind table is not properly configured in the
+     * configuration table.
      */
-    public String getAssetTableName() {
+    public String getAssetTableName() throws ConfigTableException {
         String errorMsg = " was configured as the asset table in Asset_Tables_Config for the '"
-                + this.kindString + " asset kind. Please make sure that exactly one table is configured"
+                + this.kindString + "' asset kind. Please make sure that exactly one table is configured"
                 + " for each asset kind.";
         String queryStr = "SELECT DISTINCT assetTableName FROM Asset_Tables_Config WHERE assetKind = '"
                 + this.kindString + "'";
@@ -50,8 +50,10 @@ public enum AssetKind {
 
     /**
      * @return a string representing the main asset table name.
+     * @throws ConfigTableException if the main table is not properly configured in the configuration
+     * table.
      */
-    public static String getMainTableName() {
+    public static String getMainTableName() throws ConfigTableException {
         String errorMsg = " was configured as the main table in Asset_Tables_Config. "
                 + "Please make sure that exactly one table has the 'isMainTable' flag on.";
         String queryStr = "SELECT DISTINCT assetTableName FROM Asset_Tables_Config WHERE isMainTable = True";
@@ -61,21 +63,21 @@ public enum AssetKind {
     /*
     This function returns a table name returned from the provided queryStr. If there is not exactly
     one table name returned from the provided query it means that the Asset_Tables_Config is not
-    configured properly and therefore unexpected behaviors may arise. In this case an error is logged.
+    configured properly and therefore unexpected behaviors may arise. In this case a
+    ConfigTableException is thrown.
      */
-    private static String getTableName(String queryStr, String errorMsg) {
+    private static String getTableName(String queryStr, String errorMsg) throws ConfigTableException {
         ResultSet resultSet = executeStringQuery(queryStr);
         String tableName = null;
         if (resultSet.next()) {
             tableName = resultSet.getString("assetTableName");
         } else {
-            String error_msg = "No table" + errorMsg;
-            logger.atInfo().log(error_msg);
+            throw new ConfigTableException("No table" + errorMsg);
         }
 
+        // Each asset should have exactly one table name associated with it
         if (resultSet.next()) {
-            String error_msg = "More then one table" + errorMsg;
-            logger.atInfo().log(error_msg);
+            throw new ConfigTableException("More then one table" + errorMsg);
         }
 
         return tableName;

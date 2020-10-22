@@ -1,6 +1,9 @@
 package com.google.cloudassets.discovery;
 
 import com.google.cloud.spanner.ResultSet;
+import com.google.cloudassets.discovery.exceptions.ConfigTableException;
+import com.google.cloudassets.discovery.exceptions.TableCreationException;
+
 import static com.google.cloudassets.discovery.Main.executeStringQuery;
 
 /**
@@ -25,8 +28,9 @@ public class TableCreation {
      * This function returns a DDL create table statement for the given table name.
      * @param tableName - a string representing the table for which to create the statement.
      * @return a string of the DDL create table statement.
+     * @throws TableCreationException
      */
-    public static String getCreateTableStatement(String tableName) {
+    public static String getCreateTableStatement(String tableName) throws TableCreationException {
         createStatement = new StringBuilder();
         // Add CREATE TABLE statement and common columns
         addCommonColumnsStatement(tableName);
@@ -38,9 +42,14 @@ public class TableCreation {
         // Add primary keys
         addCommonPrimaryKeysStatement();
 
-        // Add interleaved statement for all tables except for the main asset table
-        if (!tableName.equals(AssetKind.getMainTableName())) {
-            addInterleavedStatement();
+        try {
+            // Add interleaved statement for all tables except for the main asset table
+            if (!tableName.equals(AssetKind.getMainTableName())) {
+                addInterleavedStatement();
+            }
+        } catch (ConfigTableException exception) {
+            String errorMsg = "Could not construct the DDL create table statement for " + tableName;
+            throw new TableCreationException(errorMsg, exception);
         }
 
         return createStatement.toString();
@@ -101,8 +110,10 @@ public class TableCreation {
     /*
     This function appends a string of the interleave statements part of the DDL create table statement -
     should be used after the primary keys statement.
+    Throws a ConfigTableException if the main table is not properly configured in the configuration
+    table.
      */
-    private static void addInterleavedStatement() {
+    private static void addInterleavedStatement() throws ConfigTableException {
         createStatement.append(", INTERLEAVE IN PARENT " + AssetKind.getMainTableName() + " ON DELETE CASCADE");
     }
 }
