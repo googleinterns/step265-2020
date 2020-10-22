@@ -60,11 +60,10 @@ public class IndexController {
         db = DatabaseId.of(SPANNER_PROJECT_ID, SPANNER_INSTANCE_ID, SPANNER_DATABASE_ID);
         dbClient = spanner.getDatabaseClient(db);
         AssetsRepository assets = new AssetsRepository();
-        List<String> displayNames = new ArrayList<>();
         //TODO use workspaceID from user/workspace/project
-        List<List<String>> resultTable = assets.getAllAssets(dbClient, displayNames);
-        model.addAttribute("displayNames", displayNames);
-        model.addAttribute("allAssets", resultTable);
+        ResultListObject resultListObject = assets.getAllAssets(dbClient);
+        model.addAttribute("displayNames", resultListObject.columnDisplays);
+        model.addAttribute("allAssets", resultListObject.columnResults);
         return "allassets";
     }
 
@@ -90,12 +89,11 @@ public class IndexController {
         //TODO use real workspaceID from user/workspace/project table this is temporary (using "noasan")
         List<String> kindList = assets.getFilterList(dbClient, "noasan", "kind");
         model.addAttribute("kindList", kindList);
-        List<String> displayNames = new ArrayList<>();
         String kind = kindObject.getKind();
         if (kind != null) {
-            List<List<String>> resultTable = assets.getAssetsByKind(dbClient, displayNames, kind);
-            model.addAttribute("displayNames", displayNames);
-            model.addAttribute("allAssets", resultTable);
+            ResultListObject resultListObject = assets.getAssetsByKind(dbClient, kind);
+            model.addAttribute("displayNames", resultListObject.columnDisplays);
+            model.addAttribute("allAssets", resultListObject.columnResults);
         }
         return "bykind";
     }
@@ -121,11 +119,9 @@ public class IndexController {
         //TODO use real workspaceID from user/workspace/project table this is temporary (using "noasan")
         List<String> statusList = assets.getFilterList(dbClient, "noasan", "status");
         model.addAttribute("statusList", statusList);
-        List<String> displayNames = new ArrayList<>();
-        List<List<String>> resultTable = assets.getAssetsByStatus(dbClient, displayNames,
-                statusObject.getStatus());
-        model.addAttribute("displayNames", displayNames);
-        model.addAttribute("allAssets", resultTable);
+        ResultListObject resultListObject = assets.getAssetsByStatus(dbClient, statusObject.getStatus());
+        model.addAttribute("displayNames", resultListObject.columnDisplays);
+        model.addAttribute("allAssets", resultListObject.columnResults);
         return "bystatus";
     }
 
@@ -150,12 +146,9 @@ public class IndexController {
         //TODO use real workspaceID from user/workspace/project table this is temporary (using "noasan")
         List<String> locationList = assets.getFilterList(dbClient, "noasan", "location");
         model.addAttribute("locationList", locationList);
-        List<String> displayNames = new ArrayList<>();
-        List<List<String>> resultTable = assets.getAssetsByLocation(dbClient, displayNames,
-                locationObject.getLocation());
-        model.addAttribute("displayNames", displayNames);
-        model.addAttribute("allAssets", resultTable);
+        ResultListObject resultListObject = assets.getAssetsByLocation(dbClient, locationObject.getLocation());
+        model.addAttribute("displayNames", resultListObject.columnDisplays);
+        model.addAttribute("allAssets", resultListObject.columnResults);
         return "bylocation";
     }
-
 }
