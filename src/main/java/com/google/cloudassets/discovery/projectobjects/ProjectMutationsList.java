@@ -43,19 +43,18 @@ public class ProjectMutationsList {
             throw new TableInsertionException(errorMsg, exception);
         }
 
-            for (AssetObject asset : assetObjectList) {
-                this.mutations.add(
-                        setCommonColumnValues(tableName, asset)
+        for (AssetObject asset : assetObjectList) {
+            this.mutations.add(setCommonColumnValues(tableName, asset)
                                 .set("assetId").to(asset.getId())
                                 .set("creationTime").to(asset.getCreationTime())
                                 .set("status").to(asset.getStatus())
                                 .set("location").to(asset.getLocation())
                                 .build());
 
-                // It is important that the insertion of the specific asset types happens after the
-                // insertion of the AssetObject as the specific tables are interleaved with MAIN_TABLE.
-                addSpecificAssetMutation(asset);
-            }
+            // It is important that the insertion of the specific asset types happens after the
+            // insertion of the AssetObject as the specific tables are interleaved with MAIN_TABLE.
+            addSpecificAssetMutation(asset);
+        }
         return this.mutations;
     }
 
