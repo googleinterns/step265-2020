@@ -127,6 +127,7 @@ public class ProjectAssetsMapper {
         getAllPubSubAssets(assetObjectList);
         getAllStorageAssets(assetObjectList);
         getAllCloudSqlAssets(assetObjectList);
+        getAllSpannerAssets(assetObjectList);
 
         return assetObjectList;
     }
@@ -153,8 +154,8 @@ public class ProjectAssetsMapper {
     }
 
     /*
-    This function returns a list of the different Compute Asset Objects that belong to a
-    specific Google Cloud project (if the compute API is enabled for this project).
+    This function adds the different Compute Asset Objects that belong to a specific Google Cloud
+    project to the assetObjectList (if the compute API is enabled for this project).
      */
     private void getAllComputeAssets(List<AssetObject> assetObjectList) {
         String apiService = "compute.googleapis.com";
@@ -177,8 +178,8 @@ public class ProjectAssetsMapper {
     }
 
     /*
-    This function returns a list of the different Pub Sub Asset Objects that belong to a
-    specific Google Cloud project (if the pubsub API is enabled for this project).
+    This function adds the different Pub Sub Asset Objects that belong to a specific Google Cloud
+    project to the assetObjectList (if the pubsub API is enabled for this project).
      */
     private void getAllPubSubAssets(List<AssetObject> assetObjectList) {
         String apiService = "pubsub.googleapis.com";
@@ -195,8 +196,8 @@ public class ProjectAssetsMapper {
     }
 
     /*
-    This function returns a list of the different Storage Asset Objects that belong to a
-    specific Google Cloud project (if the storage API is enabled for this project).
+    This function adds the different Storage Asset Objects that belong to a specific Google Cloud
+    project to the assetObjectList (if the storage API is enabled for this project).
      */
     private void getAllStorageAssets(List<AssetObject> assetObjectList) {
         String apiService = "storage.googleapis.com";
@@ -210,8 +211,8 @@ public class ProjectAssetsMapper {
     }
 
     /*
-    This function returns a list of the different Cloud Sql Asset Objects that belong to a
-    specific Google Cloud project (if the sqladmin API is enabled for this project).
+    This function adds the different Cloud Sql Asset Objects that belong to a specific Google Cloud
+    project to the assetObjectList (if the sqladmin API is enabled for this project).
      */
     private void getAllCloudSqlAssets(List<AssetObject> assetObjectList) {
         String apiService = "sqladmin.googleapis.com";
@@ -221,6 +222,21 @@ public class ProjectAssetsMapper {
 
             String instanceCloudSqlUrl = cloudSqlUrl.replace(ASSET_TYPE_EXP, "instances");
             getAssetObjectList(assetObjectList, instanceCloudSqlUrl, AssetKind.INSTANCE_CLOUD_SQL_ASSET);
+        }
+    }
+
+    /*
+    This function adds the different Spanner Asset Objects that belong to a specific Google Cloud
+    project to the assetObjectList (if the spanner API is enabled for this project).
+     */
+    private void getAllSpannerAssets(List<AssetObject> assetObjectList) {
+        String apiService = "spanner.googleapis.com";
+        if (isApiEnabled(apiService)) {
+            String spannerUrl = ("https://" + apiService + "/v1/projects/" + PROJECT_ID_EXP +
+                    "/" + ASSET_TYPE_EXP).replace(PROJECT_ID_EXP, projectConfig.getProjectId());
+
+            String instanceSpannerUrl = spannerUrl.replace(ASSET_TYPE_EXP, "instances");
+            getAssetObjectList(assetObjectList, instanceSpannerUrl, AssetKind.INSTANCE_SPANNER_ASSET);
         }
     }
 }
