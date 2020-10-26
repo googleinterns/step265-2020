@@ -15,7 +15,8 @@ public enum AssetKind {
     INSTANCE_CLOUD_SQL_ASSET("sql#instance"),
     INSTANCE_COMPUTE_ASSET("compute#instance"),
     SUBSCRIPTION_PUB_SUB_ASSET("pubsub#subscription"),
-    TOPIC_PUB_SUB_ASSET("pubsub#topic");
+    TOPIC_PUB_SUB_ASSET("pubsub#topic"),
+    INSTANCE_SPANNER_ASSET("spanner#instance");
 
     private final String kindString;
 
