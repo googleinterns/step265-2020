@@ -58,7 +58,10 @@ implement public getters for these new fields.
     kind for a new asset we support.
            
 1. Add its creation to the AssetObjectsFactory (to the createAssetObject function).
-1. Add its creation to the getAllAssets function in the ProjectAssetsMapper class.
+1. Add its creation to the getAllAssets function in the ProjectAssetsMapper class. Please notice that
+assets are parsed from json format using the AssetObjectsList class and sometimes new asset types
+require adding a new key to the JsonAlias in the setAssetObjectsList function (according to the
+data returned by their REST API). 
 1. Add a relevant asset table in the spanner db if needed (sometimes there aren't any new interesting
 asset attributes which are not covered in the Main_Assets table, and that fine) by following these steps:
     1. For each wanted property of this asset add a new row to the Asset_Tables_Config table in our

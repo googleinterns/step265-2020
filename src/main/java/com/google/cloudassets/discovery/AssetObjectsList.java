@@ -20,7 +20,7 @@ public class AssetObjectsList {
      * This function creates a list of maps in which each map represents a AssetObject that should
      * be constructed.
      */
-    @JsonAlias({"items", "topics", "subscriptions"})
+    @JsonAlias({"items", "topics", "subscriptions", "instances"})
     public void setAssetObjectsList(List items) {
         this.assetObjectsList = new ArrayList<>();
         for (Object item : items) {
