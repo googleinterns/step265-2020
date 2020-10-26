@@ -122,6 +122,13 @@ public class ProjectMutationsList {
                         .set("allowedPersistenceRegions").to(Value.stringArray(topicPubSubObject.getAllowedPersistenceRegions()))
                         .build());
                 break;
+            case INSTANCE_SPANNER_ASSET:
+                InstanceSpannerObject instanceSpannerObject = (InstanceSpannerObject) asset;
+                this.mutations.add(setCommonColumnValues(tableName, asset)
+                        .set("displayName").to(instanceSpannerObject.getDisplayName())
+                        .set("nodeCount").to(instanceSpannerObject.getNodeCount())
+                        .build());
+                break;
         }
     }
 
