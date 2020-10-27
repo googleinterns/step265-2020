@@ -13,9 +13,9 @@
 <body>
 
 <form name='f' action="#" th:action="@{/bykind}" th:object="${kindObject}" method='GET'>
-    <table>
+    <table class="filters">
         <tr>
-            <td>Choose a Kind of Asset:</td>
+            <td>Asset Kind:</td>
             <td>
                 <select th:field="*{kind}">
                     <option value=""> -- </option>
@@ -23,20 +23,15 @@
                             th:value="${kind}"
                             th:utext="${kind}"/>
                 </select>
-
             </td>
-        </tr>
-
-        <tr>
-            <td><input name="submit" type="submit" value="submit" /></td>
+            <td><input name="submit" type="submit" value="Apply" /></td>
         </tr>
     </table>
 </form>
 
 <div class="container">
     <div th:if="${not #lists.isEmpty(allAssets)}">
-        <h2>Asset List</h2>
-        <table class="table table-bordered">
+        <table class="results">
             <th:block th:each="name : ${displayNames}">
                 <th th:text="${name}"></th>
             </th:block>

@@ -1,7 +1,7 @@
 package resourceDisplay;
 
 /**
- * This Class is used to get kind filter from user
+ * This Class is used to get all filters from user for allAssets
  */
 public class FilterObject {
     private String location;

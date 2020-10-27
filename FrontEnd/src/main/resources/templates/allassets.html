@@ -4,19 +4,21 @@
     <meta charset="UTF-8">
     <link rel="stylesheet" href="allassets.css">
     <title>All Assets</title>
+
     <ul>
         <li><a href="/allassets">All Assets</a></li>
         <li><a href="/bykind">Additional Information Per Asset Kind</a></li>
     </ul>
+
     <h1>All Assets</h1>
 
 </head>
 <body>
 
 <form name='f' action="#" th:action="@{/allassets}" th:object="${filterObject}" method='GET'>
-    <table>
+    <table class="filters">
         <tr>
-            <td>Choose a Status:</td>
+            <td>Status:</td>
             <td>
                 <select th:field="*{status}">
                     <option th:value="all"> -- </option>
@@ -26,10 +28,7 @@
                 </select>
 
             </td>
-        </tr>
-
-        <tr>
-            <td>Choose a Location:</td>
+            <td>Location:</td>
             <td>
                 <select th:field="*{location}">
                     <option th:value="all"> -- </option>
@@ -39,10 +38,7 @@
                 </select>
 
             </td>
-        </tr>
-
-        <tr>
-            <td>Choose a Kind:</td>
+            <td>Kind:</td>
             <td>
                 <select th:field="*{kind}">
                     <option th:value="all"> -- </option>
@@ -50,12 +46,8 @@
                             th:value="${kind}"
                             th:utext="${kind}"/>
                 </select>
-
             </td>
-        </tr>
-
-        <tr>
-            <td><input name="submit" type="submit" value="submit" /></td>
+            <td><input name="submit" type="submit" value="Apply" /></td>
         </tr>
     </table>
 </form>
@@ -63,8 +55,7 @@
 
 <div class="container">
     <div th:if="${not #lists.isEmpty(allAssets)}">
-        <h2>Assets</h2>
-        <table class="table table-bordered">
+        <table class="results">
             <th:block th:each="name : ${displayNames}">
                 <th th:text="${name}"></th>
             </th:block>
@@ -78,6 +69,7 @@
         </table>
     </div>
 </div>
+
 
 
 </body>

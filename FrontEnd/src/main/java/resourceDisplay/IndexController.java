@@ -102,7 +102,7 @@ public class IndexController {
         List<String> kindList = assets.getFilterList(dbClient, "noasan", "kind");
         model.addAttribute("kindList", kindList);
         String kind = kindObject.getKind();
-        if (kind != null) {
+        if (kind != null && !kind.equals("")) {
             ResultListObject resultListObject = assets.getAssetsByKind(dbClient, kind);
             model.addAttribute("displayNames", resultListObject.columnDisplays);
             model.addAttribute("allAssets", resultListObject.columnResults);

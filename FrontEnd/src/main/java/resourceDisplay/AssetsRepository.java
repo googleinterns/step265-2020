@@ -15,7 +15,7 @@ public class AssetsRepository {
      *
      * @param dbClient    - A client for connection to the DB
      * @param workspaceId - A workspace for which we want the list of different filter values
-     * @param filterType - The type of filter for which we want the values
+     * @param filterType  - The type of filter for which we want the values
      * @return a list of all values of specific filter type
      */
     public List<String> getFilterList(DatabaseClient dbClient, String workspaceId,
@@ -127,14 +127,15 @@ public class AssetsRepository {
     /**
      * This is used to fill-in the tables for building a TableQueryObject with kind filter
      *
-     * @param resultSet - A ResultSet from query
-     * @param columnDisplays - The columnDisplays list to fill
-     * @param columnNames - The columnNames list to fill
+     * @param resultSet               - A ResultSet from query
+     * @param columnDisplays          - The columnDisplays list to fill
+     * @param columnNames             - The columnNames list to fill
      * @param columnNamesForKindQuery - The columnNamesForKindQuery list to fill
-     * @param columnTypes - The columnTypes list to fill
-     * @param columnsForUsing - The columnsForUsing list to fill
-     * @param tableName - The tableName to use in the join statement
-     * @param isForUsing - A boolean value to know if used in the using part of statement
+     * @param columnTypes             - The columnTypes list to fill
+     * @param columnsForUsing         - The columnsForUsing list to fill
+     * @param tableName               - The tableName to use in the join statement
+     * @param isForUsing              - A boolean value to know if used in the using part of
+     *                                statement
      */
     public void fillInLists(ResultSet resultSet, List<String> columnDisplays,
                             List<String> columnNames, List<String> columnNamesForKindQuery,
@@ -158,8 +159,8 @@ public class AssetsRepository {
     /**
      * This is used to create TableQueryObject dynamically for kind
      *
-     * @param dbClient   - A client for connection to the DB
-     * @param kind - The kind of object we want to filter by
+     * @param dbClient - A client for connection to the DB
+     * @param kind     - The kind of object we want to filter by
      * @return A TableQueryObject for using when running query
      */
     public TableQueryObject createTableQueryObjectForKind(DatabaseClient dbClient, String kind) {
@@ -191,11 +192,13 @@ public class AssetsRepository {
                 if (!resultSetForQueryForTableName.isNull("assetTableName")) {
                     String tableName = resultSetForQueryForTableName.getString("assetTableName");
                     ResultSet resultSetForKindTable = runConfigQuery(tableName, dbClient);
-                    fillInLists(resultSetForKindTable, columnDisplays, columnNames, columnNamesForKindQuery,
+                    fillInLists(resultSetForKindTable, columnDisplays, columnNames,
+                            columnNamesForKindQuery,
                             columnTypes, columnsForUsing, tableName, false);
                     String columns = String.join(", ", columnNamesForKindQuery);
                     String usingString = String.join(", ", columnsForUsing);
-                    statementString = String.format("SELECT %s FROM Main_Assets JOIN %s USING (%s)  ORDER By %s"
+                    statementString = String.format("SELECT %s FROM Main_Assets JOIN %s USING " +
+                                    "(%s)  ORDER By %s"
                             , columns, tableName, usingString, columnNames.get(0));
                 }
             }
@@ -208,13 +211,14 @@ public class AssetsRepository {
     /**
      * This is used to create TableQueryObject dynamically for all cases other than kind
      *
-     * @param dbClient   - A client for connection to the DB
-     * @param filters - The types of filters we want to use
+     * @param dbClient - A client for connection to the DB
+     * @param filters  - The types of filters we want to use
      * @return A TableQueryObject for using when running query
      */
     public TableQueryObject createTableQueryObject(DatabaseClient dbClient, List<String> filters) {
 
-        List<String> columnDisplays = new ArrayList<>();;
+        List<String> columnDisplays = new ArrayList<>();
+        ;
         List<String> columnNames = new ArrayList<>();
         List<String> columnTypes = new ArrayList<>();
         ResultSet resultSetForAllAssets = runConfigQuery("forAllAssets", dbClient);
@@ -234,19 +238,21 @@ public class AssetsRepository {
         String columns = String.join(", ", columnNames);
         String statementString;
         if (filters.isEmpty()) {
-            statementString = String.format("SELECT %s FROM Main_Assets ORDER By %s", columns, columnNames.get(0));
-        }
-        else {
+            statementString = String.format("SELECT %s FROM Main_Assets ORDER By %s", columns,
+                    columnNames.get(0));
+        } else {
             List<String> forWhere = new ArrayList<>();
-            for(String filter : filters) {
+            for (String filter : filters) {
                 String oneFilter = String.format("%s = @%s", filter, filter);
                 forWhere.add(oneFilter);
             }
             String where = String.join(" AND ", forWhere);
-            statementString = String.format("SELECT %s FROM Main_Assets WHERE %s ORDER By %s", columns, where, columnNames.get(0));
+            statementString = String.format("SELECT %s FROM Main_Assets WHERE %s ORDER By %s",
+                    columns, where, columnNames.get(0));
         }
 
-        TableQueryObject tableQueryObject = new TableQueryObject(columnDisplays, columnNames, columnTypes, statementString);
+        TableQueryObject tableQueryObject = new TableQueryObject(columnDisplays, columnNames,
+                columnTypes, statementString);
         return tableQueryObject;
     }
 
@@ -255,27 +261,32 @@ public class AssetsRepository {
      *
      * @param dbClient - A client for connection to the DB
      * @param location - The wanted location from the user
-     * @param status - The wanted status from the user
-     * @param kind - The wanted kind from the user
+     * @param status   - The wanted status from the user
+     * @param kind     - The wanted kind from the user
      * @return A ResultListObject witch holds a list of display names for each column and a list
      * of lists where each row holds information of one asset in strings (to use
      * in template)
      */
-    public ResultListObject getAllAssets(DatabaseClient dbClient, String location, String status, String kind) {
+    public ResultListObject getAllAssets(DatabaseClient dbClient, String location, String status,
+                                         String kind) {
         List<String> filters = new ArrayList<>();
-        if(!status.equals("all")) {
+        if (!status.equals("all")) {
             filters.add("status");
         }
-        if(!location.equals("all")) {
+        if (!location.equals("all")) {
             filters.add("location");
         }
-        if(!kind.equals("all")) {
+        if (!kind.equals("all")) {
             filters.add("kind");
         }
         TableQueryObject tableQueryObject = createTableQueryObject(dbClient, filters);
-        Statement statement = Statement.newBuilder(tableQueryObject.Query).bind("location").to(location).bind("status").to(status).bind("kind").to(kind).build();
-        List<List<String>> results = executeQueryAndReturnList(statement, dbClient, tableQueryObject.columnNames, tableQueryObject.columnTypes);
-        ResultListObject resultList = new ResultListObject(tableQueryObject.columnDisplays, results);
+        Statement statement =
+                Statement.newBuilder(tableQueryObject.Query).bind("location").to(location).bind(
+                        "status").to(status).bind("kind").to(kind).build();
+        List<List<String>> results = executeQueryAndReturnList(statement, dbClient,
+                tableQueryObject.columnNames, tableQueryObject.columnTypes);
+        ResultListObject resultList = new ResultListObject(tableQueryObject.columnDisplays,
+                results);
         return resultList;
     }
 
