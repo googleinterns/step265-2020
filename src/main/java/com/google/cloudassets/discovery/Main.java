@@ -208,7 +208,8 @@ public class Main {
         List<String> createTableQueries = new ArrayList<>();
 
         for (String tableName : newSupportedTableNames) {
-            createTableQueries.add(TableCreation.getCreateTableStatement(tableName));
+            TableCreation tableCreation = new TableCreation(tableName);
+            createTableQueries.add(tableCreation.getCreateTableStatement());
         }
         return createTableQueries;
     }

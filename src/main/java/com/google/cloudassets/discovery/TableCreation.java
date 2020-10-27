@@ -22,45 +22,57 @@ public class TableCreation {
                                                         + "and isPrimaryKey = True "
                                                         + "ORDER BY primaryKeyIndex";
 
-    private static StringBuilder createStatement;
+    private String tableName;
+    private StringBuilder createStatement;
+
+    /**
+     * This function constructs a TableCreation object with the given table name.
+     * @param name - a string representing the table for which to create the statement.
+     */
+    public TableCreation(String name) {
+        this.tableName = name;
+        this.createStatement = new StringBuilder();
+    }
 
     /**
      * This function returns a DDL create table statement for the given table name.
-     * @param tableName - a string representing the table for which to create the statement.
      * @return a string of the DDL create table statement.
      * @throws TableCreationException
      */
-    public static String getCreateTableStatement(String tableName) throws TableCreationException {
-        createStatement = new StringBuilder();
-        // Add CREATE TABLE statement and common columns
-        addCommonColumnsStatement(tableName);
+    public String getCreateTableStatement() throws TableCreationException {
+        // No need to reconstruct the create statement if this function was already called once
+        if (this.createStatement.length() == 0) {
+            // Add CREATE TABLE statement and common columns
+            addCommonColumnsStatement();
 
-        // Add specific table columns
-        ResultSet tableConfig = executeStringQuery(GET_TABLES_CONFIG_QUERY + " WHERE assetTableName = '" + tableName + "'");
-        addColumnsStatement(tableConfig);
+            // Add specific table columns
+            ResultSet tableConfig = executeStringQuery(GET_TABLES_CONFIG_QUERY + " WHERE assetTableName = '"
+                    + this.tableName + "'");
+            addColumnsStatement(tableConfig);
 
-        // Add primary keys
-        addCommonPrimaryKeysStatement();
+            // Add primary keys
+            addCommonPrimaryKeysStatement();
 
-        try {
-            // Add interleaved statement for all tables except for the main asset table
-            if (!tableName.equals(AssetKind.getMainTableName())) {
-                addInterleavedStatement();
+            try {
+                // Add interleaved statement for all tables except for the main asset table
+                if (!this.tableName.equals(AssetKind.getMainTableName())) {
+                    addInterleavedStatement();
+                }
+            } catch (ConfigTableException exception) {
+                String errorMsg = "Could not construct the DDL create table statement for " + tableName;
+                throw new TableCreationException(errorMsg, exception);
             }
-        } catch (ConfigTableException exception) {
-            String errorMsg = "Could not construct the DDL create table statement for " + tableName;
-            throw new TableCreationException(errorMsg, exception);
         }
 
-        return createStatement.toString();
+        return this.createStatement.toString();
     }
 
     /*
     This function appends a string of the beginning of the DDL create table statement for the given
     table name with the columns that are common for all of the asset tables.
      */
-    private static void addCommonColumnsStatement(String tableName) {
-        createStatement.append("CREATE TABLE " + tableName + " (");
+    private void addCommonColumnsStatement() {
+        this.createStatement.append("CREATE TABLE " + this.tableName + " (");
 
         ResultSet commonConfig = executeStringQuery(GET_TABLES_CONFIG_QUERY + " WHERE assetTableName = 'forAllAssets'");
         addColumnsStatement(commonConfig);
@@ -70,18 +82,18 @@ public class TableCreation {
     This function appends a string representing the columns part of the DDL create table statement
     to the createStatement variable.
      */
-    private static void addColumnsStatement(ResultSet tableConfig) {
+    private void addColumnsStatement(ResultSet tableConfig) {
         while (tableConfig.next()) {
-            createStatement.append(tableConfig.getString("columnName"));
-            createStatement.append(" ");
-            createStatement.append(tableConfig.getString("columnType"));
+            this.createStatement.append(tableConfig.getString("columnName"));
+            this.createStatement.append(" ");
+            this.createStatement.append(tableConfig.getString("columnType"));
             if (tableConfig.getBoolean("isNotNull")) {
-                createStatement.append(" NOT NULL");
+                this.createStatement.append(" NOT NULL");
             }
             if (tableConfig.getBoolean("allowCommitTimestamp")) {
-                createStatement.append(" OPTIONS (allow_commit_timestamp=true)");
+                this.createStatement.append(" OPTIONS (allow_commit_timestamp=true)");
             }
-            createStatement.append(", ");
+            this.createStatement.append(", ");
         }
     }
 
@@ -90,21 +102,21 @@ public class TableCreation {
     common to all of the asset tables - should be used after the statement of last column wanted for
     a given table.
      */
-    private static void addCommonPrimaryKeysStatement() {
+    private void addCommonPrimaryKeysStatement() {
         ResultSet tableConfig = executeStringQuery(GET_COMMON_PRIMARY_KEYS_QUERY);
 
-        createStatement.append(") PRIMARY KEY (");
+        this.createStatement.append(") PRIMARY KEY (");
 
         while (tableConfig.next()) {
-            createStatement.append(tableConfig.getString("columnName"));
-            createStatement.append(", ");
+            this.createStatement.append(tableConfig.getString("columnName"));
+            this.createStatement.append(", ");
         }
         // Delete the last comma from the createStatement variable
-        if (createStatement.length() > 0) {
-            createStatement.delete(createStatement.length() - 2, createStatement.length());
+        if (this.createStatement.length() > 0) {
+            this.createStatement.delete(this.createStatement.length() - 2, this.createStatement.length());
         }
 
-        createStatement.append(")");
+        this.createStatement.append(")");
     }
 
     /*
@@ -113,7 +125,7 @@ public class TableCreation {
     Throws a ConfigTableException if the main table is not properly configured in the configuration
     table.
      */
-    private static void addInterleavedStatement() throws ConfigTableException {
-        createStatement.append(", INTERLEAVE IN PARENT " + AssetKind.getMainTableName() + " ON DELETE CASCADE");
+    private void addInterleavedStatement() throws ConfigTableException {
+        this.createStatement.append(", INTERLEAVE IN PARENT " + AssetKind.getMainTableName() + " ON DELETE CASCADE");
     }
 }
