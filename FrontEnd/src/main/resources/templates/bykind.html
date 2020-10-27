@@ -1,0 +1,57 @@
+<!DOCTYPE HTML>
+<html xmlns:th="https://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="allassets.css">
+    <title>Kind</title>
+    <ul>
+        <li><a href="/allassets">All Assets</a></li>
+        <li><a href="/bykind">By Kind</a></li>
+        <li><a href="/bylocation">By Location</a></li>
+        <li><a href="/bystatus">By Status</a></li>
+    </ul>
+    <h1>By Kind</h1>
+</head>
+<body>
+
+<form name='f' action="#" th:action="@{/bykind}" th:object="${kindObject}" method='GET'>
+    <table>
+        <tr>
+            <td>Choose a Type of Asset:</td>
+            <td>
+                <select th:field="*{kind}">
+                    <option value=""> -- </option>
+                    <option th:each="kind : ${kindList}"
+                            th:value="${kind}"
+                            th:utext="${kind}"/>
+                </select>
+
+            </td>
+        </tr>
+
+        <tr>
+            <td><input name="submit" type="submit" value="submit" /></td>
+        </tr>
+    </table>
+</form>
+
+<div class="container">
+    <div th:if="${not #lists.isEmpty(allAssets)}">
+        <h2>Asset List</h2>
+        <table class="table table-bordered">
+            <th:block th:each="name : ${displayNames}">
+                <th th:text="${name}"></th>
+            </th:block>
+            <th:block th:each="asset : ${allAssets}">
+                <tr>
+                    <th:block th:each="col : ${asset}">
+                        <td th:text="${col}"></td>
+                    </th:block>
+                </tr>
+            </th:block>
+        </table>
+    </div>
+</div>
+
+</body>
+</html>

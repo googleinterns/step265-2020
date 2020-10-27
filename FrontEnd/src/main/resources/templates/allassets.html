@@ -1,0 +1,39 @@
+<!DOCTYPE HTML>
+<html xmlns:th="https://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="allassets.css">
+    <title>All</title>
+    <ul>
+        <li><a href="/allassets">All Assets</a></li>
+        <li><a href="/bykind">By Kind</a></li>
+        <li><a href="/bylocation">By Location</a></li>
+        <li><a href="/bystatus">By Status</a></li>
+    </ul>
+    <h1>All Assets</h1>
+
+</head>
+
+<body>
+
+<div class="container">
+    <div th:if="${not #lists.isEmpty(allAssets)}">
+        <h2>Asset List</h2>
+        <table class="table table-bordered">
+            <th:block th:each="name : ${displayNames}">
+                <th th:text="${name}"></th>
+            </th:block>
+            <th:block th:each="asset : ${allAssets}">
+                <tr>
+                    <th:block th:each="col : ${asset}">
+                        <td th:text="${col}"></td>
+                    </th:block>
+                </tr>
+            </th:block>
+        </table>
+    </div>
+</div>
+
+</body>
+</html>
+
