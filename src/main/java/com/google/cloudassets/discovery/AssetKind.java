@@ -2,6 +2,8 @@ package com.google.cloudassets.discovery;
 
 import com.google.cloud.spanner.ResultSet;
 import com.google.cloudassets.discovery.exceptions.ConfigTableException;
+import com.google.cloudassets.discovery.exceptions.NoTableConfigException;
+import com.google.cloudassets.discovery.exceptions.TooManyTablesConfigException;
 
 import static com.google.cloudassets.discovery.Main.executeStringQuery;
 
@@ -40,12 +42,21 @@ public enum AssetKind {
      * configuration table.
      */
     public String getAssetTableName() throws ConfigTableException {
-        String errorMsg = " was configured as the asset table in Asset_Tables_Config for the '"
-                + this.kindString + "' asset kind. Please make sure that exactly one table is configured"
-                + " for each asset kind.";
         String queryStr = "SELECT DISTINCT assetTableName FROM Asset_Tables_Config WHERE assetKind = '"
                 + this.kindString + "'";
-        return getTableName(queryStr, errorMsg);
+        try {
+            return getTableName(queryStr);
+        } catch (NoTableConfigException exception) {
+            String errorMsg = "No table was configured as the asset table in Asset_Tables_Config for the '"
+                    + this.kindString + "' asset kind. Please make sure that exactly one table is configured"
+                    + " for each asset kind.";
+            throw new ConfigTableException(errorMsg, exception);
+        } catch (TooManyTablesConfigException exception) {
+            String errorMsg = "More than one table was was configured as the asset table in Asset_Tables_Config for the '"
+                    + this.kindString + "' asset kind. Please make sure that exactly one table is configured"
+                    + " for each asset kind.";
+            throw new ConfigTableException(errorMsg, exception);
+        }
     }
 
     /**
@@ -54,30 +65,38 @@ public enum AssetKind {
      * table.
      */
     public static String getMainTableName() throws ConfigTableException {
-        String errorMsg = " was configured as the main table in Asset_Tables_Config. "
-                + "Please make sure that exactly one table has the 'isMainTable' flag on.";
         String queryStr = "SELECT DISTINCT assetTableName FROM Asset_Tables_Config WHERE isMainTable = True";
-        return getTableName(queryStr, errorMsg);
+        try {
+            return getTableName(queryStr);
+        } catch (NoTableConfigException exception) {
+            String errorMsg = "No table was configured as the main table in Asset_Tables_Config. "
+                    + "Please make sure that exactly one table has the 'isMainTable' flag on.";
+            throw new ConfigTableException(errorMsg, exception);
+        } catch (TooManyTablesConfigException exception) {
+            String errorMsg = "More than one table was configured as the main table in Asset_Tables_Config. "
+                    + "Please make sure that exactly one table has the 'isMainTable' flag on.";
+            throw new ConfigTableException(errorMsg, exception);
+        }
     }
 
     /*
     This function returns a table name returned from the provided queryStr. If there is not exactly
     one table name returned from the provided query it means that the Asset_Tables_Config is not
     configured properly and therefore unexpected behaviors may arise. In this case a
-    ConfigTableException is thrown.
+    NoTableConfigException / TooManyTablesConfigException is thrown.
      */
-    private static String getTableName(String queryStr, String errorMsg) throws ConfigTableException {
+    private static String getTableName(String queryStr) throws NoTableConfigException, TooManyTablesConfigException {
         ResultSet resultSet = executeStringQuery(queryStr);
         String tableName = null;
         if (resultSet.next()) {
             tableName = resultSet.getString("assetTableName");
         } else {
-            throw new ConfigTableException("No table" + errorMsg);
+            throw new NoTableConfigException();
         }
 
         // Each asset should have exactly one table name associated with it
         if (resultSet.next()) {
-            throw new ConfigTableException("More then one table" + errorMsg);
+            throw new TooManyTablesConfigException();
         }
 
         return tableName;
