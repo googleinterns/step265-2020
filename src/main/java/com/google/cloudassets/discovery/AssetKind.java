@@ -16,7 +16,8 @@ public enum AssetKind {
     INSTANCE_COMPUTE_ASSET("compute#instance"),
     SUBSCRIPTION_PUB_SUB_ASSET("pubsub#subscription"),
     TOPIC_PUB_SUB_ASSET("pubsub#topic"),
-    INSTANCE_SPANNER_ASSET("spanner#instance");
+    INSTANCE_SPANNER_ASSET("spanner#instance"),
+    APP_APP_ENGINE_ASSET("appengine#app");
 
     private final String kindString;
 

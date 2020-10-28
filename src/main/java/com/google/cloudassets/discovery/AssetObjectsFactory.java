@@ -34,6 +34,8 @@ public class AssetObjectsFactory {
                 return new InstanceCloudSqlObject.Builder(assetProperties, projectConfig).build();
             case INSTANCE_SPANNER_ASSET:
                 return new InstanceSpannerObject.Builder(assetProperties, projectConfig).build();
+            case APP_APP_ENGINE_ASSET:
+                return new AppAppEngineObject.Builder(assetProperties, projectConfig).build();
         }
         return null;
     }

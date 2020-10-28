@@ -129,6 +129,17 @@ public class ProjectMutationsList {
                         .set("nodeCount").to(instanceSpannerObject.getNodeCount())
                         .build());
                 break;
+            case APP_APP_ENGINE_ASSET:
+                AppAppEngineObject appAppEngineObject = (AppAppEngineObject) asset;
+                this.mutations.add(setCommonColumnValues(tableName, asset)
+                        .set("authDomain").to(appAppEngineObject.getAuthDomain())
+                        .set("defaultHostname").to(appAppEngineObject.getDefaultHostname())
+                        .set("codeBucket").to(appAppEngineObject.getCodeBucket())
+                        .set("gcrDomain").to(appAppEngineObject.getGcrDomain())
+                        .set("defaultBucket").to(appAppEngineObject.getDefaultBucket())
+                        .set("databaseType").to(appAppEngineObject.getDatabaseType())
+                        .build());
+                break;
         }
     }
 
