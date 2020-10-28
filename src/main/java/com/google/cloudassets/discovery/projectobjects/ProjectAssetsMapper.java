@@ -6,11 +6,8 @@ import com.google.api.client.http.HttpRequestInitializer;
 import com.google.api.client.http.HttpTransport;
 import com.google.auth.http.HttpCredentialsAdapter;
 import com.google.auth.oauth2.GoogleCredentials;
-import com.google.cloudassets.discovery.ApiDetails;
+import com.google.cloudassets.discovery.*;
 import com.google.cloudassets.discovery.assetobjects.AssetObject;
-import com.google.cloudassets.discovery.AssetObjectsFactory;
-import com.google.cloudassets.discovery.AssetObjectsList;
-import com.google.cloudassets.discovery.AssetKind;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.api.client.http.javanet.NetHttpTransport;
@@ -80,9 +77,10 @@ public class ProjectAssetsMapper {
     private void getAssetObjectList(List<AssetObject> assetObjectList, String assetListUrl,
                                            AssetKind assetKind) {
         try {
-            AssetObjectsList tempAssetObjectsList = jsonMapper.readValue(getHttpInfo(assetListUrl),
-                                                                            AssetObjectsList.class);
-             for (Map<String,Object> assetProperties : tempAssetObjectsList.getAssetObjectsList()) {
+            JsonNode jsonNode = jsonMapper.readTree(getHttpInfo(assetListUrl));
+            AssetJsonParser assetJsonParser = new AssetJsonParser(jsonNode, assetKind);
+
+            for (Map<String,Object> assetProperties : assetJsonParser.getAssetsList()) {
                 AssetObject assetObject = assetObjectFactory.createAssetObject(assetKind,
                                                                                 assetProperties,
                                                                                 projectConfig);
@@ -128,6 +126,7 @@ public class ProjectAssetsMapper {
         getAllStorageAssets(assetObjectList);
         getAllCloudSqlAssets(assetObjectList);
         getAllSpannerAssets(assetObjectList);
+        getAllAppEngineAssets(assetObjectList);
 
         return assetObjectList;
     }
@@ -237,6 +236,20 @@ public class ProjectAssetsMapper {
 
             String instanceSpannerUrl = spannerUrl.replace(ASSET_TYPE_EXP, "instances");
             getAssetObjectList(assetObjectList, instanceSpannerUrl, AssetKind.INSTANCE_SPANNER_ASSET);
+        }
+    }
+
+    /*
+    This function adds the different App Engine Asset Objects that belong to a specific Google Cloud
+    project to the assetObjectList (if the appengine API is enabled for this project).
+     */
+    private void getAllAppEngineAssets(List<AssetObject> assetObjectList) {
+        String apiService = "appengine.googleapis.com";
+        if (isApiEnabled(apiService)) {
+            String appEngineUrl = ("https://" + apiService + "/v1/apps/" + PROJECT_ID_EXP)
+                    .replace(PROJECT_ID_EXP, projectConfig.getProjectId());
+
+            getAssetObjectList(assetObjectList, appEngineUrl, AssetKind.APP_APP_ENGINE_ASSET);
         }
     }
 }
