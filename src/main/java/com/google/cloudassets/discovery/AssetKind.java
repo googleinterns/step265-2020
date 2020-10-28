@@ -17,7 +17,8 @@ public enum AssetKind {
     SUBSCRIPTION_PUB_SUB_ASSET("pubsub#subscription"),
     TOPIC_PUB_SUB_ASSET("pubsub#topic"),
     INSTANCE_SPANNER_ASSET("spanner#instance"),
-    APP_APP_ENGINE_ASSET("appengine#app");
+    APP_APP_ENGINE_ASSET("appengine#app"),
+    CLUSTER_KUBERNETES_ASSET("kubernetes#cluster");
 
     private final String kindString;
 

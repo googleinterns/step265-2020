@@ -98,11 +98,11 @@ public class ProjectAssetsMapper {
     provided zonesUrl string.
     If an exception is caught, it logs the details to the logger and returns an empty list.
      */
-    private List<String> getZonesList(String zonesUrl) {
+    private List<String> getZonesList(String zonesUrl, String zoneJsonKey) {
         List<String> zonesList = new ArrayList<>();
         try {
             JsonNode zonesJsonNode = jsonMapper.readTree(getHttpInfo(zonesUrl));
-            for (JsonNode zoneNode : zonesJsonNode.get("items")) {
+            for (JsonNode zoneNode : zonesJsonNode.get(zoneJsonKey)) {
                 zonesList.add(zoneNode.get("name").toString().replaceAll("\"", ""));
             }
         } catch (IOException exception) {
@@ -127,6 +127,7 @@ public class ProjectAssetsMapper {
         getAllCloudSqlAssets(assetObjectList);
         getAllSpannerAssets(assetObjectList);
         getAllAppEngineAssets(assetObjectList);
+        getAllKubernetesAssets(assetObjectList);
 
         return assetObjectList;
     }
@@ -161,7 +162,7 @@ public class ProjectAssetsMapper {
         if (isApiEnabled(apiService)) {
             String zonesComputeUrl = ("https://" + apiService + "/compute/v1/projects/" +
                     PROJECT_ID_EXP + "/zones").replace(PROJECT_ID_EXP, projectConfig.getProjectId());
-            List<String> zonesList = getZonesList(zonesComputeUrl);
+            List<String> zonesList = getZonesList(zonesComputeUrl, "items");
 
             for (String zone : zonesList) {
                 String computeUrl = (zonesComputeUrl + "/" + ZONE_NAME_EXP + "/" + ASSET_TYPE_EXP)
@@ -250,6 +251,25 @@ public class ProjectAssetsMapper {
                     .replace(PROJECT_ID_EXP, projectConfig.getProjectId());
 
             getAssetObjectList(assetObjectList, appEngineUrl, AssetKind.APP_APP_ENGINE_ASSET);
+        }
+    }
+
+    /*
+    This function adds the different Kubernetes Engine Asset Objects that belong to a specific Google
+    Cloud project to the assetObjectList (if the container API is enabled for this project).
+     */
+    private void getAllKubernetesAssets(List<AssetObject> assetObjectList) {
+        String apiService = "container.googleapis.com";
+        if (isApiEnabled(apiService)) {
+            String zonesKubernetesUrl = ("https://" + apiService + "/v1beta1/projects/" +
+                    PROJECT_ID_EXP + "/locations").replace(PROJECT_ID_EXP, projectConfig.getProjectId());
+            List<String> zonesList = getZonesList(zonesKubernetesUrl, "locations");
+
+            for (String zone : zonesList) {
+                String kubernetesUrl = (zonesKubernetesUrl + "/" + ZONE_NAME_EXP + "/clusters")
+                        .replace(ZONE_NAME_EXP, zone);
+                getAssetObjectList(assetObjectList, kubernetesUrl, AssetKind.CLUSTER_KUBERNETES_ASSET);
+            }
         }
     }
 }

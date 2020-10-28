@@ -36,6 +36,8 @@ public class AssetObjectsFactory {
                 return new InstanceSpannerObject.Builder(assetProperties, projectConfig).build();
             case APP_APP_ENGINE_ASSET:
                 return new AppAppEngineObject.Builder(assetProperties, projectConfig).build();
+            case CLUSTER_KUBERNETES_ASSET:
+                return new ClusterKubernetesObject.Builder(assetProperties, projectConfig).build();
         }
         return null;
     }

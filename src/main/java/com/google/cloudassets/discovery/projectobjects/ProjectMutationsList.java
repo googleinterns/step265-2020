@@ -1,5 +1,6 @@
 package com.google.cloudassets.discovery.projectobjects;
 
+import com.google.cloud.Timestamp;
 import com.google.cloudassets.discovery.AssetKind;
 import com.google.cloudassets.discovery.assetobjects.*;
 import com.google.cloud.spanner.Mutation;
@@ -138,6 +139,16 @@ public class ProjectMutationsList {
                         .set("gcrDomain").to(appAppEngineObject.getGcrDomain())
                         .set("defaultBucket").to(appAppEngineObject.getDefaultBucket())
                         .set("databaseType").to(appAppEngineObject.getDatabaseType())
+                        .build());
+                break;
+            case CLUSTER_KUBERNETES_ASSET:
+                ClusterKubernetesObject clusterKubernetesObject = (ClusterKubernetesObject) asset;
+                this.mutations.add(setCommonColumnValues(tableName, asset)
+                        .set("currentNodeCount").to(clusterKubernetesObject.getCurrentNodeCount())
+                        .set("loggingService").to(clusterKubernetesObject.getLoggingService())
+                        .set("monitoringService").to(clusterKubernetesObject.getMonitoringService())
+                        .set("statusMessage").to(clusterKubernetesObject.getStatusMessage())
+                        .set("expireTime").to(clusterKubernetesObject.getExpireTime())
                         .build());
                 break;
         }
