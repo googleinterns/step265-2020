@@ -50,7 +50,7 @@ public class Main {
      * This function initializes all of the mapping and updating of all of the assets for each
      * of the projects in the ProjectId.txt file.
      */
-    public static void main(String[] args) {
+    public static void main(String[] args) throws TableCreationException, TableInsertionException {
         SpannerOptions options = SpannerOptions.newBuilder().setProjectId(SPANNER_PROJECT_ID).build();
 
         // Create spanner DatabaseClient and initialize static fields
@@ -63,17 +63,13 @@ public class Main {
         try {
             maintainTables();
             updateAllProjectsAssets();
-        } catch (TableCreationException exception) {
-            String errorMsg = "Encountered an error while running table maintenance functions.";
-            logger.atInfo().withCause(exception).log(errorMsg);
-        } catch (TableInsertionException exception) {
-            String errorMsg = "Encountered an error while inserting data into tables.";
-            logger.atInfo().withCause(exception).log(errorMsg);
+        } catch (Throwable exception) {
+            throw exception;
+        } finally {
+            // Close spanner DatabaseClient
+            readFromDb.close();
+            spanner.close();
         }
-
-        // Close spanner DatabaseClient
-        readFromDb.close();
-        spanner.close();
     }
 
     /*
