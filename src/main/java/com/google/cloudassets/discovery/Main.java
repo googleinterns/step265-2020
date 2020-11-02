@@ -49,6 +49,8 @@ public class Main {
     /**
      * This function initializes all of the mapping and updating of all of the assets for each
      * of the projects in the ProjectId.txt file.
+     * @throws TableCreationException
+     * @throws TableInsertionException
      */
     public static void main(String[] args) throws TableCreationException, TableInsertionException {
         SpannerOptions options = SpannerOptions.newBuilder().setProjectId(SPANNER_PROJECT_ID).build();
