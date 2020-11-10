@@ -49,7 +49,7 @@ public class TopicPubSubObject extends AssetObject {
             setName(assetProperties.get("name"));
 
             // Set specific asset type fields
-            HashMap<String, Object> messageStoragePolicyMap = convertObjectToMap(assetProperties.get("messageStoragePolicy"));
+            HashMap<String, Object> messageStoragePolicyMap = castToMap(assetProperties.get("messageStoragePolicy"));
             specificObjectClass.allowedPersistenceRegions = convertListToLastSegList(messageStoragePolicyMap.get("allowedPersistenceRegions"));
             return super.build();
         }

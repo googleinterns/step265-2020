@@ -139,8 +139,8 @@ public class AssetObjectTest {
      * a Boolean value that can't be converted into String with regular casting.
      */
     @Test
-    public void testConvertObjectToStringBoolean() {
-        assertNull(AssetObject.convertObjectToString(true));
+    public void testCastToStringBoolean() {
+        assertNull(AssetObject.castToString(true));
     }
 
     /**
@@ -149,8 +149,8 @@ public class AssetObjectTest {
      * a String value that can't be converted into a Boolean with regular casting.
      */
     @Test
-    public void testConvertObjectToBooleanString() {
-        assertNull(AssetObject.convertObjectToBoolean("invalid"));
+    public void testCastToBooleanString() {
+        assertNull(AssetObject.castToBoolean("invalid"));
     }
 
     /**
@@ -159,7 +159,7 @@ public class AssetObjectTest {
      * a String value that can't be converted into a HashMap<String, Object> with regular casting.
      */
     @Test
-    public void testConvertObjectToMapString() {
-        assertNull(AssetObject.convertObjectToMap("invalid"));
+    public void testCastToMapString() {
+        assertNull(AssetObject.castToMap("invalid"));
     }
 }

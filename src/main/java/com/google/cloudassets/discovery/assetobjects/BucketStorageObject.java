@@ -53,7 +53,7 @@ public class BucketStorageObject extends AssetObject {
             setCreationTime(convertStringToDate(assetProperties.get("timeCreated")));
 
             // Set specific asset type fields
-            specificObjectClass.storageClass = convertObjectToString(assetProperties.get("storageClass"));
+            specificObjectClass.storageClass = castToString(assetProperties.get("storageClass"));
             specificObjectClass.updatedTime = convertStringToDate(assetProperties.get("updated"));
 
             return super.build();

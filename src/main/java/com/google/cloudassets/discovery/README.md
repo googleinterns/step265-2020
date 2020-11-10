@@ -61,10 +61,8 @@ implement public getters for these new fields.
 1. Add its creation to the getAllAssets function in the ProjectAssetsMapper class.
 1. Add a relevant asset table in the spanner db if needed (sometimes there aren't any new interesting
 asset attributes which are not covered in the Main_Assets table, and that fine) by following these steps:
-    1. In the AssetTables enum class add a new enum by the following convention:
-    {SPECIFIC_ASSET_KIND}_{GENERAL_ASSET_KIND}_TABLE (for example: DISK_COMPUTE_TABLE)
-    Initialize it with the table name and a create table query (please use the provided helper
-    functions whenever possible).
+    1. For each wanted property of this asset add a new row to the Asset_Tables_Config table in our
+    spanner DB. Important guidelines for adding new rows to this configuration table are detailed below. 
     1. In the ProjectMutationsList class you should add a new case statement in the addSpecificAssetMutation
     function and set the new table fields into the relevant Mutation object.
 
@@ -74,7 +72,7 @@ Please follow the steps as mentioned in the last section above.
 ### Updating the structure of an existing asset table:
 1. In the AssetTables enum class you should add the relevant fields into the relevant create table query
 1. If you added a new field or removed one (and not only changed its type):
-    1. In the specific asset kind class (in the ResourceDiscovery.AssetObjects package) you should:
+    1. In the specific asset kind class (in the com.google.cloudassets.discovery.assetobjects package) you should:
         1. add/remove the field
         1. add/remove its value setting from the Builder.build() function
         1. add a getter function
@@ -82,4 +80,23 @@ Please follow the steps as mentioned in the last section above.
 1. In order not to have unexpected problems it is best to delete the relevant table manually right 
 before running the Main.main function which will created any missing asset tables (granted of course 
 that we are not talking about the Main_Assets table as all other asset tables are interleaved
-with it and therefor you would have to delete all of them first) 
+with it and therefore you would have to delete all of them first)
+### Asset_Tables_Config configuration table:
+When altering or adding a new row the columns which must be filled out for our back-end's use are:
+1. assetTableName - the asset table name as will be created in our spanner DB. 
+The name most follow this convention: {SPECIFIC_ASSET_KIND}_{GENERAL_ASSET_KIND}_ASSETS
+1. assetKind - most match one of the enums of the AssetKind class. Please make sure that each assetKind
+has **exactly** one distinct assetTableName.
+1. isMainTable - most be set to True for all of the rows of the main asset table and False for any
+other row. It is important that **exactly** one table has this field set to True.
+1. columnName - a string representing the column name which will be in the asset table and should
+represent a property of the asset. 
+1. columnType - a string representing the column type in DDL syntax (this string is inserted into the
+create table query).
+1. isNotNull - set to True if you want a certain column not to enable null values, False otherwise.
+1. allowCommitTimestamp - set to True if you want this column to allow commit timestamp insertion (as
+we use for the rowLastUpdateTime column), False otherwise.
+1. isPrimaryKey - set to True if this column is a primary key in the given table, False otherwise.
+Please notice that currently only columns that are marked 'forAllAssets' can be primary keys.
+1. primaryKeyIndex - the index of the primary key. Please make sure that there are not two columns
+with the same primaryKeyIndex number.

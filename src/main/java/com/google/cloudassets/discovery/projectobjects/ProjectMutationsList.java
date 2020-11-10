@@ -1,9 +1,11 @@
 package com.google.cloudassets.discovery.projectobjects;
 
+import com.google.cloudassets.discovery.AssetKind;
 import com.google.cloudassets.discovery.assetobjects.*;
-import com.google.cloudassets.discovery.AssetTable;
 import com.google.cloud.spanner.Mutation;
 import com.google.cloud.spanner.Value;
+import com.google.cloudassets.discovery.exceptions.ConfigTableException;
+import com.google.cloudassets.discovery.exceptions.TableInsertionException;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -29,17 +31,25 @@ public class ProjectMutationsList {
      * @param assetObjectList - a list of AssetObjects to be converted.
      * @return a list of Mutations of the AssetObjects as they should be inserted into the spanner
      * db tables.
+     * @throws TableInsertionException if data could not be inserted to a certain table.
      */
-    public List<Mutation> getMutationList(List<AssetObject> assetObjectList) {
+    public List<Mutation> getMutationList(List<AssetObject> assetObjectList) throws TableInsertionException {
+        String tableName;
+        try {
+            tableName = AssetKind.getMainTableName();
+        } catch (ConfigTableException exception) {
+            String errorMsg = "Could not insert data into the main table as its name could not be "
+                            + "properly retrieved.";
+            throw new TableInsertionException(errorMsg, exception);
+        }
+
         for (AssetObject asset : assetObjectList) {
-            String tableName = AssetTable.MAIN_TABLE.getTableName();
-            this.mutations.add(
-                    setCommonColumnValues(tableName, asset)
-                    .set("assetId").to(asset.getId())
-                    .set("creationTime").to(asset.getCreationTime())
-                    .set("status").to(asset.getStatus())
-                    .set("location").to(asset.getLocation())
-                    .build());
+            this.mutations.add(setCommonColumnValues(tableName, asset)
+                                .set("assetId").to(asset.getId())
+                                .set("creationTime").to(asset.getCreationTime())
+                                .set("status").to(asset.getStatus())
+                                .set("location").to(asset.getLocation())
+                                .build());
 
             // It is important that the insertion of the specific asset types happens after the
             // insertion of the AssetObject as the specific tables are interleaved with MAIN_TABLE.
@@ -51,12 +61,19 @@ public class ProjectMutationsList {
     /*
     This function adds a new Mutation to the mutations list based on the specific AssetKind of the
     provided AssetObject.
+    Throws a TableInsertionException if data could not be inserted to the given asset kind table.
      */
-    private void addSpecificAssetMutation(AssetObject asset) {
+    private void addSpecificAssetMutation(AssetObject asset) throws TableInsertionException {
         String tableName;
+        try {
+            tableName = asset.getKindEnum().getAssetTableName();
+        } catch (ConfigTableException exception) {
+            String errorMsg = "Could not insert data into the following asset kind table: "
+                            + asset.getKindEnum().toString() + ", as its name could not be properly retrieved.";
+            throw new TableInsertionException(errorMsg, exception);
+        }
         switch (asset.getKindEnum()) {
             case INSTANCE_COMPUTE_ASSET:
-                tableName = AssetTable.INSTANCE_COMPUTE_TABLE.getTableName();
                 InstanceComputeObject instanceComputeObject = (InstanceComputeObject) asset;
                 this.mutations.add(setCommonColumnValues(tableName, asset)
                                 .set("description").to(instanceComputeObject.getDescription())
@@ -66,7 +83,6 @@ public class ProjectMutationsList {
                                 .build());
                 break;
             case DISK_COMPUTE_ASSET:
-                tableName = AssetTable.DISK_COMPUTE_TABLE.getTableName();
                 DiskComputeObject diskComputeObject = (DiskComputeObject) asset;
                 this.mutations.add(setCommonColumnValues(tableName, asset)
                                 .set("diskSizeGb").to(diskComputeObject.getDiskSizeGb())
@@ -76,7 +92,6 @@ public class ProjectMutationsList {
                                 .build());
                 break;
             case BUCKET_STORAGE_ASSET:
-                tableName = AssetTable.BUCKET_STORAGE_TABLE.getTableName();
                 BucketStorageObject bucketStorageObject = (BucketStorageObject) asset;
                 this.mutations.add(setCommonColumnValues(tableName, asset)
                                 .set("storageClass").to(bucketStorageObject.getStorageClass())
@@ -84,7 +99,6 @@ public class ProjectMutationsList {
                                 .build());
                 break;
             case INSTANCE_CLOUD_SQL_ASSET:
-                tableName = AssetTable.INSTANCE_CLOUD_SQL_TABLE.getTableName();
                 InstanceCloudSqlObject instanceCloudSqlObject = (InstanceCloudSqlObject) asset;
                 this.mutations.add(setCommonColumnValues(tableName, asset)
                                 .set("etag").to(instanceCloudSqlObject.getEtag())
@@ -96,7 +110,6 @@ public class ProjectMutationsList {
                                 .build());
                 break;
             case SUBSCRIPTION_PUB_SUB_ASSET:
-                tableName = AssetTable.SUBSCRIPTION_PUB_SUB_TABLE.getTableName();
                 SubscriptionPubSubObject subscriptionPubSubObject = (SubscriptionPubSubObject) asset;
                 this.mutations.add(setCommonColumnValues(tableName, asset)
                         .set("topic").to(subscriptionPubSubObject.getTopic())
@@ -104,7 +117,6 @@ public class ProjectMutationsList {
                         .build());
                 break;
             case TOPIC_PUB_SUB_ASSET:
-                tableName = AssetTable.TOPIC_PUB_SUB_TABLE.getTableName();
                 TopicPubSubObject topicPubSubObject = (TopicPubSubObject) asset;
                 this.mutations.add(setCommonColumnValues(tableName, asset)
                         .set("allowedPersistenceRegions").to(Value.stringArray(topicPubSubObject.getAllowedPersistenceRegions()))

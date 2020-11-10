@@ -56,9 +56,9 @@ public class InstanceComputeObject extends AssetObject {
             setStatus(assetProperties.get("status"));
 
             // Set specific asset type fields
-            specificObjectClass.description = convertObjectToString(assetProperties.get("description"));
-            specificObjectClass.canIpForward = convertObjectToBoolean(assetProperties.get("canIpForward"));
-            specificObjectClass.cpuPlatform = convertObjectToString(assetProperties.get("cpuPlatform"));
+            specificObjectClass.description = castToString(assetProperties.get("description"));
+            specificObjectClass.canIpForward = castToBoolean(assetProperties.get("canIpForward"));
+            specificObjectClass.cpuPlatform = castToString(assetProperties.get("cpuPlatform"));
             specificObjectClass.machineType = getLastSeg(assetProperties.get("machineType"));
 
             return super.build();
