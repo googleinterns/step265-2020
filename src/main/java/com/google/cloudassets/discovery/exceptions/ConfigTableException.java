@@ -5,7 +5,7 @@ package com.google.cloudassets.discovery.exceptions;
  * table is not configured properly.
  */
 public class ConfigTableException extends Exception {
-    public ConfigTableException(String errorMsg) {
-        super(errorMsg);
+    public ConfigTableException(String errorMsg, Throwable cause) {
+        super(errorMsg, cause);
     }
 }
