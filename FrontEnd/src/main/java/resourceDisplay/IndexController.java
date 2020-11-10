@@ -54,7 +54,7 @@ public class IndexController {
      * @return the bystatus template
      */
     @GetMapping("/allassets")
-    public String test(@AuthenticationPrincipal OAuth2User principal, Model model,
+    public String getAll(@AuthenticationPrincipal OAuth2User principal, Model model,
                        @ModelAttribute FilterObject filterObject) {
         SpannerOptions options =
                 SpannerOptions.newBuilder().setProjectId(SPANNER_PROJECT_ID).build();
@@ -73,7 +73,7 @@ public class IndexController {
         String status = filterObject.getStatus();
         String location = filterObject.getLocation();
         String kind = filterObject.getKind();
-        if(status != null && location != null && kind != null) {
+        if (status != null && location != null && kind != null) {
             ResultListObject resultListObject = assets.getAllAssets(dbClient, location, status, kind);
             model.addAttribute("displayNames", resultListObject.columnDisplays);
             model.addAttribute("allAssets", resultListObject.columnResults);

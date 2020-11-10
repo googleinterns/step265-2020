@@ -241,12 +241,12 @@ public class AssetsRepository {
             statementString = String.format("SELECT %s FROM Main_Assets ORDER By %s", columns,
                     columnNames.get(0));
         } else {
-            List<String> forWhere = new ArrayList<>();
+            List<String> queryFilters = new ArrayList<>();
             for (String filter : filters) {
                 String oneFilter = String.format("%s = @%s", filter, filter);
-                forWhere.add(oneFilter);
+                queryFilters.add(oneFilter);
             }
-            String where = String.join(" AND ", forWhere);
+            String where = String.join(" AND ", queryFilters);
             statementString = String.format("SELECT %s FROM Main_Assets WHERE %s ORDER By %s",
                     columns, where, columnNames.get(0));
         }
