@@ -6,30 +6,40 @@ package com.google.cloudassets.discovery.projectobjects;
 public class ProjectConfig {
     private final String workspaceId;
     private final String projectId;
+    private final String serviceAccountEmail;
 
     /**
      * This constructor updates the workspaceId and projectId for the current project.
      * @param workspace - a string representing the workspace id.
      * @param project - a string representing the project id.
+     * @param serviceAccount - a string representing the service account that should be used to
+     *                       retrieve data of this project.
      */
-    public ProjectConfig(String workspace, String project) {
+    public ProjectConfig(String workspace, String project, String serviceAccount) {
         this.workspaceId = workspace;
         this.projectId = project;
+        this.serviceAccountEmail = serviceAccount;
     }
 
     /**
-     * This getter function returns the workspaceId for the current project.
-     * @return a string representing the workspace id.
+     * @return a string representing the workspace ID of this project.
      */
     public String getWorkspaceId() {
         return this.workspaceId;
     }
 
     /**
-     * This getter function returns the projectId for the current project.
-     * @return a string representing the project id.
+     * @return a string representing the project ID of this project.
      */
     public String getProjectId() {
         return this.projectId;
+    }
+
+    /**
+     * @return a string representing the service account that should be used to retrieve data of
+     * this project.
+     */
+    public String getServiceAccountEmail() {
+        return this.serviceAccountEmail;
     }
 }
