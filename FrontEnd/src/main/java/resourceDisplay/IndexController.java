@@ -46,28 +46,40 @@ public class IndexController {
     }
 
     /**
-     * This page returns all the assets in the DB
+     * This page returns all assets in the DB with different filtering options
      *
-     * @param principal - Used to check authentication
-     * @param model     - Used to show table to user
-     * @return the allassets template
+     * @param principal    - Used to check authentication
+     * @param model        - Used to show table to user
+     * @param filterObject - Used to get filters from the user
+     * @return the bystatus template
      */
     @GetMapping("/allassets")
-    public String getAll(@AuthenticationPrincipal OAuth2User principal, Model model) {
+    public String getAll(@AuthenticationPrincipal OAuth2User principal, Model model,
+                       @ModelAttribute FilterObject filterObject) {
         SpannerOptions options =
                 SpannerOptions.newBuilder().setProjectId(SPANNER_PROJECT_ID).build();
         spanner = options.getService();
         db = DatabaseId.of(SPANNER_PROJECT_ID, SPANNER_INSTANCE_ID, SPANNER_DATABASE_ID);
         dbClient = spanner.getDatabaseClient(db);
         AssetsRepository assets = new AssetsRepository();
-        //TODO use workspaceID from user/workspace/project
-        ResultListObject resultListObject = assets.getAllAssets(dbClient);
-        model.addAttribute("displayNames", resultListObject.columnDisplays);
-        model.addAttribute("allAssets", resultListObject.columnResults);
+        model.addAttribute("filterObject", filterObject);
+        //TODO use real workspaceID from user/workspace/project table this is temporary (using "noasan")
+        List<String> locationList = assets.getFilterList(dbClient, "noasan", "location");
+        model.addAttribute("locationList", locationList);
+        List<String> statusList = assets.getFilterList(dbClient, "noasan", "status");
+        model.addAttribute("statusList", statusList);
+        List<String> kindList = assets.getFilterList(dbClient, "noasan", "kind");
+        model.addAttribute("kindList", kindList);
+        String status = filterObject.getStatus();
+        String location = filterObject.getLocation();
+        String kind = filterObject.getKind();
+        if (status != null && location != null && kind != null) {
+            ResultListObject resultListObject = assets.getAllAssets(dbClient, location, status, kind);
+            model.addAttribute("displayNames", resultListObject.columnDisplays);
+            model.addAttribute("allAssets", resultListObject.columnResults);
+        }
         return "allassets";
     }
-
-    // todo
 
     /**
      * This page returns assets by kind (with the specific data per asset)
@@ -90,65 +102,11 @@ public class IndexController {
         List<String> kindList = assets.getFilterList(dbClient, "noasan", "kind");
         model.addAttribute("kindList", kindList);
         String kind = kindObject.getKind();
-        if (kind != null) {
+        if (kind != null && !kind.equals("")) {
             ResultListObject resultListObject = assets.getAssetsByKind(dbClient, kind);
             model.addAttribute("displayNames", resultListObject.columnDisplays);
             model.addAttribute("allAssets", resultListObject.columnResults);
         }
         return "bykind";
-    }
-
-    /**
-     * This page returns assets by status
-     *
-     * @param principal    - Used to check authentication
-     * @param model        - Used to show table to user
-     * @param statusObject - Used to get filter from user
-     * @return the bystatus template
-     */
-    @GetMapping("/bystatus")
-    public String getByStatus(@AuthenticationPrincipal OAuth2User principal, Model model,
-                              @ModelAttribute StatusObject statusObject) {
-        SpannerOptions options =
-                SpannerOptions.newBuilder().setProjectId(SPANNER_PROJECT_ID).build();
-        spanner = options.getService();
-        db = DatabaseId.of(SPANNER_PROJECT_ID, SPANNER_INSTANCE_ID, SPANNER_DATABASE_ID);
-        dbClient = spanner.getDatabaseClient(db);
-        AssetsRepository assets = new AssetsRepository();
-        model.addAttribute("statusObject", statusObject);
-        //TODO use real workspaceID from user/workspace/project table this is temporary (using "noasan")
-        List<String> statusList = assets.getFilterList(dbClient, "noasan", "status");
-        model.addAttribute("statusList", statusList);
-        ResultListObject resultListObject = assets.getAssetsByStatus(dbClient, statusObject.getStatus());
-        model.addAttribute("displayNames", resultListObject.columnDisplays);
-        model.addAttribute("allAssets", resultListObject.columnResults);
-        return "bystatus";
-    }
-
-    /**
-     * This page returns assets by location
-     *
-     * @param principal      - Used to check authentication
-     * @param model          - Used to show table to user
-     * @param locationObject - Used to get filter from user
-     * @return the bylocation template
-     */
-    @GetMapping("/bylocation")
-    public String getByLocation(@AuthenticationPrincipal OAuth2User principal, Model model,
-                                @ModelAttribute LocationObject locationObject) {
-        SpannerOptions options =
-                SpannerOptions.newBuilder().setProjectId(SPANNER_PROJECT_ID).build();
-        spanner = options.getService();
-        db = DatabaseId.of(SPANNER_PROJECT_ID, SPANNER_INSTANCE_ID, SPANNER_DATABASE_ID);
-        dbClient = spanner.getDatabaseClient(db);
-        AssetsRepository assets = new AssetsRepository();
-        model.addAttribute("locationObject", locationObject);
-        //TODO use real workspaceID from user/workspace/project table this is temporary (using "noasan")
-        List<String> locationList = assets.getFilterList(dbClient, "noasan", "location");
-        model.addAttribute("locationList", locationList);
-        ResultListObject resultListObject = assets.getAssetsByLocation(dbClient, locationObject.getLocation());
-        model.addAttribute("displayNames", resultListObject.columnDisplays);
-        model.addAttribute("allAssets", resultListObject.columnResults);
-        return "bylocation";
     }
 }
