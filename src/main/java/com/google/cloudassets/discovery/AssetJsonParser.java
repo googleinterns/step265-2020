@@ -37,44 +37,26 @@ public class AssetJsonParser {
      *                 the properties of a given asset object.
      * @param assetKind - an AssetKind enum which represents for which asset kind the provided
      *                  properties belong.
-
      */
     public AssetJsonParser(JsonNode jsonNode, AssetKind assetKind) {
         this.assetsList = new ArrayList<>();
         this.propertiesMap = jsonMapper.convertValue(jsonNode, Map.class);
+
         // Some of the asset API return their properties in a slightly different json structure
-        switch (assetKind) {
-            case APP_APP_ENGINE_ASSET:
-                this.assetsList.add(propertiesMap);
-                break;
-            case TOPIC_PUB_SUB_ASSET:
-                this.assetsList = getFromPropertiesMap("topics");
-                break;
-            case SUBSCRIPTION_PUB_SUB_ASSET:
-                this.assetsList = getFromPropertiesMap("subscriptions");
-                break;
-            case INSTANCE_SPANNER_ASSET:
-                this.assetsList = getFromPropertiesMap("instances");
-                break;
-            case CLUSTER_KUBERNETES_ASSET:
-                this.assetsList = getFromPropertiesMap("clusters");
-                break;
-            default:
-                this.assetsList = getFromPropertiesMap("items");
-                break;
+        String assetKey = assetKind.getJsonParserKey();
+        if (assetKind == AssetKind.APP_APP_ENGINE_ASSET) {
+            this.assetsList.add(this.propertiesMap);
+        } else if (assetKey != null) {
+            this.assetsList = (List<Map<String,Object>>) this.propertiesMap.get(assetKey);
+        } else {
+            this.assetsList = (List<Map<String,Object>>) this.propertiesMap.get("items");
         }
+
         // In case the provided jsonNode returned no actual assets data, convert the assetList into
-        // an emptyList in order not to fail for loops using this list
+        // an emptyList in order not to fail the for loops which are using this list
         if (this.assetsList == null) {
             this.assetsList = Collections.emptyList();
         }
-    }
-
-    /*
-    This function returns a list of maps from the propertiesMap based on the given key string.
-     */
-    private List<Map<String,Object>> getFromPropertiesMap(String key) {
-        return (List<Map<String,Object>>) this.propertiesMap.get(key);
     }
 
     /**
