@@ -11,6 +11,31 @@ import java.util.List;
 public class AssetsRepository {
 
     /**
+     * This is used to create a list of all workspace values for a specific user
+     *
+     * @param dbClient    - A client for connection to the DB
+     * @param userID - The user for whom we want the list of workspaces
+     * @return a list of all workspace values for the specific user
+     */
+    public List<String> getWorkspaceIdList(DatabaseClient dbClient, String userID) {
+        List<String> workspaceIdList = new ArrayList<>();
+        String statementString = "SELECT DISTINCT workspaceId FROM Workspace_User_Table WHERE " +
+                "userEmail = @userID ORDER BY workspaceId";
+        Statement statement = Statement.newBuilder(statementString)
+                .bind("userID")
+                .to(userID)
+                .build();
+        try (ResultSet resultSet = dbClient.singleUse().executeQuery(statement)) {
+            while (resultSet.next()) {
+                if (!resultSet.isNull("workspaceId")) {
+                    workspaceIdList.add(resultSet.getString("workspaceId"));
+                }
+            }
+        }
+        return workspaceIdList;
+    }
+
+    /**
      * This is used to create a list of all filter values from a project
      *
      * @param dbClient    - A client for connection to the DB
@@ -198,7 +223,7 @@ public class AssetsRepository {
                     String columns = String.join(", ", columnNamesForKindQuery);
                     String usingString = String.join(", ", columnsForUsing);
                     statementString = String.format("SELECT %s FROM Main_Assets JOIN %s USING " +
-                                    "(%s)  ORDER By %s"
+                                    "(%s) WHERE workspaceId = @workspaceId ORDER By %s"
                             , columns, tableName, usingString, columnNames.get(0));
                 }
             }
@@ -238,7 +263,7 @@ public class AssetsRepository {
         String columns = String.join(", ", columnNames);
         String statementString;
         if (filters.isEmpty()) {
-            statementString = String.format("SELECT %s FROM Main_Assets ORDER By %s", columns,
+            statementString = String.format("SELECT %s FROM Main_Assets WHERE workspaceId = @workspaceId ORDER By %s", columns,
                     columnNames.get(0));
         } else {
             List<String> queryFilters = new ArrayList<>();
@@ -246,6 +271,8 @@ public class AssetsRepository {
                 String oneFilter = String.format("%s = @%s", filter, filter);
                 queryFilters.add(oneFilter);
             }
+            String workspaceIdFilter = String.format("%s = @%s", "workspaceId", "workspaceId");
+            queryFilters.add(workspaceIdFilter);
             String where = String.join(" AND ", queryFilters);
             statementString = String.format("SELECT %s FROM Main_Assets WHERE %s ORDER By %s",
                     columns, where, columnNames.get(0));
@@ -263,12 +290,13 @@ public class AssetsRepository {
      * @param location - The wanted location from the user
      * @param status   - The wanted status from the user
      * @param kind     - The wanted kind from the user
+     * @param workspaceId     - The chosen workspace from the user
      * @return A ResultListObject witch holds a list of display names for each column and a list
      * of lists where each row holds information of one asset in strings (to use
      * in template)
      */
     public ResultListObject getAllAssets(DatabaseClient dbClient, String location, String status,
-                                         String kind) {
+                                         String kind, String workspaceId) {
         List<String> filters = new ArrayList<>();
         if (!status.equals("all")) {
             filters.add("status");
@@ -282,7 +310,7 @@ public class AssetsRepository {
         TableQueryObject tableQueryObject = createTableQueryObject(dbClient, filters);
         Statement statement =
                 Statement.newBuilder(tableQueryObject.Query).bind("location").to(location).bind(
-                        "status").to(status).bind("kind").to(kind).build();
+                        "status").to(status).bind("kind").to(kind).bind("workspaceId").to(workspaceId).build();
         List<List<String>> results = executeQueryAndReturnList(statement, dbClient,
                 tableQueryObject.columnNames, tableQueryObject.columnTypes);
         ResultListObject resultList = new ResultListObject(tableQueryObject.columnDisplays,
@@ -295,13 +323,14 @@ public class AssetsRepository {
      *
      * @param dbClient - A client for connection to the DB
      * @param kind     - The wanted status from the user
+     * @param workspaceId     - The chosen workspace from the user
      * @return A ResultListObject witch holds a list of display names for each column and a list
      * of lists where each row holds information of one asset in strings (to use
      * in template)
      */
-    public ResultListObject getAssetsByKind(DatabaseClient dbClient, String kind) {
+    public ResultListObject getAssetsByKind(DatabaseClient dbClient, String kind, String workspaceId) {
         TableQueryObject tableQueryObject = createTableQueryObjectForKind(dbClient, kind);
-        Statement statement = Statement.newBuilder(tableQueryObject.Query).build();
+        Statement statement = Statement.newBuilder(tableQueryObject.Query).bind("workspaceId").to(workspaceId).build();
         List<List<String>> results = executeQueryAndReturnList(statement, dbClient,
                 tableQueryObject.columnNames, tableQueryObject.columnTypes);
         ResultListObject resultList = new ResultListObject(tableQueryObject.columnDisplays,

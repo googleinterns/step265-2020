@@ -7,13 +7,33 @@
     <ul>
         <li><a href="/allassets" class="active">All Assets</a></li>
         <li><a href="/bykind">Additional Information Per Asset Kind</a></li>
+        <li><a><form name='f' action="#" th:action="@{/allassets}" th:object="${workspaceObject}" method='GET'>
+            <table>
+                <tr>
+                    <td>Workspace ID:</td>
+                    <td>
+                        <select th:field="*{workspaceID}" onchange="this.form.submit();">
+                            <option th:utext="${chosenWorkspaceID}" th:value="${chosenWorkspaceID}"></option>
+                            <option th:each="workspaceID : ${workspaceIdList}"
+                                    th:if="${workspaceID} != ${chosenWorkspaceID}"
+                                    th:value="${workspaceID}"
+                                    th:utext="${workspaceID}"/>
+                        </select>
+
+                    </td>
+                </tr>
+            </table>
+        </form>
+        </a></li>
     </ul>
 </head>
 <body>
 
+
 <form name='f' action="#" th:action="@{/allassets}" th:object="${filterObject}" method='GET'>
     <table class="filters">
         <tr>
+
             <td>Status:</td>
             <td>
                 <select th:field="*{status}">

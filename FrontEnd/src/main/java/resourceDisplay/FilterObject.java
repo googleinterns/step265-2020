@@ -4,6 +4,7 @@ package resourceDisplay;
  * This Class is used to get all filters from user for allAssets
  */
 public class FilterObject {
+
     private String location;
     private String status;
     private String kind;
