@@ -1,10 +1,10 @@
 package com.google.cloudassets.discovery.projectobjects;
 
-import com.google.api.client.http.GenericUrl;
-import com.google.api.client.http.HttpRequest;
-import com.google.api.client.http.HttpRequestInitializer;
-import com.google.api.client.http.HttpTransport;
+import com.google.api.client.http.*;
+import com.google.api.client.http.json.JsonHttpContent;
+import com.google.api.client.json.jackson2.JacksonFactory;
 import com.google.auth.http.HttpCredentialsAdapter;
+import com.google.auth.oauth2.AccessToken;
 import com.google.auth.oauth2.GoogleCredentials;
 import com.google.cloudassets.discovery.*;
 import com.google.cloudassets.discovery.assetobjects.AssetObject;
@@ -14,9 +14,9 @@ import com.google.api.client.http.javanet.NetHttpTransport;
 import com.google.common.flogger.FluentLogger;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.*;
 
 /**
  * The ProjectAssetsMapper class is in charge of getting all of the different assets for the given
@@ -28,12 +28,17 @@ public class ProjectAssetsMapper {
     private static final String ASSET_TYPE_EXP = "{asset_type}";
     private static final String API_ENABLED_STR = "ENABLED";
 
+    private static final SimpleDateFormat DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
     private static final ObjectMapper jsonMapper = new ObjectMapper();
     private static final AssetObjectsFactory assetObjectFactory = new AssetObjectsFactory();
+    private static final HttpTransport requestFactory = new NetHttpTransport();
 
     private static final FluentLogger logger = FluentLogger.forEnclosingClass();
 
     private final ProjectConfig projectConfig;
+    private AccessToken accessToken;
+    private GoogleCredentials credentials;
+
 
     /**
      * The ProjectAssetsMapper constructor initialized the relevant project configurations.
@@ -41,22 +46,80 @@ public class ProjectAssetsMapper {
      */
     public ProjectAssetsMapper(ProjectConfig config) {
         this.projectConfig = config;
+        generateAccessToken();
+    }
+
+    /*
+    This function creates a map of the data needed for the POST request for generating a new access
+    token (a list of the scopes we need permission for).
+     */
+    private Map<String, List<String>> getScopeMap() {
+        Map<String, List<String>> scopeMap =  new HashMap<>();
+        List<String> scopesList = new ArrayList<>();
+        scopesList.add("https://www.googleapis.com/auth/cloud-platform");
+        scopeMap.put("scope", scopesList);
+        return scopeMap;
+    }
+
+    /*
+    This function generates an access token for the specific project's service account.
+     */
+    private void generateAccessToken() {
+        String accessTokenUrl = "https://iamcredentials.googleapis.com/v1/projects/-/serviceAccounts/"
+                            + this.projectConfig.getServiceAccountEmail() + ":generateAccessToken";
+        try {
+            // Build POST request to get AccessToken
+            GoogleCredentials credentials = GoogleCredentials.getApplicationDefault();
+            HttpRequestInitializer requestInitializer = new HttpCredentialsAdapter(credentials);
+            HttpRequest request = this.requestFactory.createRequestFactory(requestInitializer)
+                    .buildPostRequest(new GenericUrl(accessTokenUrl), new JsonHttpContent(new JacksonFactory(), getScopeMap()));
+
+            // Update newly generated AccessToken
+            JsonNode jsonNode = jsonMapper.readTree(request.execute().parseAsString());
+            Map<String, Object> accessTokenMap = jsonMapper.convertValue(jsonNode, Map.class);
+            Date expireTime = DATE_FORMAT.parse((String) accessTokenMap.get("expireTime"));
+            this.accessToken = new AccessToken((String) accessTokenMap.get("accessToken"), expireTime);
+        } catch (IOException exception) {
+            String errorMsg = "Encountered an IOException. Provided url was: " + accessTokenUrl;
+            logger.atInfo().withCause(exception).log(errorMsg);
+        } catch (ParseException exception) {
+            String errorMsg = "Encountered a date parsing error while parsing 'expireTime' value. "
+                            + "Dates should be in yyyy-MM-ddTHH:mm:ss format.";
+            logger.atInfo().withCause(exception).log(errorMsg);
+        }
+
+    }
+
+    /*
+    This function creates the GoogleCredentials needed to access the different APIs and refreshes
+    it if the access token has expired.
+     */
+    private void updateCredentials() {
+        if (this.credentials == null) {
+            this.credentials = new GoogleCredentials(this.accessToken);
+        }
+
+        // Refreshes the AccessToken used for the credentials if needed
+        try {
+            credentials.refreshIfExpired();
+        } catch (IOException exception) {
+            String errorMsg = "Encountered an IOException while trying to refresh the AccessToken "
+                        + "of workspace ID: " + this.projectConfig.getWorkspaceId() ;
+            logger.atInfo().withCause(exception).log(errorMsg);
+        }
     }
 
     /*
      * This function returns a string representing the HttpResponse of the given HttpRequest url (in
      * json format).
      * @param assetListUrl - a string representing the url of a certain Google Cloud Api asset list
-     * @return
      * If an exception is caught, it logs the details to the logger and returns null.
      */
     private String getHttpInfo(String assetListUrl) {
         try {
-            GoogleCredentials credentials = GoogleCredentials.getApplicationDefault();
-            HttpRequestInitializer requestInitializer = new HttpCredentialsAdapter(credentials);
-            HttpTransport requestFactory = new NetHttpTransport();
-
-            HttpRequest request = requestFactory.createRequestFactory(requestInitializer)
+            updateCredentials();
+            HttpRequestInitializer requestInitializer = new HttpCredentialsAdapter(this.credentials);
+            HttpRequest request = this.requestFactory.createRequestFactory(requestInitializer)
                                                 .buildGetRequest(new GenericUrl(assetListUrl));
             return request.execute().parseAsString();
         } catch (IOException exception) {
