@@ -2,8 +2,6 @@ package com.google.cloudassets.discovery;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.google.cloudassets.discovery.AssetJsonParser;
-import com.google.cloudassets.discovery.AssetKind;
 import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
