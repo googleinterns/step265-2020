@@ -16,16 +16,30 @@ public enum AssetKind {
     DISK_COMPUTE_ASSET("compute#disk"),
     INSTANCE_CLOUD_SQL_ASSET("sql#instance"),
     INSTANCE_COMPUTE_ASSET("compute#instance"),
-    SUBSCRIPTION_PUB_SUB_ASSET("pubsub#subscription"),
-    TOPIC_PUB_SUB_ASSET("pubsub#topic");
+    SUBSCRIPTION_PUB_SUB_ASSET("pubsub#subscription", "subscriptions"),
+    TOPIC_PUB_SUB_ASSET("pubsub#topic", "topics"),
+    INSTANCE_SPANNER_ASSET("spanner#instance", "instances"),
+    APP_APP_ENGINE_ASSET("appengine#app"),
+    CLUSTER_KUBERNETES_ASSET("kubernetes#cluster", "clusters");
 
     private final String kindString;
+    // This key is used to parse the json returned by the specific asset's API. If it is not provided,
+    // the AssetJsonParser class uses a default key which works for most assets.
+    private String jsonParserKey;
 
     /*
-    This private constructor initialized the fields for the given enum.
+    This private constructor initialized the kindString field for the given enum.
      */
-    private AssetKind(String kind) {
+    AssetKind(String kind) {
         this.kindString = kind;
+    }
+
+    /*
+    This private constructor initialized the kindString & jsonParserKey fields for the given enum.
+     */
+    AssetKind(String kind, String key) {
+        this.kindString = kind;
+        this.jsonParserKey = key;
     }
 
     /**
@@ -34,6 +48,14 @@ public enum AssetKind {
     @Override
     public String toString() {
         return this.kindString;
+    }
+
+    /**
+     * @return a string representing the key that should be used to parsed the json properties
+     * file of this asset.
+     */
+    public String getJsonParserKey() {
+        return this.jsonParserKey;
     }
 
     /**

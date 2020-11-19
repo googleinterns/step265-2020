@@ -1,10 +1,10 @@
 # Resource Discovery Project - Backend
 
 ## Adding a new type of asset to be supported:
-1. You should create a new class for the new asset and place it in the AssetObjects folder 
-1. The class should:
+1. You should create a new class for the new asset and place it in the AssetObjects folder.
+The class should:
     1. Extend the abstract AssetObject class (which will provide your asset with the following 
-       fields: kind, name, id, location, creationTime and status).
+       fields: workspaceId, projectId, kind, name, id, location, creationTime and status).
     1. **Important** - the name and kind fields most have valid data as they are part of the primary 
         keys in the assets tables.
     1. Implement an inner Builder class which extends the BaseBuilder with the following functions:
@@ -47,7 +47,7 @@
                        }
                    }
         ```
-1. Add any asset specific fields to the new asset object class you created and make sure to also
+    1. Add any asset specific fields to the new asset object class you created and make sure to also
 implement public getters for these new fields.
 1. Add a new const to the enum AssetKind class by the following convention:
     {SPECIFIC_ASSET_KIND}_{GENERAL_ASSET_KIND}_ASSET (for example: DISK_COMPUTE_ASSET)
@@ -56,9 +56,11 @@ implement public getters for these new fields.
         {GENERAL_ASSET_KIND}#{SPECIFIC_ASSET_KIND} (for example: compute#disk)
     Please note that some of the assets have a 'kind' attribute and if so it can be used to set the
     kind for a new asset we support.
-           
 1. Add its creation to the AssetObjectsFactory (to the createAssetObject function).
-1. Add its creation to the getAllAssets function in the ProjectAssetsMapper class.
+1. Add its creation to the getAllAssets function in the ProjectAssetsMapper class. Please notice that
+assets are parsed from json format using the AssetJsonParser class and sometimes new asset types
+require adding a new key extraction to the constructor function (according to the data returned by 
+their REST API). 
 1. Add a relevant asset table in the spanner db if needed (sometimes there aren't any new interesting
 asset attributes which are not covered in the Main_Assets table, and that fine) by following these steps:
     1. For each wanted property of this asset add a new row to the Asset_Tables_Config table in our

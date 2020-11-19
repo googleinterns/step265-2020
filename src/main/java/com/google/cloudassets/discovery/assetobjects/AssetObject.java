@@ -278,4 +278,21 @@ abstract public class AssetObject {
         }
         return null;
     }
+
+    /*
+    This function receives an Object representing an int and returns it as an Integer.
+    If the provided intToCast can not be casted into an int, null is returned and details
+    are logged.
+     */
+    protected static Integer castToInt(Object intToCast) {
+        try {
+            return (Integer) intToCast;
+        } catch (ClassCastException exception) {
+            String errorMsg = "Encountered a casting error, expected to get an object that can be " +
+                    "casted into an Integer. Received object: " + intToCast;
+            logger.atInfo().withCause(exception).log(errorMsg);
+        }
+        return null;
+    }
+
 }

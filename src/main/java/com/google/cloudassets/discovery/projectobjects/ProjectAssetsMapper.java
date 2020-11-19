@@ -6,11 +6,8 @@ import com.google.api.client.http.HttpRequestInitializer;
 import com.google.api.client.http.HttpTransport;
 import com.google.auth.http.HttpCredentialsAdapter;
 import com.google.auth.oauth2.GoogleCredentials;
-import com.google.cloudassets.discovery.ApiDetails;
+import com.google.cloudassets.discovery.*;
 import com.google.cloudassets.discovery.assetobjects.AssetObject;
-import com.google.cloudassets.discovery.AssetObjectsFactory;
-import com.google.cloudassets.discovery.AssetObjectsList;
-import com.google.cloudassets.discovery.AssetKind;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.api.client.http.javanet.NetHttpTransport;
@@ -80,9 +77,10 @@ public class ProjectAssetsMapper {
     private void getAssetObjectList(List<AssetObject> assetObjectList, String assetListUrl,
                                            AssetKind assetKind) {
         try {
-            AssetObjectsList tempAssetObjectsList = jsonMapper.readValue(getHttpInfo(assetListUrl),
-                                                                            AssetObjectsList.class);
-             for (Map<String,Object> assetProperties : tempAssetObjectsList.getAssetObjectsList()) {
+            JsonNode jsonNode = jsonMapper.readTree(getHttpInfo(assetListUrl));
+            AssetJsonParser assetJsonParser = new AssetJsonParser(jsonNode, assetKind);
+
+            for (Map<String,Object> assetProperties : assetJsonParser.getAssetsList()) {
                 AssetObject assetObject = assetObjectFactory.createAssetObject(assetKind,
                                                                                 assetProperties,
                                                                                 projectConfig);
@@ -100,11 +98,11 @@ public class ProjectAssetsMapper {
     provided zonesUrl string.
     If an exception is caught, it logs the details to the logger and returns an empty list.
      */
-    private List<String> getZonesList(String zonesUrl) {
+    private List<String> getZonesList(String zonesUrl, String zoneJsonKey) {
         List<String> zonesList = new ArrayList<>();
         try {
             JsonNode zonesJsonNode = jsonMapper.readTree(getHttpInfo(zonesUrl));
-            for (JsonNode zoneNode : zonesJsonNode.get("items")) {
+            for (JsonNode zoneNode : zonesJsonNode.get(zoneJsonKey)) {
                 zonesList.add(zoneNode.get("name").toString().replaceAll("\"", ""));
             }
         } catch (IOException exception) {
@@ -127,6 +125,9 @@ public class ProjectAssetsMapper {
         getAllPubSubAssets(assetObjectList);
         getAllStorageAssets(assetObjectList);
         getAllCloudSqlAssets(assetObjectList);
+        getAllSpannerAssets(assetObjectList);
+        getAllAppEngineAssets(assetObjectList);
+        getAllKubernetesAssets(assetObjectList);
 
         return assetObjectList;
     }
@@ -153,15 +154,15 @@ public class ProjectAssetsMapper {
     }
 
     /*
-    This function returns a list of the different Compute Asset Objects that belong to a
-    specific Google Cloud project (if the compute API is enabled for this project).
+    This function adds the different Compute Asset Objects that belong to a specific Google Cloud
+    project to the assetObjectList (if the compute API is enabled for this project).
      */
     private void getAllComputeAssets(List<AssetObject> assetObjectList) {
         String apiService = "compute.googleapis.com";
         if (isApiEnabled(apiService)) {
             String zonesComputeUrl = ("https://" + apiService + "/compute/v1/projects/" +
                     PROJECT_ID_EXP + "/zones").replace(PROJECT_ID_EXP, projectConfig.getProjectId());
-            List<String> zonesList = getZonesList(zonesComputeUrl);
+            List<String> zonesList = getZonesList(zonesComputeUrl, "items");
 
             for (String zone : zonesList) {
                 String computeUrl = (zonesComputeUrl + "/" + ZONE_NAME_EXP + "/" + ASSET_TYPE_EXP)
@@ -177,8 +178,8 @@ public class ProjectAssetsMapper {
     }
 
     /*
-    This function returns a list of the different Pub Sub Asset Objects that belong to a
-    specific Google Cloud project (if the pubsub API is enabled for this project).
+    This function adds the different Pub Sub Asset Objects that belong to a specific Google Cloud
+    project to the assetObjectList (if the pubsub API is enabled for this project).
      */
     private void getAllPubSubAssets(List<AssetObject> assetObjectList) {
         String apiService = "pubsub.googleapis.com";
@@ -195,8 +196,8 @@ public class ProjectAssetsMapper {
     }
 
     /*
-    This function returns a list of the different Storage Asset Objects that belong to a
-    specific Google Cloud project (if the storage API is enabled for this project).
+    This function adds the different Storage Asset Objects that belong to a specific Google Cloud
+    project to the assetObjectList (if the storage API is enabled for this project).
      */
     private void getAllStorageAssets(List<AssetObject> assetObjectList) {
         String apiService = "storage.googleapis.com";
@@ -210,8 +211,8 @@ public class ProjectAssetsMapper {
     }
 
     /*
-    This function returns a list of the different Cloud Sql Asset Objects that belong to a
-    specific Google Cloud project (if the sqladmin API is enabled for this project).
+    This function adds the different Cloud Sql Asset Objects that belong to a specific Google Cloud
+    project to the assetObjectList (if the sqladmin API is enabled for this project).
      */
     private void getAllCloudSqlAssets(List<AssetObject> assetObjectList) {
         String apiService = "sqladmin.googleapis.com";
@@ -221,6 +222,54 @@ public class ProjectAssetsMapper {
 
             String instanceCloudSqlUrl = cloudSqlUrl.replace(ASSET_TYPE_EXP, "instances");
             getAssetObjectList(assetObjectList, instanceCloudSqlUrl, AssetKind.INSTANCE_CLOUD_SQL_ASSET);
+        }
+    }
+
+    /*
+    This function adds the different Spanner Asset Objects that belong to a specific Google Cloud
+    project to the assetObjectList (if the spanner API is enabled for this project).
+     */
+    private void getAllSpannerAssets(List<AssetObject> assetObjectList) {
+        String apiService = "spanner.googleapis.com";
+        if (isApiEnabled(apiService)) {
+            String spannerUrl = ("https://" + apiService + "/v1/projects/" + PROJECT_ID_EXP +
+                    "/" + ASSET_TYPE_EXP).replace(PROJECT_ID_EXP, projectConfig.getProjectId());
+
+            String instanceSpannerUrl = spannerUrl.replace(ASSET_TYPE_EXP, "instances");
+            getAssetObjectList(assetObjectList, instanceSpannerUrl, AssetKind.INSTANCE_SPANNER_ASSET);
+        }
+    }
+
+    /*
+    This function adds the different App Engine Asset Objects that belong to a specific Google Cloud
+    project to the assetObjectList (if the appengine API is enabled for this project).
+     */
+    private void getAllAppEngineAssets(List<AssetObject> assetObjectList) {
+        String apiService = "appengine.googleapis.com";
+        if (isApiEnabled(apiService)) {
+            String appEngineUrl = ("https://" + apiService + "/v1/apps/" + PROJECT_ID_EXP)
+                    .replace(PROJECT_ID_EXP, projectConfig.getProjectId());
+
+            getAssetObjectList(assetObjectList, appEngineUrl, AssetKind.APP_APP_ENGINE_ASSET);
+        }
+    }
+
+    /*
+    This function adds the different Kubernetes Engine Asset Objects that belong to a specific Google
+    Cloud project to the assetObjectList (if the container API is enabled for this project).
+     */
+    private void getAllKubernetesAssets(List<AssetObject> assetObjectList) {
+        String apiService = "container.googleapis.com";
+        if (isApiEnabled(apiService)) {
+            String zonesKubernetesUrl = ("https://" + apiService + "/v1beta1/projects/" +
+                    PROJECT_ID_EXP + "/locations").replace(PROJECT_ID_EXP, projectConfig.getProjectId());
+            List<String> zonesList = getZonesList(zonesKubernetesUrl, "locations");
+
+            for (String zone : zonesList) {
+                String kubernetesUrl = (zonesKubernetesUrl + "/" + ZONE_NAME_EXP + "/clusters")
+                        .replace(ZONE_NAME_EXP, zone);
+                getAssetObjectList(assetObjectList, kubernetesUrl, AssetKind.CLUSTER_KUBERNETES_ASSET);
+            }
         }
     }
 }

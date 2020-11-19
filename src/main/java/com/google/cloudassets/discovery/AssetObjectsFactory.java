@@ -32,6 +32,12 @@ public class AssetObjectsFactory {
                 return new BucketStorageObject.Builder(assetProperties, projectConfig).build();
             case INSTANCE_CLOUD_SQL_ASSET:
                 return new InstanceCloudSqlObject.Builder(assetProperties, projectConfig).build();
+            case INSTANCE_SPANNER_ASSET:
+                return new InstanceSpannerObject.Builder(assetProperties, projectConfig).build();
+            case APP_APP_ENGINE_ASSET:
+                return new AppAppEngineObject.Builder(assetProperties, projectConfig).build();
+            case CLUSTER_KUBERNETES_ASSET:
+                return new ClusterKubernetesObject.Builder(assetProperties, projectConfig).build();
         }
         return null;
     }

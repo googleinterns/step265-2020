@@ -40,7 +40,7 @@ public class TopicPubSubObject extends AssetObject {
 
         /**
          * This function sets the relevant fields of the TopicPubSubObject.
-         * Fields that should be initialized for this object are: kind (manually generated) and name.
+         * Fields that should be initialized for this object are: kind and name.
          * @return the newly initialized TopicPubSubObject
          */
         public TopicPubSubObject build() {
