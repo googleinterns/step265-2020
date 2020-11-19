@@ -14,7 +14,6 @@ import java.util.Map;
  */
 public class AssetJsonParser {
     private List<Map<String,Object>> assetsList;
-    private Map<String, Object> propertiesMap;
 
     private static final ObjectMapper jsonMapper = new ObjectMapper();
 
@@ -40,16 +39,16 @@ public class AssetJsonParser {
      */
     public AssetJsonParser(JsonNode jsonNode, AssetKind assetKind) {
         this.assetsList = new ArrayList<>();
-        this.propertiesMap = jsonMapper.convertValue(jsonNode, Map.class);
+        Map<String, Object> propertiesMap = jsonMapper.convertValue(jsonNode, Map.class);
 
         // Some of the asset API return their properties in a slightly different json structure
         String assetKey = assetKind.getJsonParserKey();
         if (assetKind == AssetKind.APP_APP_ENGINE_ASSET) {
-            this.assetsList.add(this.propertiesMap);
+            this.assetsList.add(propertiesMap);
         } else if (assetKey != null) {
-            this.assetsList = (List<Map<String,Object>>) this.propertiesMap.get(assetKey);
+            this.assetsList = (List<Map<String,Object>>) propertiesMap.get(assetKey);
         } else {
-            this.assetsList = (List<Map<String,Object>>) this.propertiesMap.get("items");
+            this.assetsList = (List<Map<String,Object>>) propertiesMap.get("items");
         }
 
         // In case the provided jsonNode returned no actual assets data, convert the assetList into
