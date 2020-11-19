@@ -1,4 +1,4 @@
-package com.google.cloudassets.discovery.assetobjects;
+package com.google.cloudassets.discovery;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
