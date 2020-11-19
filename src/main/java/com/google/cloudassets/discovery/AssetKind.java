@@ -107,7 +107,7 @@ public enum AssetKind {
     configured properly and therefore unexpected behaviors may arise. In this case a
     NoTableConfigException / TooManyTablesConfigException is thrown.
      */
-    private static String getTableName(String queryStr) throws NoTableConfigException, TooManyTablesConfigException {
+    protected static String getTableName(String queryStr) throws NoTableConfigException, TooManyTablesConfigException {
         ResultSet resultSet = executeStringQuery(queryStr);
         String tableName = null;
         if (resultSet.next()) {
