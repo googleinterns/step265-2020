@@ -1,7 +1,10 @@
 package resourceDisplay;
 
-import com.google.cloud.spanner.*;
-
+//import com.google.cloud.spanner.*;
+import com.google.cloud.spanner.DatabaseClient;
+import com.google.cloud.spanner.Statement;
+import com.google.cloud.spanner.ResultSet;
+import com.google.cloud.spanner.Type;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -271,7 +274,7 @@ public class AssetsRepository {
                 String oneFilter = String.format("%s = @%s", filter, filter);
                 queryFilters.add(oneFilter);
             }
-            String workspaceIdFilter = String.format("%s = @%s", "workspaceId", "workspaceId");
+            String workspaceIdFilter = String.format("%s", "workspaceId = @workspaceId");
             queryFilters.add(workspaceIdFilter);
             String where = String.join(" AND ", queryFilters);
             statementString = String.format("SELECT %s FROM Main_Assets WHERE %s ORDER By %s",

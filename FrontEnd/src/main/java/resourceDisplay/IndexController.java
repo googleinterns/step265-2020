@@ -4,14 +4,15 @@ import com.google.cloud.spanner.DatabaseClient;
 import com.google.cloud.spanner.DatabaseId;
 import com.google.cloud.spanner.Spanner;
 import com.google.cloud.spanner.SpannerOptions;
+import com.google.cloudassets.acounts.CreateWorkspace;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
-
-import java.util.*;
+import java.util.List;
+//import java.util.*;
 
 /**
  * This Class holds all the different mappings
@@ -25,7 +26,7 @@ public class IndexController {
     private static DatabaseId db;
     private static DatabaseClient dbClient;
     private static String userID;
-    public static String workspaceID = "--";
+    private static String workspaceID;
 
     /**
      * This helper function returns a DatabaseClient to use for connection to DB
@@ -71,10 +72,10 @@ public class IndexController {
         List<String> workspaceIdList = assets.getWorkspaceIdList(dbClient, userID);
         model.addAttribute("workspaceIdList", workspaceIdList);
         model.addAttribute("workspaceObject", workspaceObject);
+        workspaceID = workspaceIdList.get(0);
         model.addAttribute("chosenWorkspaceID", workspaceID);
         if (workspaceObject.getWorkspaceID() != null) {
             workspaceID = workspaceObject.getWorkspaceID();
-            workspaceObject.setChosenWorkspaceID(workspaceObject.getWorkspaceID());
         }
         return "index";
     }
@@ -99,7 +100,6 @@ public class IndexController {
         model.addAttribute("chosenWorkspaceID", workspaceID);
         if (workspaceObject.getWorkspaceID() != null) {
             workspaceID = workspaceObject.getWorkspaceID();
-            workspaceObject.setChosenWorkspaceID(workspaceObject.getWorkspaceID());
         }
         if (workspaceID != null) {
             model.addAttribute("filterObject", filterObject);
@@ -141,7 +141,6 @@ public class IndexController {
         model.addAttribute("chosenWorkspaceID", workspaceID);
         if (workspaceObject.getWorkspaceID() != null) {
             workspaceID = workspaceObject.getWorkspaceID();
-            workspaceObject.setChosenWorkspaceID(workspaceObject.getWorkspaceID());
         }
         model.addAttribute("kindObject", kindObject);
         List<String> kindList = assets.getFilterList(dbClient, workspaceID, "kind");
@@ -154,4 +153,5 @@ public class IndexController {
         }
         return "bykind";
     }
+
 }

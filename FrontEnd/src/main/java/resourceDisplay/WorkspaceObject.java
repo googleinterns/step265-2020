@@ -5,7 +5,6 @@ package resourceDisplay;
  */
 public class WorkspaceObject {
     private String workspaceID;
-    private String chosenWorkspaceID = "--";
 
     public String getWorkspaceID() {
         return workspaceID;
@@ -15,11 +14,4 @@ public class WorkspaceObject {
         this.workspaceID = workspaceID;
     }
 
-    public String getChosenWorkspaceID() {
-        return chosenWorkspaceID;
-    }
-
-    public void setChosenWorkspaceID(String chosenWorkspaceID) {
-        this.chosenWorkspaceID = chosenWorkspaceID;
-    }
 }
