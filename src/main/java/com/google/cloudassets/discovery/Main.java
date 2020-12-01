@@ -23,11 +23,11 @@ public class Main {
     private static final String SPANNER_INSTANCE_ID = "spanner1";
     private static final String SPANNER_DATABASE_ID = "db1";
 
-    private static final String GET_PROJECTS_LIST_QUERY = "SELECT s.workspaceId, p.projectId, "
+    private static final String GET_PROJECTS_LIST_QUERY = "SELECT workspaceId, p.projectId, "
                                                         + "s.serviceAccountEmail\n"
                                                         + "FROM Workspace_Project_Table as p inner join "
                                                         + "Workspace_Service_Account_Table as s\n"
-                                                        + "on p.workspaceId = s.workspaceId\n"
+                                                        + "USING (workspaceId)\n"
                                                         + "WHERE p.isActive = True and p.serviceAccountActive = True";
     private static final String GET_TABLES_LIST_QUERY = "SELECT table_name "
                                                         + "FROM information_schema.tables "
