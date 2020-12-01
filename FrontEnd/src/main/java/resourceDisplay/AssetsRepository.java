@@ -1,38 +1,112 @@
 package resourceDisplay;
 
-//import com.google.cloud.spanner.*;
-import com.google.cloud.spanner.DatabaseClient;
-import com.google.cloud.spanner.Statement;
-import com.google.cloud.spanner.ResultSet;
-import com.google.cloud.spanner.Type;
+import com.google.cloud.spanner.*;
+import com.google.cloudassets.acounts.CreateWorkspace;
+
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 /**
  * This Class does all DB access
  */
 public class AssetsRepository {
+    private static final String SPANNER_STING_FOR_WORKSPACE_ID = "SELECT DISTINCT workspaceId, workspaceDisplayName " +
+            "FROM Workspace_User_Table WHERE userEmail = @userID ORDER BY workspaceId";
+
+    /**
+     * This is used to check if a workspaceID already exists
+     *
+     * @param dbClient - A client for connection to the DB
+     * @param workspaceId   - The new workspace Id to be created
+     * @return a boolean value that says if the workspace already exists
+     */
+    public static boolean checkIfWorkspaceExists(DatabaseClient dbClient, String workspaceId) {
+
+        Statement statement =
+                Statement.newBuilder(
+                        "SELECT workspaceId, serviceAccountEmail, workspaceDisplayName "
+                                + "FROM Workspace_Service_Account_Table "
+                                + "WHERE workspaceId = @workspaceId")
+                        .bind("workspaceId")
+                        .to(workspaceId)
+                        .build();
+        try (ResultSet resultSet = dbClient.singleUse().executeQuery(statement)) {
+            if (resultSet.next()) {
+                return true;
+            }
+            return false;
+        }
+
+    }
+
+    /**
+     * This is used to create a new workspace and service account and add to all relevant tables
+     *
+     * @param dbClient - A client for connection to the DB
+     * @param userId   - The user for whom we want to create a new workspace
+     * @param workspaceName   - The new workspace name (display name for user)
+     * @param workspaceId   - The new workspace Id (used by us)
+     * @param project   - The projects associated with this workspace
+     * @param serviceAccount   - The new service account
+     */
+    public static void addNewWorkspaceAndAccount(DatabaseClient dbClient, String userId,
+                                                 String workspaceName, String workspaceId,
+                                                 String project, String serviceAccount) {
+        List<Mutation> mutations =
+                Arrays.asList(
+                        Mutation.newInsertBuilder("Workspace_Service_Account_Table")
+                                .set("workspaceId")
+                                .to(workspaceId)
+                                .set("serviceAccountEmail")
+                                .to(serviceAccount)
+                                .set("workspaceDisplayName")
+                                .to(workspaceName)
+                                .build(),
+                        Mutation.newInsertBuilder("Workspace_User_Table")
+                                .set("workspaceId")
+                                .to(workspaceId)
+                                .set("workspaceDisplayName")
+                                .to(workspaceName)
+                                .set("userEmail")
+                                .to(userId)
+                                .build(),
+                        Mutation.newInsertBuilder("Workspace_Project_Table")
+                                .set("workspaceId")
+                                .to(workspaceId)
+                                .set("projectId")
+                                .to(project)
+                                .set("isActive")
+                                .to(Boolean.FALSE)
+                                .set("serviceAccountActive")
+                                .to(Boolean.FALSE)
+                                .build());
+        dbClient.write(mutations);
+    }
 
     /**
      * This is used to create a list of all workspace values for a specific user
      *
-     * @param dbClient    - A client for connection to the DB
-     * @param userID - The user for whom we want the list of workspaces
+     * @param dbClient - A client for connection to the DB
+     * @param userID   - The user for whom we want the list of workspaces
      * @return a list of all workspace values for the specific user
      */
-    public List<String> getWorkspaceIdList(DatabaseClient dbClient, String userID) {
-        List<String> workspaceIdList = new ArrayList<>();
-        String statementString = "SELECT DISTINCT workspaceId FROM Workspace_User_Table WHERE " +
-                "userEmail = @userID ORDER BY workspaceId";
-        Statement statement = Statement.newBuilder(statementString)
+    public List<WorkspaceObject> getWorkspaceIdList(DatabaseClient dbClient, String userID) {
+        List<WorkspaceObject> workspaceIdList = new ArrayList<>();
+        Statement statement = Statement.newBuilder(SPANNER_STING_FOR_WORKSPACE_ID)
                 .bind("userID")
                 .to(userID)
                 .build();
         try (ResultSet resultSet = dbClient.singleUse().executeQuery(statement)) {
             while (resultSet.next()) {
+                WorkspaceObject workspaceObject = new  WorkspaceObject();
                 if (!resultSet.isNull("workspaceId")) {
-                    workspaceIdList.add(resultSet.getString("workspaceId"));
+                    workspaceObject.setWorkspaceID(resultSet.getString("workspaceId"));
                 }
+                if (!resultSet.isNull("workspaceDisplayName")) {
+                    workspaceObject.setWorkspaceDisplayName(resultSet.getString("workspaceDisplayName"));
+                }
+                workspaceIdList.add(workspaceObject);
             }
         }
         return workspaceIdList;
@@ -266,7 +340,8 @@ public class AssetsRepository {
         String columns = String.join(", ", columnNames);
         String statementString;
         if (filters.isEmpty()) {
-            statementString = String.format("SELECT %s FROM Main_Assets WHERE workspaceId = @workspaceId ORDER By %s", columns,
+            statementString = String.format("SELECT %s FROM Main_Assets WHERE workspaceId = " +
+                            "@workspaceId ORDER By %s", columns,
                     columnNames.get(0));
         } else {
             List<String> queryFilters = new ArrayList<>();
@@ -289,11 +364,11 @@ public class AssetsRepository {
     /**
      * This builds and executes the query with all the different filters
      *
-     * @param dbClient - A client for connection to the DB
-     * @param location - The wanted location from the user
-     * @param status   - The wanted status from the user
-     * @param kind     - The wanted kind from the user
-     * @param workspaceId     - The chosen workspace from the user
+     * @param dbClient    - A client for connection to the DB
+     * @param location    - The wanted location from the user
+     * @param status      - The wanted status from the user
+     * @param kind        - The wanted kind from the user
+     * @param workspaceId - The chosen workspace from the user
      * @return A ResultListObject witch holds a list of display names for each column and a list
      * of lists where each row holds information of one asset in strings (to use
      * in template)
@@ -324,16 +399,18 @@ public class AssetsRepository {
     /**
      * This builds and executes the query with kind (type of asset) filter
      *
-     * @param dbClient - A client for connection to the DB
-     * @param kind     - The wanted status from the user
-     * @param workspaceId     - The chosen workspace from the user
+     * @param dbClient    - A client for connection to the DB
+     * @param kind        - The wanted status from the user
+     * @param workspaceId - The chosen workspace from the user
      * @return A ResultListObject witch holds a list of display names for each column and a list
      * of lists where each row holds information of one asset in strings (to use
      * in template)
      */
-    public ResultListObject getAssetsByKind(DatabaseClient dbClient, String kind, String workspaceId) {
+    public ResultListObject getAssetsByKind(DatabaseClient dbClient, String kind,
+                                            String workspaceId) {
         TableQueryObject tableQueryObject = createTableQueryObjectForKind(dbClient, kind);
-        Statement statement = Statement.newBuilder(tableQueryObject.Query).bind("workspaceId").to(workspaceId).build();
+        Statement statement =
+                Statement.newBuilder(tableQueryObject.Query).bind("workspaceId").to(workspaceId).build();
         List<List<String>> results = executeQueryAndReturnList(statement, dbClient,
                 tableQueryObject.columnNames, tableQueryObject.columnTypes);
         ResultListObject resultList = new ResultListObject(tableQueryObject.columnDisplays,

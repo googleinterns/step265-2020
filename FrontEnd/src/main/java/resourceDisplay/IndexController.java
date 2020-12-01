@@ -10,9 +10,9 @@ import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import java.util.List;
-//import java.util.*;
 
 /**
  * This Class holds all the different mappings
@@ -26,6 +26,7 @@ public class IndexController {
     private static DatabaseId db;
     private static DatabaseClient dbClient;
     private static String userID;
+    private static String userName;
     private static String workspaceID;
 
     /**
@@ -67,12 +68,15 @@ public class IndexController {
     public String chooseWorkspace(@AuthenticationPrincipal OAuth2User principal, Model model,
                                   @ModelAttribute FilterObject filterObject, @ModelAttribute WorkspaceObject workspaceObject) {
         userID = principal.getAttribute("email");
+        userName = principal.getAttribute("name");
         dbClient = getDbClient(SPANNER_PROJECT_ID, SPANNER_INSTANCE_ID, SPANNER_DATABASE_ID);
         AssetsRepository assets = new AssetsRepository();
-        List<String> workspaceIdList = assets.getWorkspaceIdList(dbClient, userID);
+        List<WorkspaceObject> workspaceIdList = assets.getWorkspaceIdList(dbClient, userID);
         model.addAttribute("workspaceIdList", workspaceIdList);
         model.addAttribute("workspaceObject", workspaceObject);
-        workspaceID = workspaceIdList.get(0);
+        if(!workspaceIdList.isEmpty()) {
+            workspaceID = workspaceIdList.get(0).getWorkspaceID();
+        }
         model.addAttribute("chosenWorkspaceID", workspaceID);
         if (workspaceObject.getWorkspaceID() != null) {
             workspaceID = workspaceObject.getWorkspaceID();
@@ -94,7 +98,7 @@ public class IndexController {
                        @ModelAttribute FilterObject filterObject, @ModelAttribute WorkspaceObject workspaceObject) {
         dbClient = getDbClient(SPANNER_PROJECT_ID, SPANNER_INSTANCE_ID, SPANNER_DATABASE_ID);
         AssetsRepository assets = new AssetsRepository();
-        List<String> workspaceIdList = assets.getWorkspaceIdList(dbClient, userID);
+        List<WorkspaceObject> workspaceIdList = assets.getWorkspaceIdList(dbClient, userID);
         model.addAttribute("workspaceIdList", workspaceIdList);
         model.addAttribute("workspaceObject", workspaceObject);
         model.addAttribute("chosenWorkspaceID", workspaceID);
@@ -135,7 +139,7 @@ public class IndexController {
                             @ModelAttribute KindObject kindObject, @ModelAttribute WorkspaceObject workspaceObject) {
         dbClient = getDbClient(SPANNER_PROJECT_ID, SPANNER_INSTANCE_ID, SPANNER_DATABASE_ID);
         AssetsRepository assets = new AssetsRepository();
-        List<String> workspaceIdList = assets.getWorkspaceIdList(dbClient, userID);
+        List<WorkspaceObject> workspaceIdList = assets.getWorkspaceIdList(dbClient, userID);
         model.addAttribute("workspaceIdList", workspaceIdList);
         model.addAttribute("workspaceObject", workspaceObject);
         model.addAttribute("chosenWorkspaceID", workspaceID);
@@ -152,6 +156,60 @@ public class IndexController {
             model.addAttribute("allAssets", resultListObject.columnResults);
         }
         return "bykind";
+    }
+
+    /**
+     * This page is used to create a new workspace
+     *
+     * @param principal    - Used to check authentication
+     * @param model        - Used to show table to user
+     * @param createWorkspace - Used to create a new workspace
+     * @param workspaceObject - Holds the current chosen workspace
+     * @return the newworkspace template
+     */
+    @GetMapping("/newworkspace")
+    public String createNewWorkspace(@AuthenticationPrincipal OAuth2User principal, Model model,
+                                        @ModelAttribute CreateWorkspace createWorkspace, @ModelAttribute WorkspaceObject workspaceObject) {
+        dbClient = getDbClient(SPANNER_PROJECT_ID, SPANNER_INSTANCE_ID, SPANNER_DATABASE_ID);
+        createWorkspace.setUserName(userName);
+        AssetsRepository assets = new AssetsRepository();
+        List<WorkspaceObject> workspaceIdList = assets.getWorkspaceIdList(dbClient, userID);
+        model.addAttribute("workspaceIdList", workspaceIdList);
+        model.addAttribute("createWorkspace", createWorkspace);
+        model.addAttribute("serviceAccount", createWorkspace.getServiceAccount());
+        model.addAttribute("workspaceObject", workspaceObject);
+        model.addAttribute("chosenWorkspaceID", workspaceID);
+        if (workspaceObject.getWorkspaceID() != null) {
+            workspaceID = workspaceObject.getWorkspaceID();
+        }
+        return "newworkspace";
+        }
+
+    /**
+     * This page shows a newly created workspace
+     *
+     * @param principal    - Used to check authentication
+     * @param model        - Used to show table to user
+     * @param createWorkspace - Shows newly created workspace
+     * @param workspaceObject - Holds the current chosen workspace
+     * @return the showworkspace template
+     */
+    @PostMapping("/newworkspace")
+    public String showNewWorkspace(@AuthenticationPrincipal OAuth2User principal, Model model,
+                                     @ModelAttribute CreateWorkspace createWorkspace, @ModelAttribute WorkspaceObject workspaceObject) {
+        dbClient = getDbClient(SPANNER_PROJECT_ID, SPANNER_INSTANCE_ID, SPANNER_DATABASE_ID);
+        AssetsRepository assets = new AssetsRepository();
+        List<WorkspaceObject> workspaceIdList = assets.getWorkspaceIdList(dbClient, userID);
+        model.addAttribute("workspaceIdList", workspaceIdList);
+        model.addAttribute("workspaceObject", workspaceObject);
+        model.addAttribute("chosenWorkspaceID", workspaceID);
+        if (workspaceObject.getWorkspaceID() != null) {
+            workspaceID = workspaceObject.getWorkspaceID();
+        }
+        if (createWorkspace.getWorkspaceName() != null) {
+            createWorkspace.setIdAndServiceAccount(userID, dbClient, userName);
+        }
+        return "showworkspace";
     }
 
 }
