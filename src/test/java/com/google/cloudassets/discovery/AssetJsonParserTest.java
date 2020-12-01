@@ -35,7 +35,7 @@ public class AssetJsonParserTest {
         String appEngineProperties = "{}";
         AssetJsonParser jsonParser = new AssetJsonParser(createJsonNode(appEngineProperties),
                                                         AssetKind.DISK_COMPUTE_ASSET);
-        assertEquals(new ArrayList<Map<String,Object>>(), jsonParser.getAssetsList());
+        assertEquals(0, jsonParser.getAssetsList().size());
     }
 
     /**
@@ -47,7 +47,7 @@ public class AssetJsonParserTest {
         String appEngineProperties = "{\"kind\":\"storage#buckets\"}";
         AssetJsonParser jsonParser = new AssetJsonParser(createJsonNode(appEngineProperties),
                                                         AssetKind.BUCKET_STORAGE_ASSET);
-        assertEquals(new ArrayList<Map<String,Object>>(), jsonParser.getAssetsList());
+        assertEquals(0, jsonParser.getAssetsList().size());
     }
 
     /**
