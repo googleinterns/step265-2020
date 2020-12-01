@@ -90,7 +90,7 @@ public class AssetJsonParserTest {
         AssetJsonParser jsonParser = new AssetJsonParser(createJsonNode(appEngineProperties),
                                                         AssetKind.BUCKET_STORAGE_ASSET);
         assertEquals(2, jsonParser.getAssetsList().size());
-        assertEquals("test2", jsonParser.getAssetsList().get(1).get("name"));
         assertEquals("storage#bucket", jsonParser.getAssetsList().get(0).get("kind"));
+        assertEquals("test2", jsonParser.getAssetsList().get(1).get("name"));
     }
 }
