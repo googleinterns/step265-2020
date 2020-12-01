@@ -35,7 +35,7 @@ public class AssetKindTest {
         try {
             AssetKind.getTableName(sqlQuery);
         } catch (TooManyTablesConfigException exception) {
-            assert(true);
+            return;
         }
         catch (NoTableConfigException exception) {
             fail("Wrong exception was thrown. Expected: TooManyTablesConfigException, Actual: NoTableConfigException");
