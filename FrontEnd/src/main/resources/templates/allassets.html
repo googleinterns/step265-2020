@@ -7,6 +7,7 @@
     <ul>
         <li><a href="/allassets" class="active">All Assets</a></li>
         <li><a href="/bykind">Additional Information Per Asset Kind</a></li>
+        <li><a href="/newworkspace">Add a new Workspace</a></li>
         <li><a><form name='f' action="#" th:action="@{/allassets}" th:object="${workspaceObject}" method='GET'>
             <table>
                 <tr>
@@ -14,10 +15,10 @@
                     <td>
                         <select th:field="*{workspaceID}" onchange="this.form.submit();">
                             <option th:utext="${chosenWorkspaceID}" th:value="${chosenWorkspaceID}"></option>
-                            <option th:each="workspaceID : ${workspaceIdList}"
-                                    th:if="${workspaceID} != ${chosenWorkspaceID}"
-                                    th:value="${workspaceID}"
-                                    th:utext="${workspaceID}"/>
+                            <option th:each="workspace : ${workspaceIdList}"
+                                    th:if="${workspace.workspaceID} != ${chosenWorkspaceID}"
+                                    th:value="${workspace.workspaceID}"
+                                    th:utext="${workspace.workspaceDisplayName}"/>
                         </select>
 
                     </td>
