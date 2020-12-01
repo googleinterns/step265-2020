@@ -24,10 +24,10 @@ public class Main {
     private static final String SPANNER_DATABASE_ID = "db1";
 
     private static final String GET_PROJECTS_LIST_QUERY = "SELECT workspaceId, p.projectId, "
-                                                        + "s.serviceAccountEmail\n"
+                                                        + "s.serviceAccountEmail "
                                                         + "FROM Workspace_Project_Table as p inner join "
-                                                        + "Workspace_Service_Account_Table as s\n"
-                                                        + "USING (workspaceId)\n"
+                                                        + "Workspace_Service_Account_Table as s "
+                                                        + "USING (workspaceId) "
                                                         + "WHERE p.isActive = True and p.serviceAccountActive = True";
     private static final String GET_TABLES_LIST_QUERY = "SELECT table_name "
                                                         + "FROM information_schema.tables "
