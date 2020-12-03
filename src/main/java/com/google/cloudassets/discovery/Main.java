@@ -1,7 +1,7 @@
 package com.google.cloudassets.discovery;
 
-import com.google.cloudassets.discovery.exceptions.TableCreationException;
-import com.google.cloudassets.discovery.exceptions.TableInsertionException;
+import com.google.cloudassets.discovery.AssetDiscoveryExceptions.TableCreationException;
+import com.google.cloudassets.discovery.AssetDiscoveryExceptions.TableInsertionException;
 import com.google.cloudassets.discovery.projectobjects.ProjectAssetsMapper;
 import com.google.cloudassets.discovery.projectobjects.ProjectConfig;
 import com.google.cloudassets.discovery.projectobjects.ProjectMutationsList;

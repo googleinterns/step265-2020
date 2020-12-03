@@ -1,12 +1,11 @@
 package com.google.cloudassets.discovery.projectobjects;
 
-import com.google.cloud.Timestamp;
 import com.google.cloudassets.discovery.AssetKind;
 import com.google.cloudassets.discovery.assetobjects.*;
 import com.google.cloud.spanner.Mutation;
 import com.google.cloud.spanner.Value;
-import com.google.cloudassets.discovery.exceptions.ConfigTableException;
-import com.google.cloudassets.discovery.exceptions.TableInsertionException;
+import com.google.cloudassets.discovery.AssetDiscoveryExceptions.ConfigTableException;
+import com.google.cloudassets.discovery.AssetDiscoveryExceptions.TableInsertionException;
 
 import java.util.ArrayList;
 import java.util.List;

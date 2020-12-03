@@ -2,8 +2,8 @@ package com.google.cloudassets.discovery;
 
 import com.google.cloud.Timestamp;
 import com.google.cloud.spanner.ResultSet;
-import com.google.cloudassets.discovery.exceptions.TableCreationException;
-import com.google.cloudassets.discovery.exceptions.TableInsertionException;
+import com.google.cloudassets.discovery.AssetDiscoveryExceptions.TableCreationException;
+import com.google.cloudassets.discovery.AssetDiscoveryExceptions.TableInsertionException;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
