@@ -9,7 +9,6 @@ import com.google.api.gax.longrunning.OperationFuture;
 import com.google.cloud.spanner.*;
 import com.google.common.flogger.FluentLogger;
 import com.google.spanner.admin.database.v1.UpdateDatabaseDdlMetadata;
-import org.apache.commons.lang3.tuple.Pair;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -24,9 +23,10 @@ public class Main {
     private static final String SPANNER_INSTANCE_ID = "spanner1";
     private static final String SPANNER_DATABASE_ID = "db1";
 
-    private static final String GET_PROJECTS_LIST_QUERY = "SELECT workspaceId, projectId "
-                                                        + "FROM Workspace_Project_Table "
-                                                        + "WHERE isActive = True";
+    private static final String GET_PROJECTS_LIST_QUERY =
+            "SELECT workspaceId, p.projectId, s.serviceAccountEmail "
+            + "FROM Workspace_Project_Table as p inner join Workspace_Service_Account_Table as s "
+            + "USING (workspaceId) WHERE p.isActive = True and p.serviceAccountActive = True";
     private static final String GET_TABLES_LIST_QUERY = "SELECT table_name "
                                                         + "FROM information_schema.tables "
                                                         + "WHERE table_name like '%Assets'";
@@ -78,40 +78,41 @@ public class Main {
     This function updates in out spanner db all of the assets for all of the relevant projects.
      */
     private static void updateAllProjectsAssets() throws TableInsertionException {
-        for (Pair<String, String> pair : getProjectsList()) {
-            String workspaceId = pair.getKey();
-            String projectId = pair.getValue();
-
-            updateProjectAssets(workspaceId, projectId);
+        for (ProjectConfig project : getProjectsList()) {
+            updateProjectAssets(project);
         }
     }
 
     /*
     This function retrieves the project ids for which this process should run and returns it as a
-    List of Pairs in which the key is the workspace id and the value is the project id.
+    List of ProjectConfigs containing the workspace ID, project ID and ServiceAccount email
+    information for each project.
      */
-    private static List<Pair<String, String>> getProjectsList() {
-        List<Pair<String, String>> projectsList = new ArrayList<>();
+    private static List<ProjectConfig> getProjectsList() {
+        List<ProjectConfig> projectsList = new ArrayList<>();
 
         ResultSet resultSet = executeStringQuery(GET_PROJECTS_LIST_QUERY);
         while (resultSet.next()) {
-            projectsList.add(Pair.of(resultSet.getString("workspaceId"), resultSet.getString("projectId")));
+            projectsList.add(new ProjectConfig(resultSet.getString("workspaceId"),
+                                            resultSet.getString("projectId"),
+                                            resultSet.getString("serviceAccountEmail")));
         }
         return projectsList;
     }
 
     /*
-    This function receives a specific workspace ID & project ID and updates all of its assets information.
+    This function receives a specific workspace ID & project ID as a ProjectConfig object and
+    updates all of its assets information.
      */
-    private static void updateProjectAssets(String workspaceId, String projectId) throws TableInsertionException {
+    private static void updateProjectAssets(ProjectConfig project) throws TableInsertionException {
         // Update project config and assets
-        ProjectAssetsMapper projectAssets = new ProjectAssetsMapper(new ProjectConfig(workspaceId, projectId));
+        ProjectAssetsMapper projectAssets = new ProjectAssetsMapper(project);
         ProjectMutationsList projectMutations = new ProjectMutationsList();
         List<Mutation> mutationsToAdd = projectMutations.getMutationList(projectAssets.getAllAssets());
 
         // We prepare the insertion of the new assets before the deletion of the old ones so
         // that we wont have data loss in case of an error.
-        deleteProjectAssets(workspaceId, projectId);
+        deleteProjectAssets(project.getWorkspaceId(), project.getProjectId());
         dbClient.write(mutationsToAdd);
     }
 
