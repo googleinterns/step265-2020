@@ -53,25 +53,35 @@ public class Main {
      * @throws TableInsertionException
      */
     public static void main(String[] args) throws TableCreationException, TableInsertionException {
-        SpannerOptions options = SpannerOptions.newBuilder().setProjectId(SPANNER_PROJECT_ID).build();
+        initializeDbVars();
 
-        // Create spanner DatabaseClient and initialize static fields
-        spanner = options.getService();
-        db = DatabaseId.of(SPANNER_PROJECT_ID, SPANNER_INSTANCE_ID, SPANNER_DATABASE_ID);
-        dbClient = spanner.getDatabaseClient(db);
-        readFromDb = dbClient.readOnlyTransaction();
-
-        // Use spanner DatabaseClient
         try {
             maintainTables();
             updateAllProjectsAssets();
         } catch (Throwable exception) {
             throw exception;
         } finally {
-            // Close spanner DatabaseClient
-            readFromDb.close();
-            spanner.close();
+            closeDbVars();
         }
+    }
+
+    /**
+     * This function create the spanner DatabaseClient and initializes all of the DB related variables.
+     */
+    protected static void initializeDbVars() {
+        SpannerOptions options = SpannerOptions.newBuilder().setProjectId(SPANNER_PROJECT_ID).build();
+        spanner = options.getService();
+        db = DatabaseId.of(SPANNER_PROJECT_ID, SPANNER_INSTANCE_ID, SPANNER_DATABASE_ID);
+        dbClient = spanner.getDatabaseClient(db);
+        readFromDb = dbClient.readOnlyTransaction();
+    }
+
+    /**
+     * This function closes all of the DB related variables.
+     */
+    protected static void closeDbVars() {
+        readFromDb.close();
+        spanner.close();
     }
 
     /*
