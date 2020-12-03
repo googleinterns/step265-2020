@@ -39,9 +39,8 @@ public class ProjectMutationsList {
         try {
             tableName = AssetKind.getMainTableName();
         } catch (ConfigTableException exception) {
-            String errorMsg = "Could not insert data into the main table as its name could not be "
-                            + "properly retrieved.";
-            throw new TableInsertionException(errorMsg, exception);
+            throw new TableInsertionException("Could not insert data into the main table as its name " +
+                    "could not be properly retrieved.", exception);
         }
 
         for (AssetObject asset : assetObjectList) {
@@ -69,9 +68,8 @@ public class ProjectMutationsList {
         try {
             tableName = asset.getKindEnum().getAssetTableName();
         } catch (ConfigTableException exception) {
-            String errorMsg = "Could not insert data into the following asset kind table: "
-                            + asset.getKindEnum().toString() + ", as its name could not be properly retrieved.";
-            throw new TableInsertionException(errorMsg, exception);
+            throw new TableInsertionException("Could not insert data into the following asset kind table: "
+                    + asset.getKindEnum().toString() + ", as its name could not be properly retrieved.", exception);
         }
         switch (asset.getKindEnum()) {
             case INSTANCE_COMPUTE_ASSET:

@@ -75,7 +75,8 @@ public class ProjectAssetsMapper {
             GoogleCredentials credentials = GoogleCredentials.getApplicationDefault();
             HttpRequestInitializer requestInitializer = new HttpCredentialsAdapter(credentials);
             HttpRequest request = this.requestFactory.createRequestFactory(requestInitializer)
-                    .buildPostRequest(new GenericUrl(accessTokenUrl), new JsonHttpContent(new JacksonFactory(), getScopeMap()));
+                    .buildPostRequest(new GenericUrl(accessTokenUrl),
+                                    new JsonHttpContent(new JacksonFactory(), getScopeMap()));
 
             // Update newly generated AccessToken
             JsonNode jsonNode = jsonMapper.readTree(request.execute().parseAsString());
@@ -83,12 +84,11 @@ public class ProjectAssetsMapper {
             Date expireTime = DATE_FORMAT.parse((String) accessTokenMap.get("expireTime"));
             this.accessToken = new AccessToken((String) accessTokenMap.get("accessToken"), expireTime);
         } catch (IOException exception) {
-            String errorMsg = "Encountered an IOException. Provided url was: " + accessTokenUrl;
-            logger.atInfo().withCause(exception).log(errorMsg);
+            logger.atInfo().withCause(exception).log("Encountered an IOException. Provided url was: %s",
+                                                    accessTokenUrl);
         } catch (ParseException exception) {
-            String errorMsg = "Encountered a date parsing error while parsing 'expireTime' value. "
-                            + "Dates should be in yyyy-MM-ddTHH:mm:ss format.";
-            logger.atInfo().withCause(exception).log(errorMsg);
+            logger.atInfo().withCause(exception).log("Encountered a date parsing error while " +
+                    "parsing 'expireTime' value. Dates should be in yyyy-MM-ddTHH:mm:ss format.");
         }
 
     }
@@ -106,9 +106,8 @@ public class ProjectAssetsMapper {
         try {
             credentials.refreshIfExpired();
         } catch (IOException exception) {
-            String errorMsg = "Encountered an IOException while trying to refresh the AccessToken "
-                        + "of workspace ID: " + this.projectConfig.getWorkspaceId() ;
-            logger.atInfo().withCause(exception).log(errorMsg);
+            logger.atInfo().withCause(exception).log("Encountered an IOException while trying to " +
+                    "refresh the AccessToken of workspace ID: %s", this.projectConfig.getWorkspaceId());
         }
     }
 
@@ -126,8 +125,8 @@ public class ProjectAssetsMapper {
                                                 .buildGetRequest(new GenericUrl(assetListUrl));
             return request.execute().parseAsString();
         } catch (IOException exception) {
-            String errorMsg = "Encountered an IOException. Provided url was: " + assetListUrl;
-            logger.atInfo().withCause(exception).log(errorMsg);
+            logger.atInfo().withCause(exception).log("Encountered an IOException. Provided url was: %s",
+                                                    assetListUrl);
         }
         return null;
     }
@@ -153,9 +152,8 @@ public class ProjectAssetsMapper {
                 assetObjectList.add(assetObject);
             }
         } catch (IOException exception) {
-            String errorMsg = "Encountered an IOException while calling jsonMapper.readValue(). " +
-                                "Provided url was: " + assetListUrl;
-            logger.atInfo().withCause(exception).log(errorMsg);
+            logger.atInfo().withCause(exception).log("Encountered an IOException while calling " +
+                    "jsonMapper.readValue(). Provided url was: %s", assetListUrl);
         }
     }
 
@@ -172,9 +170,8 @@ public class ProjectAssetsMapper {
                 zonesList.add(zoneNode.get("name").toString().replaceAll("\"", ""));
             }
         } catch (IOException exception) {
-            String errorMsg = "Encountered an IOException while calling jsonMapper.readTree(). " +
-                                "Provided url was: " + zonesUrl;
-            logger.atInfo().withCause(exception).log(errorMsg);
+            logger.atInfo().withCause(exception).log("Encountered an IOException while calling " +
+                    "jsonMapper.readTree(). Provided url was: %s", zonesUrl);
         }
         return zonesList;
     }
@@ -212,9 +209,8 @@ public class ProjectAssetsMapper {
             }
             return Boolean.FALSE;
         } catch (IOException exception) {
-            String errorMsg = "Encountered an IOException while calling jsonMapper.readValue(). " +
-                    "Provided url was: " + apiService;
-            logger.atInfo().withCause(exception).log(errorMsg);
+            logger.atInfo().withCause(exception).log("Encountered an IOException while calling " +
+                    "jsonMapper.readValue(). Provided url was: %s", apiService);
         }
         return null;
     }
