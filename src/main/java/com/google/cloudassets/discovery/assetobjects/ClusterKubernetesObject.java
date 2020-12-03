@@ -50,17 +50,22 @@ public class ClusterKubernetesObject extends AssetObject {
         public ClusterKubernetesObject build() {
             // Set AssetObject fields
             setKind(AssetKind.CLUSTER_KUBERNETES_ASSET);
-            setName(assetProperties.get("name"));
-            setLocation(assetProperties.get("location"));
-            setCreationTime(convertStringToDate(assetProperties.get("createTime")));
-            setStatus(assetProperties.get("status"));
+            try {
+                setName(assetProperties.get("name"));
+                setLocation(assetProperties.get("location"));
+                setCreationTime(convertStringToDate(assetProperties.get("createTime")));
+                setStatus(assetProperties.get("status"));
 
-            // Set specific asset type fields
-            specificObjectClass.currentNodeCount = castToInt(assetProperties.get("currentNodeCount"));
-            specificObjectClass.loggingService = castToString(assetProperties.get("loggingService"));
-            specificObjectClass.monitoringService = castToString(assetProperties.get("monitoringService"));
-            specificObjectClass.statusMessage = castToString(assetProperties.get("statusMessage"));
-            specificObjectClass.expireTime = convertStringToDate(assetProperties.get("expireTime"));
+                // Set specific asset type fields
+                specificObjectClass.currentNodeCount = castToInt(assetProperties.get("currentNodeCount"));
+                specificObjectClass.loggingService = castToString(assetProperties.get("loggingService"));
+                specificObjectClass.monitoringService = castToString(assetProperties.get("monitoringService"));
+                specificObjectClass.statusMessage = castToString(assetProperties.get("statusMessage"));
+                specificObjectClass.expireTime = convertStringToDate(assetProperties.get("expireTime"));
+            } catch (NullPointerException exception) {
+                logger.atInfo().withCause(exception).log("Could not set all of the ClusterKubernetesObject " +
+                        "fields as one or more were missing. The provided map was: %s", assetProperties);
+            }
             return super.build();
         }
     }

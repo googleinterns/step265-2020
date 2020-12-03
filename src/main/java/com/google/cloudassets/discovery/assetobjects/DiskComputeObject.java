@@ -50,18 +50,22 @@ public class DiskComputeObject extends AssetObject {
         public DiskComputeObject build() {
             // Set AssetObject fields
             setKind(AssetKind.DISK_COMPUTE_ASSET);
-            setName(assetProperties.get("name"));
-            setId(assetProperties.get("id"));
-            setLocation(getLastSeg(assetProperties.get("zone")));
-            setCreationTime(convertStringToDate(assetProperties.get("creationTimestamp")));
-            setStatus(assetProperties.get("status"));
+            try {
+                setName(assetProperties.get("name"));
+                setId(assetProperties.get("id"));
+                setLocation(getLastSeg(assetProperties.get("zone")));
+                setCreationTime(convertStringToDate(assetProperties.get("creationTimestamp")));
+                setStatus(assetProperties.get("status"));
 
-            // Set specific asset type fields
-            specificObjectClass.diskSizeGb = convertStringToInt(assetProperties.get("sizeGb"));
-            specificObjectClass.updatedTime = convertStringToDate(assetProperties.get("lastAttachTimestamp"));
-            specificObjectClass.licenses = convertListToLastSegList(assetProperties.get("licenses"));
-            specificObjectClass.type = getLastSeg(assetProperties.get("type"));
-
+                // Set specific asset type fields
+                specificObjectClass.diskSizeGb = convertStringToInt(assetProperties.get("sizeGb"));
+                specificObjectClass.updatedTime = convertStringToDate(assetProperties.get("lastAttachTimestamp"));
+                specificObjectClass.licenses = convertListToLastSegList(assetProperties.get("licenses"));
+                specificObjectClass.type = getLastSeg(assetProperties.get("type"));
+            } catch (NullPointerException exception) {
+                logger.atInfo().withCause(exception).log("Could not set all of the DiskComputeObject " +
+                        "fields as one or more were missing. The provided map was: %s", assetProperties);
+            }
             return super.build();
         }
     }

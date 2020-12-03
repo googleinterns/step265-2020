@@ -35,7 +35,7 @@ abstract public class AssetObject {
     protected Timestamp creationTime;
     protected String status;
 
-    private static final FluentLogger logger = FluentLogger.forEnclosingClass();
+    protected static final FluentLogger logger = FluentLogger.forEnclosingClass();
     private static final Pattern LAST_SEGMENT_PATTERN = Pattern.compile("/?([^/]*$)");
     private static final SimpleDateFormat DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
 

@@ -50,15 +50,19 @@ public class InstanceCloudSqlObject extends AssetObject {
         public InstanceCloudSqlObject build() {
             // Set AssetObject fields
             setKind(AssetKind.INSTANCE_CLOUD_SQL_ASSET);
-            setName(assetProperties.get("name"));
-            setLocation(getLastSeg(assetProperties.get("region")));
-            setStatus(assetProperties.get("state"));
+            try {
+                setName(assetProperties.get("name"));
+                setLocation(getLastSeg(assetProperties.get("region")));
+                setStatus(assetProperties.get("state"));
 
-            // Set specific asset type fields
-            specificObjectClass.etag = (String) assetProperties.get("etag");
-            updateFieldsFromSettings();
-            specificObjectClass.databaseVersion = getLastSeg(assetProperties.get("databaseVersion"));
-
+                // Set specific asset type fields
+                specificObjectClass.etag = (String) assetProperties.get("etag");
+                updateFieldsFromSettings();
+                specificObjectClass.databaseVersion = getLastSeg(assetProperties.get("databaseVersion"));
+            } catch (NullPointerException exception) {
+                logger.atInfo().withCause(exception).log("Could not set all of the InstanceCloudSqlObject " +
+                        "fields as one or more were missing. The provided map was: %s", assetProperties);
+            }
             return super.build();
         }
 

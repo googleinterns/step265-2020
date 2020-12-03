@@ -47,15 +47,19 @@ public class BucketStorageObject extends AssetObject {
         public BucketStorageObject build() {
             // Set AssetObject fields
             setKind(AssetKind.BUCKET_STORAGE_ASSET);
-            setName(assetProperties.get("name"));
-            setId(assetProperties.get("id"));
-            setLocation(getLastSeg(assetProperties.get("location")));
-            setCreationTime(convertStringToDate(assetProperties.get("timeCreated")));
+            try {
+                setName(assetProperties.get("name"));
+                setId(assetProperties.get("id"));
+                setLocation(getLastSeg(assetProperties.get("location")));
+                setCreationTime(convertStringToDate(assetProperties.get("timeCreated")));
 
-            // Set specific asset type fields
-            specificObjectClass.storageClass = castToString(assetProperties.get("storageClass"));
-            specificObjectClass.updatedTime = convertStringToDate(assetProperties.get("updated"));
-
+                // Set specific asset type fields
+                specificObjectClass.storageClass = castToString(assetProperties.get("storageClass"));
+                specificObjectClass.updatedTime = convertStringToDate(assetProperties.get("updated"));
+            } catch (NullPointerException exception) {
+                logger.atInfo().withCause(exception).log("Could not set all of the BucketStorageObject " +
+                        "fields as one or more were missing. The provided map was: %s", assetProperties);
+            }
             return super.build();
         }
     }

@@ -45,13 +45,18 @@ public class InstanceSpannerObject extends AssetObject {
         public InstanceSpannerObject build() {
             // Set AssetObject fields
             setKind(AssetKind.INSTANCE_SPANNER_ASSET);
-            setName(assetProperties.get("name"));
-            setLocation(getLastSeg(assetProperties.get("config")));
-            setStatus(assetProperties.get("state"));
+            try {
+                setName(assetProperties.get("name"));
+                setLocation(getLastSeg(assetProperties.get("config")));
+                setStatus(assetProperties.get("state"));
 
-            // Set specific asset type fields
-            specificObjectClass.displayName = castToString(assetProperties.get("displayName"));
-            specificObjectClass.nodeCount = castToInt(assetProperties.get("nodeCount"));
+                // Set specific asset type fields
+                specificObjectClass.displayName = castToString(assetProperties.get("displayName"));
+                specificObjectClass.nodeCount = castToInt(assetProperties.get("nodeCount"));
+            } catch (NullPointerException exception) {
+                logger.atInfo().withCause(exception).log("Could not set all of the InstanceSpannerObject " +
+                        "fields as one or more were missing. The provided map was: %s", assetProperties);
+            }
             return super.build();
         }
     }

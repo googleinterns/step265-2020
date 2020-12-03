@@ -49,18 +49,22 @@ public class InstanceComputeObject extends AssetObject {
         public InstanceComputeObject build() {
             // Set AssetObject fields
             setKind(AssetKind.INSTANCE_COMPUTE_ASSET);
-            setName(assetProperties.get("name"));
-            setId(assetProperties.get("id"));
-            setLocation(getLastSeg(assetProperties.get("zone")));
-            setCreationTime(convertStringToDate(assetProperties.get("creationTimestamp")));
-            setStatus(assetProperties.get("status"));
+            try {
+                setName(assetProperties.get("name"));
+                setId(assetProperties.get("id"));
+                setLocation(getLastSeg(assetProperties.get("zone")));
+                setCreationTime(convertStringToDate(assetProperties.get("creationTimestamp")));
+                setStatus(assetProperties.get("status"));
 
-            // Set specific asset type fields
-            specificObjectClass.description = castToString(assetProperties.get("description"));
-            specificObjectClass.canIpForward = castToBoolean(assetProperties.get("canIpForward"));
-            specificObjectClass.cpuPlatform = castToString(assetProperties.get("cpuPlatform"));
-            specificObjectClass.machineType = getLastSeg(assetProperties.get("machineType"));
-
+                // Set specific asset type fields
+                specificObjectClass.description = castToString(assetProperties.get("description"));
+                specificObjectClass.canIpForward = castToBoolean(assetProperties.get("canIpForward"));
+                specificObjectClass.cpuPlatform = castToString(assetProperties.get("cpuPlatform"));
+                specificObjectClass.machineType = getLastSeg(assetProperties.get("machineType"));
+            } catch (NullPointerException exception) {
+                logger.atInfo().withCause(exception).log("Could not set all of the InstanceComputeObject " +
+                        "fields as one or more were missing. The provided map was: %s", assetProperties);
+            }
             return super.build();
         }
     }

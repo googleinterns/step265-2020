@@ -49,18 +49,23 @@ public class AppAppEngineObject extends AssetObject {
         public AppAppEngineObject build() {
             // Set AssetObject fields
             setKind(AssetKind.APP_APP_ENGINE_ASSET);
-            setName(assetProperties.get("name"));
-            setId(assetProperties.get("id"));
-            setLocation(getLastSeg(assetProperties.get("locationId")));
-            setStatus(assetProperties.get("servingStatus"));
+            try {
+                setName(assetProperties.get("name"));
+                setId(assetProperties.get("id"));
+                setLocation(getLastSeg(assetProperties.get("locationId")));
+                setStatus(assetProperties.get("servingStatus"));
 
-            // Set specific asset type fields
-            specificObjectClass.authDomain = castToString(assetProperties.get("authDomain"));
-            specificObjectClass.defaultHostname = castToString(assetProperties.get("defaultHostname"));
-            specificObjectClass.codeBucket = castToString(assetProperties.get("codeBucket"));
-            specificObjectClass.gcrDomain = castToString(assetProperties.get("gcrDomain"));
-            specificObjectClass.defaultBucket = castToString(assetProperties.get("defaultBucket"));
-            specificObjectClass.databaseType = castToString(assetProperties.get("databaseType"));
+                // Set specific asset type fields
+                specificObjectClass.authDomain = castToString(assetProperties.get("authDomain"));
+                specificObjectClass.defaultHostname = castToString(assetProperties.get("defaultHostname"));
+                specificObjectClass.codeBucket = castToString(assetProperties.get("codeBucket"));
+                specificObjectClass.gcrDomain = castToString(assetProperties.get("gcrDomain"));
+                specificObjectClass.defaultBucket = castToString(assetProperties.get("defaultBucket"));
+                specificObjectClass.databaseType = castToString(assetProperties.get("databaseType"));
+            } catch (NullPointerException exception) {
+                logger.atInfo().withCause(exception).log("Could not set all of the AppAppEngineObject " +
+                        "fields as one or more were missing. The provided map was: %s", assetProperties);
+            }
             return super.build();
         }
     }
