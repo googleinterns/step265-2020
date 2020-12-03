@@ -102,3 +102,14 @@ we use for the rowLastUpdateTime column), False otherwise.
 Please notice that currently only columns that are marked 'forAllAssets' can be primary keys.
 1. primaryKeyIndex - the index of the primary key. Please make sure that there are not two columns
 with the same primaryKeyIndex number.
+
+## Links to all of our currently supported asset REST APIs:
+1. Compute Instance: https://cloud.google.com/compute/docs/reference/rest/v1/instances/list
+1. Compute Disk: https://cloud.google.com/compute/docs/reference/rest/v1/disks/list
+1. PubSub Topic: https://cloud.google.com/pubsub/docs/reference/rest/v1/projects.topics/list
+1. PubSub Subscription: https://cloud.google.com/pubsub/docs/reference/rest/v1/projects.subscriptions/list
+1. Storage Bucket: https://cloud.google.com/storage/docs/json_api/v1/buckets/list
+1. Cloud Sql Instance: https://cloud.google.com/sql/docs/mysql/admin-api/rest/v1beta4/instances/list
+1. Spanner Instance: https://cloud.google.com/spanner/docs/reference/rest/v1/projects.instances/list
+1. AppEngine App: https://cloud.google.com/appengine/docs/admin-api/reference/rest/v1/apps/get
+1. Kubernetes Cluster: https://cloud.google.com/kubernetes-engine/docs/reference/rest/v1beta1/projects.locations/list
