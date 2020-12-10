@@ -21,9 +21,6 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
-import static com.google.cloudassets.discovery.AssetKind.BUCKET_STORAGE_ASSET;
-import static com.google.cloudassets.discovery.AssetKind.DISK_COMPUTE_ASSET;
-
 /**
  * The ProjectAssetsMapper class is in charge of getting all of the different assets for the given
  * workspace ID & project ID.
@@ -205,7 +202,7 @@ public class ProjectAssetsMapper {
      */
     private String getPageTokenExp(AssetKind assetKind) {
         // Not using switch statement as 'else' should also cover cases in which assetKind == null
-        if (assetKind == BUCKET_STORAGE_ASSET) {
+        if (assetKind == AssetKind.BUCKET_STORAGE_ASSET) {
             return "&pageToken=";
         } else {
             return "?pageToken=";
@@ -270,7 +267,7 @@ public class ProjectAssetsMapper {
                 getAssetObjectList(assetObjectList, instanceComputeUrl, AssetKind.INSTANCE_COMPUTE_ASSET);
 
                 String diskComputeUrl = computeUrl.replace(ASSET_TYPE_EXP, "disks");
-                getAssetObjectList(assetObjectList, diskComputeUrl, DISK_COMPUTE_ASSET);
+                getAssetObjectList(assetObjectList, diskComputeUrl, AssetKind.DISK_COMPUTE_ASSET);
             }
         }
     }
@@ -304,7 +301,7 @@ public class ProjectAssetsMapper {
                     "?project=" + PROJECT_ID_EXP).replace(PROJECT_ID_EXP, projectConfig.getProjectId());
 
             String bucketStorageUrl = storageUrl.replace(ASSET_TYPE_EXP, "b");
-            getAssetObjectList(assetObjectList, bucketStorageUrl, BUCKET_STORAGE_ASSET);
+            getAssetObjectList(assetObjectList, bucketStorageUrl, AssetKind.BUCKET_STORAGE_ASSET);
         }
     }
 
