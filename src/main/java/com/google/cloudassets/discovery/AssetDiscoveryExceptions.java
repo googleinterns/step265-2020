@@ -39,9 +39,6 @@ public class AssetDiscoveryExceptions {
      * specific asset kind in our configuration table.
      */
     public static class NoTableConfigException extends Exception {
-        public NoTableConfigException() {
-            super();
-        }
     }
 
     /**
@@ -49,8 +46,5 @@ public class AssetDiscoveryExceptions {
      * for a specific asset kind in our configuration table.
      */
     public static class TooManyTablesConfigException extends Exception {
-        public TooManyTablesConfigException() {
-            super();
-        }
     }
 }
