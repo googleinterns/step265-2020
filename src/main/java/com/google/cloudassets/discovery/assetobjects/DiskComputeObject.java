@@ -50,22 +50,18 @@ public class DiskComputeObject extends AssetObject {
         public DiskComputeObject build() {
             // Set AssetObject fields
             setKind(AssetKind.DISK_COMPUTE_ASSET);
-            try {
-                setName(assetProperties.get("name"));
-                setId(assetProperties.get("id"));
-                setLocation(getLastSeg(assetProperties.get("zone")));
-                setCreationTime(convertStringToDate(assetProperties.get("creationTimestamp")));
-                setStatus(assetProperties.get("status"));
+            setName(getProperty("name"));
+            setId(getProperty("id"));
+            setLocation(getLastSeg(getProperty("zone")));
+            setCreationTime(convertStringToDate(getProperty("creationTimestamp")));
+            setStatus(getProperty("status"));
 
-                // Set specific asset type fields
-                specificObjectClass.diskSizeGb = convertStringToInt(assetProperties.get("sizeGb"));
-                specificObjectClass.updatedTime = convertStringToDate(assetProperties.get("lastAttachTimestamp"));
-                specificObjectClass.licenses = convertListToLastSegList(assetProperties.get("licenses"));
-                specificObjectClass.type = getLastSeg(assetProperties.get("type"));
-            } catch (NullPointerException exception) {
-                logger.atInfo().withCause(exception).log("Could not set all of the DiskComputeObject " +
-                        "fields as one or more were missing. The provided map was: %s", assetProperties);
-            }
+            // Set specific asset type fields
+            specificObjectClass.diskSizeGb = convertStringToInt(getProperty("sizeGb"));
+            specificObjectClass.updatedTime = convertStringToDate(getProperty("lastAttachTimestamp"));
+            specificObjectClass.licenses = convertListToLastSegList(getProperty("licenses"));
+            specificObjectClass.type = getLastSeg(getProperty("type"));
+
             return super.build();
         }
     }

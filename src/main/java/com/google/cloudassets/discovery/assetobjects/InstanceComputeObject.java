@@ -49,22 +49,18 @@ public class InstanceComputeObject extends AssetObject {
         public InstanceComputeObject build() {
             // Set AssetObject fields
             setKind(AssetKind.INSTANCE_COMPUTE_ASSET);
-            try {
-                setName(assetProperties.get("name"));
-                setId(assetProperties.get("id"));
-                setLocation(getLastSeg(assetProperties.get("zone")));
-                setCreationTime(convertStringToDate(assetProperties.get("creationTimestamp")));
-                setStatus(assetProperties.get("status"));
+            setName(getProperty("name"));
+            setId(getProperty("id"));
+            setLocation(getLastSeg(getProperty("zone")));
+            setCreationTime(convertStringToDate(getProperty("creationTimestamp")));
+            setStatus(getProperty("status"));
 
-                // Set specific asset type fields
-                specificObjectClass.description = castToString(assetProperties.get("description"));
-                specificObjectClass.canIpForward = castToBoolean(assetProperties.get("canIpForward"));
-                specificObjectClass.cpuPlatform = castToString(assetProperties.get("cpuPlatform"));
-                specificObjectClass.machineType = getLastSeg(assetProperties.get("machineType"));
-            } catch (NullPointerException exception) {
-                logger.atInfo().withCause(exception).log("Could not set all of the InstanceComputeObject " +
-                        "fields as one or more were missing. The provided map was: %s", assetProperties);
-            }
+            // Set specific asset type fields
+            specificObjectClass.description = castToString(getProperty("description"));
+            specificObjectClass.canIpForward = castToBoolean(getProperty("canIpForward"));
+            specificObjectClass.cpuPlatform = castToString(getProperty("cpuPlatform"));
+            specificObjectClass.machineType = getLastSeg(getProperty("machineType"));
+
             return super.build();
         }
     }
