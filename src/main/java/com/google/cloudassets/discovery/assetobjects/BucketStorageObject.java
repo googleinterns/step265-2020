@@ -47,14 +47,14 @@ public class BucketStorageObject extends AssetObject {
         public BucketStorageObject build() {
             // Set AssetObject fields
             setKind(AssetKind.BUCKET_STORAGE_ASSET);
-            setName(assetProperties.get("name"));
-            setId(assetProperties.get("id"));
-            setLocation(getLastSeg(assetProperties.get("location")));
-            setCreationTime(convertStringToDate(assetProperties.get("timeCreated")));
+            setName(getProperty("name"));
+            setId(getProperty("id"));
+            setLocation(getLastSeg(getProperty("location")));
+            setCreationTime(convertStringToDate(getProperty("timeCreated")));
 
             // Set specific asset type fields
-            specificObjectClass.storageClass = castToString(assetProperties.get("storageClass"));
-            specificObjectClass.updatedTime = convertStringToDate(assetProperties.get("updated"));
+            specificObjectClass.storageClass = castToString(getProperty("storageClass"));
+            specificObjectClass.updatedTime = convertStringToDate(getProperty("updated"));
 
             return super.build();
         }

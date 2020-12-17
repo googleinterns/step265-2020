@@ -50,17 +50,18 @@ public class ClusterKubernetesObject extends AssetObject {
         public ClusterKubernetesObject build() {
             // Set AssetObject fields
             setKind(AssetKind.CLUSTER_KUBERNETES_ASSET);
-            setName(assetProperties.get("name"));
-            setLocation(assetProperties.get("location"));
-            setCreationTime(convertStringToDate(assetProperties.get("createTime")));
-            setStatus(assetProperties.get("status"));
+            setName(getProperty("name"));
+            setLocation(getProperty("location"));
+            setCreationTime(convertStringToDate(getProperty("createTime")));
+            setStatus(getProperty("status"));
 
             // Set specific asset type fields
-            specificObjectClass.currentNodeCount = castToInt(assetProperties.get("currentNodeCount"));
-            specificObjectClass.loggingService = castToString(assetProperties.get("loggingService"));
-            specificObjectClass.monitoringService = castToString(assetProperties.get("monitoringService"));
-            specificObjectClass.statusMessage = castToString(assetProperties.get("statusMessage"));
-            specificObjectClass.expireTime = convertStringToDate(assetProperties.get("expireTime"));
+            specificObjectClass.currentNodeCount = castToInt(getProperty("currentNodeCount"));
+            specificObjectClass.loggingService = castToString(getProperty("loggingService"));
+            specificObjectClass.monitoringService = castToString(getProperty("monitoringService"));
+            specificObjectClass.statusMessage = castToString(getProperty("statusMessage"));
+            specificObjectClass.expireTime = convertStringToDate(getProperty("expireTime"));
+
             return super.build();
         }
     }

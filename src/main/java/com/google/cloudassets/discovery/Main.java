@@ -1,7 +1,7 @@
 package com.google.cloudassets.discovery;
 
-import com.google.cloudassets.discovery.exceptions.TableCreationException;
-import com.google.cloudassets.discovery.exceptions.TableInsertionException;
+import com.google.cloudassets.discovery.AssetDiscoveryExceptions.TableCreationException;
+import com.google.cloudassets.discovery.AssetDiscoveryExceptions.TableInsertionException;
 import com.google.cloudassets.discovery.projectobjects.ProjectAssetsMapper;
 import com.google.cloudassets.discovery.projectobjects.ProjectConfig;
 import com.google.cloudassets.discovery.projectobjects.ProjectMutationsList;
@@ -184,9 +184,8 @@ public class Main {
                 }
             }
         } catch (NullPointerException exception) {
-            String errorMsg = "existingTableNames variable was not initialized before calling the"
-                            + "setNewSupportedTableNames function.";
-            logger.atInfo().withCause(exception).log(errorMsg);
+            logger.atInfo().withCause(exception).log("existingTableNames variable was not " +
+                    "initialized before calling the setNewSupportedTableNames function.");
         }
     }
 
@@ -203,8 +202,8 @@ public class Main {
             try {
                 createTables.get();
             } catch (Exception exception) {
-                String errorMsg = "Encountered an Exception while creating new asset tables.";
-                logger.atInfo().withCause(exception).log(errorMsg);
+                logger.atInfo().withCause(exception).log("Encountered an Exception while " +
+                        "creating new asset tables.");
             }
         }
     }

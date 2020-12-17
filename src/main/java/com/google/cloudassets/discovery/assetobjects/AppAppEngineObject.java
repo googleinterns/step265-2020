@@ -49,18 +49,19 @@ public class AppAppEngineObject extends AssetObject {
         public AppAppEngineObject build() {
             // Set AssetObject fields
             setKind(AssetKind.APP_APP_ENGINE_ASSET);
-            setName(assetProperties.get("name"));
-            setId(assetProperties.get("id"));
-            setLocation(getLastSeg(assetProperties.get("locationId")));
-            setStatus(assetProperties.get("servingStatus"));
+            setName(getProperty("name"));
+            setId(getProperty("id"));
+            setLocation(getLastSeg(getProperty("locationId")));
+            setStatus(getProperty("servingStatus"));
 
             // Set specific asset type fields
-            specificObjectClass.authDomain = castToString(assetProperties.get("authDomain"));
-            specificObjectClass.defaultHostname = castToString(assetProperties.get("defaultHostname"));
-            specificObjectClass.codeBucket = castToString(assetProperties.get("codeBucket"));
-            specificObjectClass.gcrDomain = castToString(assetProperties.get("gcrDomain"));
-            specificObjectClass.defaultBucket = castToString(assetProperties.get("defaultBucket"));
-            specificObjectClass.databaseType = castToString(assetProperties.get("databaseType"));
+            specificObjectClass.authDomain = castToString(getProperty("authDomain"));
+            specificObjectClass.defaultHostname = castToString(getProperty("defaultHostname"));
+            specificObjectClass.codeBucket = castToString(getProperty("codeBucket"));
+            specificObjectClass.gcrDomain = castToString(getProperty("gcrDomain"));
+            specificObjectClass.defaultBucket = castToString(getProperty("defaultBucket"));
+            specificObjectClass.databaseType = castToString(getProperty("databaseType"));
+
             return super.build();
         }
     }

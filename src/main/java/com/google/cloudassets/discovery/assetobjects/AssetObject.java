@@ -35,7 +35,7 @@ abstract public class AssetObject {
     protected Timestamp creationTime;
     protected String status;
 
-    private static final FluentLogger logger = FluentLogger.forEnclosingClass();
+    protected static final FluentLogger logger = FluentLogger.forEnclosingClass();
     private static final Pattern LAST_SEGMENT_PATTERN = Pattern.compile("/?([^/]*$)");
     private static final SimpleDateFormat DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
 
@@ -110,6 +110,43 @@ abstract public class AssetObject {
             return specificObjectClassBuilder;
         }
 
+        /**
+         * This function returns the value of the provided propertyKey from the assetProperties map.
+         * If there is no such key for this asset the incident is logged and a null value is returned.
+         * @param propertyKey a String representing the key of the property to be retrieved.
+         * @return an object of the property or null if it could not be found.
+         */
+        public Object getProperty(String propertyKey) {
+            Object property = assetProperties.get(propertyKey);
+            if (property == null) {
+                logger.atInfo().log("%s object was missing %s property", specificObjectClass.getKind(), propertyKey);
+            }
+            return property;
+        }
+
+        /**
+         * This function returns the value of the provided propertyKey from the provided map.
+         * If there is no such key for this asset or the provided map is null the incident is logged
+         * and a null value is returned.
+         * @param propertyMap the Map from which the property should be extracted.
+         * @param propertyKey a String representing the key of the property to be retrieved.
+         * @return an object of the property or null if it could not be found.
+         */
+        public Object getProperty(Map<String,Object> propertyMap, String propertyKey) {
+            // In case the given propertyMap is null we want to avoid a NullPointerException
+            if (propertyMap != null) {
+                Object property = propertyMap.get(propertyKey);
+                if (property == null) {
+                    logger.atInfo().log("%s object was missing %s property", specificObjectClass.getKind(), propertyKey);
+                }
+                return property;
+            } else {
+                logger.atInfo().log("Could not retrieve %s object %s property because the relevant" +
+                        " map did not exist", specificObjectClass.getKind(), propertyKey);
+            }
+            return null;
+        }
+
         /*
         This function returns the specific asset object.
          */
@@ -161,17 +198,18 @@ abstract public class AssetObject {
      * If the provided string does not match that pattern the original string is returned.
      */
     protected static String getLastSeg(Object url) {
-        try {
-            String urlToParse = (String) url;
-            Matcher matcher = LAST_SEGMENT_PATTERN.matcher(urlToParse);
-            if (matcher.find()) {
-                // Return the grouped part of the regex (not including the last "/" char)
-                return matcher.group(1);
+        if (url != null) {
+            try {
+                String urlToParse = (String) url;
+                Matcher matcher = LAST_SEGMENT_PATTERN.matcher(urlToParse);
+                if (matcher.find()) {
+                    // Return the grouped part of the regex (not including the last "/" char)
+                    return matcher.group(1);
+                }
+            } catch (ClassCastException exception) {
+                logger.atInfo().withCause(exception).log("Encountered a casting error, expected to get an " +
+                        "object that can be casted into a string. Received object: %s", url);
             }
-        } catch (ClassCastException exception) {
-            String errorMsg = "Encountered a casting error, expected to get an object that can be " +
-                    "casted into a string. Received object: " + url;
-            logger.atInfo().withCause(exception).log(errorMsg);
         }
         return null;
     }
@@ -181,13 +219,14 @@ abstract public class AssetObject {
      * with the last segment for each url.
      */
     protected static List<String> convertListToLastSegList(Object urlsObject) {
-        try {
-            List<String> urlsList = (List<String>) urlsObject;
-            return urlsList.stream().map(AssetObject::getLastSeg).collect(Collectors.toList());
-        } catch (ClassCastException exception) {
-            String errorMsg = "Encountered a casting error, expected to get an object that can be " +
-                    "casted into a list of strings. Received object: " + urlsObject;
-            logger.atInfo().withCause(exception).log(errorMsg);
+        if (urlsObject != null) {
+            try {
+                List<String> urlsList = (List<String>) urlsObject;
+                return urlsList.stream().map(AssetObject::getLastSeg).collect(Collectors.toList());
+            } catch (ClassCastException exception) {
+                logger.atInfo().withCause(exception).log("Encountered a casting error, expected to get an " +
+                        "object that can be casted into a list of strings. Received object: %s", urlsObject);
+            }
         }
         return null;
     }
@@ -198,16 +237,16 @@ abstract public class AssetObject {
     If the provided dateString does not match this format null is returned and details are logged.
      */
     protected static Timestamp convertStringToDate(Object dateString) {
-        try {
-            return Timestamp.of(DATE_FORMAT.parse((String) dateString));
-        } catch (ParseException exception) {
-            String errorMsg = "Encountered a date parsing error. Dates should be in " +
-                                "yyyy-MM-ddTHH:mm:ss format, provided date: " + dateString;
-            logger.atInfo().withCause(exception).log(errorMsg);
-        } catch (ClassCastException exception) {
-            String errorMsg = "Encountered a casting error, expected to get an object that can be " +
-                    "casted into a string. Received object: " + dateString;
-            logger.atInfo().withCause(exception).log(errorMsg);
+        if (dateString != null) {
+            try {
+                return Timestamp.of(DATE_FORMAT.parse((String) dateString));
+            } catch (ParseException exception) {
+                logger.atInfo().withCause(exception).log("Encountered a date parsing error. " +
+                        "Dates should be in yyyy-MM-ddTHH:mm:ss format, provided date: %s", dateString);
+            } catch (ClassCastException exception) {
+                logger.atInfo().withCause(exception).log("Encountered a casting error, expected to get an " +
+                        "object that can be casted into a string. Received object: %s", dateString);
+            }
         }
         return null;
     }
@@ -217,16 +256,16 @@ abstract public class AssetObject {
     If the provided intString does not match this format null is returned and details are logged.
      */
     protected static Integer convertStringToInt(Object intString) {
-        try {
-            return Integer.valueOf((String) intString);
-        } catch (ClassCastException exception) {
-            String errorMsg = "Encountered a casting error, expected to get an object that can be " +
-                                "casted into a string. Received object: " + intString;
-            logger.atInfo().withCause(exception).log(errorMsg);
-        } catch (NumberFormatException exception) {
-            String errorMsg = "Encountered a formatting error, expected to get an object that can be " +
-                                "casted into an Integer. Received object: " + intString;
-            logger.atInfo().withCause(exception).log(errorMsg);
+        if (intString != null) {
+            try {
+                return Integer.valueOf((String) intString);
+            } catch (ClassCastException exception) {
+                logger.atInfo().withCause(exception).log("Encountered a casting error, expected to get an " +
+                        "object that can be casted into a string. Received object: %s", intString);
+            } catch (NumberFormatException exception) {
+                logger.atInfo().withCause(exception).log("Encountered a formatting error, expected to get an " +
+                        "object that can be casted into an Integer. Received object: %s", intString);
+            }
         }
         return null;
     }
@@ -237,12 +276,13 @@ abstract public class AssetObject {
     are logged.
      */
     protected static String castToString(Object stringToCast) {
-        try {
-            return (String) stringToCast;
-        } catch (ClassCastException exception) {
-            String errorMsg = "Encountered a casting error, expected to get an object that can be " +
-                    "casted into a string. Received object: " + stringToCast;
-            logger.atInfo().withCause(exception).log(errorMsg);
+        if (stringToCast != null) {
+            try {
+                return (String) stringToCast;
+            } catch (ClassCastException exception) {
+                logger.atInfo().withCause(exception).log("Encountered a casting error, expected to get an " +
+                        "object that can be casted into a string. Received object: %s", stringToCast);
+            }
         }
         return null;
     }
@@ -253,12 +293,13 @@ abstract public class AssetObject {
     are logged.
      */
     protected static Boolean castToBoolean(Object booleanToCast) {
-        try {
-            return (Boolean) booleanToCast;
-        } catch (ClassCastException exception) {
-            String errorMsg = "Encountered a casting error, expected to get an object that can be " +
-                    "casted into a boolean. Received object: " + booleanToCast;
-            logger.atInfo().withCause(exception).log(errorMsg);
+        if (booleanToCast != null) {
+            try {
+                return (Boolean) booleanToCast;
+            } catch (ClassCastException exception) {
+                logger.atInfo().withCause(exception).log("Encountered a casting error, expected to get an " +
+                        "object that can be casted into a boolean. Received object: %s", booleanToCast);
+            }
         }
         return null;
     }
@@ -269,12 +310,13 @@ abstract public class AssetObject {
     and details are logged.
      */
     protected static HashMap<String, Object> castToMap(Object mapToCast) {
-        try {
-            return (HashMap<String, Object>) mapToCast;
-        } catch (ClassCastException exception) {
-            String errorMsg = "Encountered a casting error, expected to get an object that can be " +
-                    "casted into a HashMap<String, Object>. Received object: " + mapToCast;
-            logger.atInfo().withCause(exception).log(errorMsg);
+        if (mapToCast != null) {
+            try {
+                return (HashMap<String, Object>) mapToCast;
+            } catch (ClassCastException exception) {
+                logger.atInfo().withCause(exception).log("Encountered a casting error, expected to get an " +
+                        "object that can be casted into a HashMap<String, Object>. Received object: %s", mapToCast);
+            }
         }
         return null;
     }
@@ -285,14 +327,14 @@ abstract public class AssetObject {
     are logged.
      */
     protected static Integer castToInt(Object intToCast) {
-        try {
-            return (Integer) intToCast;
-        } catch (ClassCastException exception) {
-            String errorMsg = "Encountered a casting error, expected to get an object that can be " +
-                    "casted into an Integer. Received object: " + intToCast;
-            logger.atInfo().withCause(exception).log(errorMsg);
+        if (intToCast != null) {
+            try {
+                return (Integer) intToCast;
+            } catch (ClassCastException exception) {
+                logger.atInfo().withCause(exception).log("Encountered a casting error, expected to get an " +
+                        "object that can be casted into an Integer. Received object: %s", intToCast);
+            }
         }
         return null;
     }
-
 }

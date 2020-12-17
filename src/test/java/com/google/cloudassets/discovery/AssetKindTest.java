@@ -1,7 +1,7 @@
 package com.google.cloudassets.discovery;
 
-import com.google.cloudassets.discovery.exceptions.NoTableConfigException;
-import com.google.cloudassets.discovery.exceptions.TooManyTablesConfigException;
+import com.google.cloudassets.discovery.AssetDiscoveryExceptions.NoTableConfigException;
+import com.google.cloudassets.discovery.AssetDiscoveryExceptions.TooManyTablesConfigException;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;

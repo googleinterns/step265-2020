@@ -1,8 +1,8 @@
 package com.google.cloudassets.discovery;
 
 import com.google.cloud.spanner.ResultSet;
-import com.google.cloudassets.discovery.exceptions.ConfigTableException;
-import com.google.cloudassets.discovery.exceptions.TableCreationException;
+import com.google.cloudassets.discovery.AssetDiscoveryExceptions.ConfigTableException;
+import com.google.cloudassets.discovery.AssetDiscoveryExceptions.TableCreationException;
 
 import static com.google.cloudassets.discovery.Main.executeStringQuery;
 

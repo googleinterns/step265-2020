@@ -45,13 +45,14 @@ public class InstanceSpannerObject extends AssetObject {
         public InstanceSpannerObject build() {
             // Set AssetObject fields
             setKind(AssetKind.INSTANCE_SPANNER_ASSET);
-            setName(assetProperties.get("name"));
-            setLocation(getLastSeg(assetProperties.get("config")));
-            setStatus(assetProperties.get("state"));
+            setName(getProperty("name"));
+            setLocation(getLastSeg(getProperty("config")));
+            setStatus(getProperty("state"));
 
             // Set specific asset type fields
-            specificObjectClass.displayName = castToString(assetProperties.get("displayName"));
-            specificObjectClass.nodeCount = castToInt(assetProperties.get("nodeCount"));
+            specificObjectClass.displayName = castToString(getProperty("displayName"));
+            specificObjectClass.nodeCount = castToInt(getProperty("nodeCount"));
+
             return super.build();
         }
     }

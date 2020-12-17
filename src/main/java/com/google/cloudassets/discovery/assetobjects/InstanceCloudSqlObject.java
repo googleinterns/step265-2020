@@ -50,14 +50,14 @@ public class InstanceCloudSqlObject extends AssetObject {
         public InstanceCloudSqlObject build() {
             // Set AssetObject fields
             setKind(AssetKind.INSTANCE_CLOUD_SQL_ASSET);
-            setName(assetProperties.get("name"));
-            setLocation(getLastSeg(assetProperties.get("region")));
-            setStatus(assetProperties.get("state"));
+            setName(getProperty("name"));
+            setLocation(getLastSeg(getProperty("region")));
+            setStatus(getProperty("state"));
 
             // Set specific asset type fields
-            specificObjectClass.etag = (String) assetProperties.get("etag");
+            specificObjectClass.etag = (String) getProperty("etag");
             updateFieldsFromSettings();
-            specificObjectClass.databaseVersion = getLastSeg(assetProperties.get("databaseVersion"));
+            specificObjectClass.databaseVersion = getLastSeg(getProperty("databaseVersion"));
 
             return super.build();
         }
@@ -67,12 +67,12 @@ public class InstanceCloudSqlObject extends AssetObject {
         backupEnabled, replicationType & activationPolicy.
          */
         private void updateFieldsFromSettings() {
-            HashMap<String, Object> settingsMap = castToMap(assetProperties.get("settings"));
-            specificObjectClass.diskSizeGb = convertStringToInt(settingsMap.get("dataDiskSizeGb"));
-            HashMap<String, Object> backupConfig = castToMap(settingsMap.get("backupConfiguration"));
-            specificObjectClass.backupEnabled = castToBoolean(backupConfig.get("enabled"));
-            specificObjectClass.replicationType = castToString(settingsMap.get("replicationType"));
-            specificObjectClass.activationPolicy = castToString(settingsMap.get("activationPolicy"));
+            HashMap<String, Object> settingsMap = castToMap(getProperty("settings"));
+            specificObjectClass.diskSizeGb = convertStringToInt(getProperty(settingsMap, "dataDiskSizeGb"));
+            HashMap<String, Object> backupConfig = castToMap(getProperty(settingsMap, "backupConfiguration"));
+            specificObjectClass.backupEnabled = castToBoolean(getProperty(backupConfig, "enabled"));
+            specificObjectClass.replicationType = castToString(getProperty(settingsMap, "replicationType"));
+            specificObjectClass.activationPolicy = castToString(getProperty(settingsMap, "activationPolicy"));
         }
     }
 
