@@ -144,14 +144,13 @@ public class ProjectAssetsMapper {
         try {
             JsonNode jsonNode = jsonMapper.readTree(getHttpInfo(assetListUrl));
 
-            Boolean hasNextPage = true;
-            while (hasNextPage) {
+            Boolean hasNextPage;
+            do {
                 AssetJsonParser assetJsonParser = new AssetJsonParser(jsonNode, assetKind);
 
                 for (Map<String, Object> assetProperties : assetJsonParser.getAssetsList()) {
                     AssetObject assetObject = assetObjectFactory.createAssetObject(assetKind,
-                            assetProperties,
-                            projectConfig);
+                            assetProperties, projectConfig);
                     assetObjectList.add(assetObject);
                 }
 
@@ -160,7 +159,7 @@ public class ProjectAssetsMapper {
                     String nextPageUrl = assetListUrl + getPageTokenExp(assetKind) + assetJsonParser.getNextPageToken();
                     jsonNode = jsonMapper.readTree(getHttpInfo(nextPageUrl));
                 }
-            }
+            } while (hasNextPage);
         } catch (IOException exception) {
             logger.atInfo().withCause(exception).log("Encountered an IOException while calling " +
                     "jsonMapper.readValue(). Provided url was: %s", assetListUrl);
@@ -177,8 +176,8 @@ public class ProjectAssetsMapper {
         try {
             JsonNode jsonNode = jsonMapper.readTree(getHttpInfo(zonesUrl));
 
-            Boolean hasNextPage = true;
-            while (hasNextPage) {
+            Boolean hasNextPage;
+            do {
                 AssetJsonParser zoneJsonParser = new AssetJsonParser(jsonNode, zoneJsonKey);
                 zonesList.addAll(zoneJsonParser.getZonesList());
 
@@ -187,7 +186,7 @@ public class ProjectAssetsMapper {
                     String nextPageUrl = zonesUrl + getPageTokenExp(null) + zoneJsonParser.getNextPageToken();
                     jsonNode = jsonMapper.readTree(getHttpInfo(nextPageUrl));
                 }
-            }
+            } while (hasNextPage);
             return zonesList;
         } catch (IOException exception) {
             logger.atInfo().withCause(exception).log("Encountered an IOException while calling " +
