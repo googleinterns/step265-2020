@@ -46,17 +46,13 @@ public class SubscriptionPubSubObject extends AssetObject {
         public SubscriptionPubSubObject build() {
             // Set AssetObject fields
             setKind(AssetKind.SUBSCRIPTION_PUB_SUB_ASSET);
-            try {
-                setName(assetProperties.get("name"));
+            setName(getProperty("name"));
 
-                // Set specific asset type fields
-                specificObjectClass.topic = castToString(assetProperties.get("topic"));
-                HashMap<String, Object> expirationPolicyMap = castToMap(assetProperties.get("expirationPolicy"));
-                specificObjectClass.ttl = castToString(expirationPolicyMap.get("ttl"));
-            } catch (NullPointerException exception) {
-                logger.atInfo().withCause(exception).log("Could not set all of the SubscriptionPubSubObject " +
-                        "fields as one or more were missing. The provided map was: %s", assetProperties);
-            }
+            // Set specific asset type fields
+            specificObjectClass.topic = castToString(getProperty("topic"));
+            HashMap<String, Object> expirationPolicyMap = castToMap(getProperty("expirationPolicy"));
+            specificObjectClass.ttl = castToString(getProperty(expirationPolicyMap, "ttl"));
+
             return super.build();
         }
     }
