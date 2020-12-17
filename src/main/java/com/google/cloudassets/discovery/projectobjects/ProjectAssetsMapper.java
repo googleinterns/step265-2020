@@ -143,14 +143,23 @@ public class ProjectAssetsMapper {
                                            AssetKind assetKind) {
         try {
             JsonNode jsonNode = jsonMapper.readTree(getHttpInfo(assetListUrl));
-            AssetJsonParser assetJsonParser = new AssetJsonParser(jsonNode, assetKind);
 
-            for (Map<String,Object> assetProperties : assetJsonParser.getAssetsList()) {
-                AssetObject assetObject = assetObjectFactory.createAssetObject(assetKind,
-                                                                                assetProperties,
-                                                                                projectConfig);
-                assetObjectList.add(assetObject);
-            }
+            Boolean hasNextPage;
+            do {
+                AssetJsonParser assetJsonParser = new AssetJsonParser(jsonNode, assetKind);
+
+                for (Map<String, Object> assetProperties : assetJsonParser.getAssetsList()) {
+                    AssetObject assetObject = assetObjectFactory.createAssetObject(assetKind,
+                            assetProperties, projectConfig);
+                    assetObjectList.add(assetObject);
+                }
+
+                hasNextPage = assetJsonParser.getHasNextPage();
+                if (hasNextPage) {
+                    String nextPageUrl = assetListUrl + getPageTokenExp(assetKind) + assetJsonParser.getNextPageToken();
+                    jsonNode = jsonMapper.readTree(getHttpInfo(nextPageUrl));
+                }
+            } while (hasNextPage);
         } catch (IOException exception) {
             logger.atInfo().withCause(exception).log("Encountered an IOException while calling " +
                     "jsonMapper.readValue(). Provided url was: %s", assetListUrl);
@@ -165,15 +174,38 @@ public class ProjectAssetsMapper {
     private List<String> getZonesList(String zonesUrl, String zoneJsonKey) {
         List<String> zonesList = new ArrayList<>();
         try {
-            JsonNode zonesJsonNode = jsonMapper.readTree(getHttpInfo(zonesUrl));
-            for (JsonNode zoneNode : zonesJsonNode.get(zoneJsonKey)) {
-                zonesList.add(zoneNode.get("name").toString().replaceAll("\"", ""));
-            }
+            JsonNode jsonNode = jsonMapper.readTree(getHttpInfo(zonesUrl));
+
+            Boolean hasNextPage;
+            do {
+                AssetJsonParser zoneJsonParser = new AssetJsonParser(jsonNode, zoneJsonKey);
+                zonesList.addAll(zoneJsonParser.getZonesList());
+
+                hasNextPage = zoneJsonParser.getHasNextPage();
+                if (hasNextPage) {
+                    String nextPageUrl = zonesUrl + getPageTokenExp(null) + zoneJsonParser.getNextPageToken();
+                    jsonNode = jsonMapper.readTree(getHttpInfo(nextPageUrl));
+                }
+            } while (hasNextPage);
+            return zonesList;
         } catch (IOException exception) {
             logger.atInfo().withCause(exception).log("Encountered an IOException while calling " +
                     "jsonMapper.readTree(). Provided url was: %s", zonesUrl);
         }
         return zonesList;
+    }
+
+    /*
+    This function returns the name of the HTTP request parameter needed for getting the next page of
+    a API response.
+     */
+    private String getPageTokenExp(AssetKind assetKind) {
+        // Not using switch statement as 'else' should also cover cases in which assetKind == null
+        if (assetKind == AssetKind.BUCKET_STORAGE_ASSET) {
+            return "&pageToken=";
+        } else {
+            return "?pageToken=";
+        }
     }
 
     /**
@@ -323,6 +355,8 @@ public class ProjectAssetsMapper {
     private void getAllKubernetesAssets(List<AssetObject> assetObjectList) {
         String apiService = "container.googleapis.com";
         if (isApiEnabled(apiService)) {
+            // We are using v1beta1 instead of v1 as it does not have this API which returns a list
+            // of all of the locations
             String zonesKubernetesUrl = ("https://" + apiService + "/v1beta1/projects/" +
                     PROJECT_ID_EXP + "/locations").replace(PROJECT_ID_EXP, projectConfig.getProjectId());
             List<String> zonesList = getZonesList(zonesKubernetesUrl, "locations");

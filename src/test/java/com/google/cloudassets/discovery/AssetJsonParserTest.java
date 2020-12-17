@@ -34,6 +34,7 @@ public class AssetJsonParserTest {
         AssetJsonParser jsonParser = new AssetJsonParser(createJsonNode(appEngineProperties),
                                                         AssetKind.DISK_COMPUTE_ASSET);
         assertEquals(0, jsonParser.getAssetsList().size());
+        assertEquals(false, jsonParser.getHasNextPage());
     }
 
     /**
@@ -46,6 +47,7 @@ public class AssetJsonParserTest {
         AssetJsonParser jsonParser = new AssetJsonParser(createJsonNode(appEngineProperties),
                                                         AssetKind.BUCKET_STORAGE_ASSET);
         assertEquals(0, jsonParser.getAssetsList().size());
+        assertEquals(false, jsonParser.getHasNextPage());
     }
 
     /**
@@ -59,6 +61,7 @@ public class AssetJsonParserTest {
                                                         AssetKind.APP_APP_ENGINE_ASSET);
         assertEquals(1, jsonParser.getAssetsList().size());
         assertEquals("test", jsonParser.getAssetsList().get(0).get("name"));
+        assertEquals(false, jsonParser.getHasNextPage());
     }
 
     /**
@@ -72,6 +75,7 @@ public class AssetJsonParserTest {
                                                         AssetKind.INSTANCE_SPANNER_ASSET);
         assertEquals(1, jsonParser.getAssetsList().size());
         assertEquals("test", jsonParser.getAssetsList().get(0).get("name"));
+        assertEquals(false, jsonParser.getHasNextPage());
     }
 
     /**
@@ -80,7 +84,9 @@ public class AssetJsonParserTest {
      */
     @Test
     public void testBucketJsonParser() {
-        String appEngineProperties = "{\"kind\":\"storage#buckets\", \"items\": [{" +
+        String appEngineProperties = "{\"kind\":\"storage#buckets\", " +
+                                    "\"nextPageToken\": \"testToken\"," +
+                                    "\"items\": [{" +
                                     "\"kind\": \"storage#bucket\"," +
                                     "\"name\": \"test1\"}," +
                                     "{\"kind\": \"storage#bucket\"," +
@@ -90,5 +96,7 @@ public class AssetJsonParserTest {
         assertEquals(2, jsonParser.getAssetsList().size());
         assertEquals("storage#bucket", jsonParser.getAssetsList().get(0).get("kind"));
         assertEquals("test2", jsonParser.getAssetsList().get(1).get("name"));
+        assertEquals(true, jsonParser.getHasNextPage());
+        assertEquals("testToken", jsonParser.getNextPageToken());
     }
 }
