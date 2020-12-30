@@ -1,0 +1,39 @@
+<!DOCTYPE HTML>
+<html xmlns:th="https://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="allassets.css">
+    <title>Add New Workspace</title>
+    <ul>
+        <li><a href="/allassets" >All Assets</a></li>
+        <li><a href="/bykind">Additional Information Per Asset Kind</a></li>
+        <li><a href="/newworkspace" class="active">Add a new Workspace</a></li>
+        <li><a><form name='f' action="#" th:action="@{/showworkspace}" th:object="${workspaceObject}" method='GET'>
+            <table>
+                <tr>
+                    <td>Workspace ID:</td>
+                    <td>
+                        <select th:field="*{workspaceID}" onchange="this.form.submit();">
+                            <option th:utext="${chosenWorkspaceID}" th:value="${chosenWorkspaceID}"></option>
+                            <option th:each="workspaceID : ${workspaceIdList}"
+                                    th:if="${workspaceID} != ${chosenWorkspaceID}"
+                                    th:value="${workspaceID}"
+                                    th:utext="${workspaceID}"/>
+                        </select>
+
+                    </td>
+                </tr>
+            </table>
+        </form>
+        </a></li>
+    </ul>
+</head>
+<body>
+    <span>To use new Workspace please add the generated Service Account to all relevant projects</span>
+    <p th:text="'Projects: ' + ${createWorkspace.project}" />
+    <p th:text="'Generated Service Account: ' + ${createWorkspace.serviceAccountEmail}" />
+    <p th:text="'The Workspace name is: ' + ${createWorkspace.workspaceName}" />
+
+
+</body>
+</html>
