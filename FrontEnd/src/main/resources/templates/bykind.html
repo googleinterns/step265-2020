@@ -14,9 +14,9 @@
                     <td>Workspace ID:</td>
                     <td>
                         <select th:field="*{workspaceID}" onchange="this.form.submit();">
-                            <option th:utext="${chosenWorkspaceID}" th:value="${chosenWorkspaceID}"></option>
+                            <option th:utext="${chosenWorkspace.workspaceDisplayName}" th:value="${chosenWorkspace.workspaceID}"></option>
                             <option th:each="workspace : ${workspaceIdList}"
-                                    th:if="${workspace.workspaceID} != ${chosenWorkspaceID}"
+                                    th:if="${workspace.workspaceID} != ${chosenWorkspace.workspaceID}"
                                     th:value="${workspace.workspaceID}"
                                     th:utext="${workspace.workspaceDisplayName}"/>
                         </select>

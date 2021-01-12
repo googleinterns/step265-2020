@@ -1,7 +1,11 @@
 package resourceDisplay;
 
-import com.google.cloud.spanner.*;
-import com.google.cloudassets.acounts.CreateWorkspace;
+import com.google.cloud.spanner.DatabaseClient;
+import com.google.cloud.spanner.ResultSet;
+import com.google.cloud.spanner.Statement;
+import com.google.cloud.spanner.Type;
+import com.google.cloud.spanner.Mutation;
+import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -10,6 +14,7 @@ import java.util.List;
 /**
  * This Class does all DB access
  */
+@Service
 public class AssetsRepository {
     private static final String SPANNER_STING_FOR_WORKSPACE_ID = "SELECT DISTINCT workspaceId, workspaceDisplayName " +
             "FROM Workspace_User_Table WHERE userEmail = @userID ORDER BY workspaceId";
@@ -47,14 +52,14 @@ public class AssetsRepository {
      * @param userId   - The user for whom we want to create a new workspace
      * @param workspaceName   - The new workspace name (display name for user)
      * @param workspaceId   - The new workspace Id (used by us)
-     * @param project   - The projects associated with this workspace
+     * @param projects   - The projects associated with this workspace
      * @param serviceAccount   - The new service account
      */
     public static void addNewWorkspaceAndAccount(DatabaseClient dbClient, String userId,
                                                  String workspaceName, String workspaceId,
-                                                 String project, String serviceAccount) {
-        List<Mutation> mutations =
-                Arrays.asList(
+                                                 List<String> projects, String serviceAccount) {
+        List<Mutation> mutations = new ArrayList<>();
+                mutations.add(
                         Mutation.newInsertBuilder("Workspace_Service_Account_Table")
                                 .set("workspaceId")
                                 .to(workspaceId)
@@ -62,7 +67,8 @@ public class AssetsRepository {
                                 .to(serviceAccount)
                                 .set("workspaceDisplayName")
                                 .to(workspaceName)
-                                .build(),
+                                .build());
+        mutations.add(
                         Mutation.newInsertBuilder("Workspace_User_Table")
                                 .set("workspaceId")
                                 .to(workspaceId)
@@ -70,17 +76,19 @@ public class AssetsRepository {
                                 .to(workspaceName)
                                 .set("userEmail")
                                 .to(userId)
-                                .build(),
-                        Mutation.newInsertBuilder("Workspace_Project_Table")
-                                .set("workspaceId")
-                                .to(workspaceId)
-                                .set("projectId")
-                                .to(project)
-                                .set("isActive")
-                                .to(Boolean.FALSE)
-                                .set("serviceAccountActive")
-                                .to(Boolean.FALSE)
                                 .build());
+        for (String project : projects) {
+            mutations.add(Mutation.newInsertBuilder("Workspace_Project_Table")
+                    .set("workspaceId")
+                    .to(workspaceId)
+                    .set("projectId")
+                    .to(project)
+                    .set("isActive")
+                    .to(Boolean.FALSE)
+                    .set("serviceAccountActive")
+                    .to(Boolean.FALSE)
+                    .build());
+        }
         dbClient.write(mutations);
     }
 
@@ -300,7 +308,7 @@ public class AssetsRepository {
                     String columns = String.join(", ", columnNamesForKindQuery);
                     String usingString = String.join(", ", columnsForUsing);
                     statementString = String.format("SELECT %s FROM Main_Assets JOIN %s USING " +
-                                    "(%s) WHERE workspaceId = @workspaceId ORDER By %s"
+                                    "(%s) WHERE Main_Assets.workspaceId = @workspaceId ORDER By %s"
                             , columns, tableName, usingString, columnNames.get(0));
                 }
             }
@@ -320,7 +328,6 @@ public class AssetsRepository {
     public TableQueryObject createTableQueryObject(DatabaseClient dbClient, List<String> filters) {
 
         List<String> columnDisplays = new ArrayList<>();
-        ;
         List<String> columnNames = new ArrayList<>();
         List<String> columnTypes = new ArrayList<>();
         ResultSet resultSetForAllAssets = runConfigQuery("forAllAssets", dbClient);

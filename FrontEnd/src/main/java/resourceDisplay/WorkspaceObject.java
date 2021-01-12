@@ -7,6 +7,14 @@ public class WorkspaceObject {
     private String workspaceID;
     private String workspaceDisplayName;
 
+    public WorkspaceObject(String workspaceID, String workspaceDisplayName) {
+        this.workspaceID = workspaceID;
+        this.workspaceDisplayName = workspaceDisplayName;
+    }
+
+    public WorkspaceObject() {
+    }
+
     public String getWorkspaceDisplayName() {
         return workspaceDisplayName;
     }
