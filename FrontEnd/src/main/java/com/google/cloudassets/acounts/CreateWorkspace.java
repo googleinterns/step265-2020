@@ -4,6 +4,10 @@ import com.google.api.services.iam.v1.model.ServiceAccount;
 import com.google.cloud.spanner.DatabaseClient;
 import resourceDisplay.AssetsRepository;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+
 /**
  * This Class creates a new Workspace
  */
@@ -13,6 +17,7 @@ public class CreateWorkspace {
     private String workspaceName;
     //todo: should change this to list of projects
     private String project;
+    private List<String> projects;
     private ServiceAccount serviceAccount;
     private String serviceAccountEmail;
     private String userName;
@@ -49,7 +54,7 @@ public class CreateWorkspace {
             this.serviceAccount = CreateServiceAccount.createServiceAccount("noa-yarden-2020", workspaceId, workspaceName);
             if (this.serviceAccount != null) {
                 this.serviceAccountEmail = serviceAccount.getEmail();
-                AssetsRepository.addNewWorkspaceAndAccount(dbClient, userId, workspaceName, workspaceId, project, serviceAccountEmail);
+                AssetsRepository.addNewWorkspaceAndAccount(dbClient, userId, workspaceName, workspaceId, projects, serviceAccountEmail);
             }
         }
     }
@@ -59,8 +64,16 @@ public class CreateWorkspace {
     }
 
     public void setProject(String project) {
-        this.project = project;
+        projects = Arrays.asList(project.split(","));
     }
+
+    public List<String> getProjects() {
+        return projects;
+    }
+
+//    public void setProjects(String project) {
+//        projects.add(project);
+//    }
 
     public String getWorkspaceName() {
         return workspaceName;

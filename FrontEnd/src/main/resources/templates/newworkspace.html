@@ -14,11 +14,11 @@
                     <td>Workspace ID:</td>
                     <td>
                         <select th:field="*{workspaceID}" onchange="this.form.submit();">
-                            <option th:utext="${chosenWorkspaceID}" th:value="${chosenWorkspaceID}"></option>
-                            <option th:each="workspaceID : ${workspaceIdList}"
-                                    th:if="${workspaceID} != ${chosenWorkspaceID}"
-                                    th:value="${workspaceID}"
-                                    th:utext="${workspaceID}"/>
+                            <option th:utext="${chosenWorkspace.workspaceDisplayName}" th:value="${chosenWorkspace.workspaceID}"></option>
+                            <option th:each="workspace : ${workspaceIdList}"
+                                    th:if="${workspace.workspaceID} != ${chosenWorkspace.workspaceID}"
+                                    th:value="${workspace.workspaceID}"
+                                    th:utext="${workspace.workspaceDisplayName}"/>
                         </select>
 
                     </td>
@@ -27,6 +27,14 @@
         </form>
         </a></li>
     </ul>
+    <script>
+        function addInputLine() {
+            var node = document.getElementById("project");
+            var clone = node.cloneNode(false);
+            clone.value='';
+            document.getElementById("projectlist").appendChild(clone);
+        }
+    </script>
 </head>
 <body>
 
@@ -37,8 +45,10 @@
         <tr>
             <td>
                 <p>Workspace Name: <input type="text" th:field="*{workspaceName}" /></p>
-                <p>Project: <input type="text" th:field="*{project}" /></p>
-                <p><input type="submit" value="Submit" />
+                <p id="projectlist">Project: <input id="project" type="text" th:field="*{project}" /></p>
+                <button th:onclick="addInputLine()" type="button">add project</button>
+
+                <p><button type="submit">Create Workspace</button></p>
 
             </td>
         </tr>

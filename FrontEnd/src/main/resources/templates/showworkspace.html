@@ -2,7 +2,7 @@
 <html xmlns:th="https://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
-    <link rel="stylesheet" href="allassets.css">
+    <link rel="stylesheet" href="showworkspace.css">
     <title>Add New Workspace</title>
     <ul>
         <li><a href="/allassets" >All Assets</a></li>
@@ -14,11 +14,11 @@
                     <td>Workspace ID:</td>
                     <td>
                         <select th:field="*{workspaceID}" onchange="this.form.submit();">
-                            <option th:utext="${chosenWorkspaceID}" th:value="${chosenWorkspaceID}"></option>
-                            <option th:each="workspaceID : ${workspaceIdList}"
-                                    th:if="${workspaceID} != ${chosenWorkspaceID}"
-                                    th:value="${workspaceID}"
-                                    th:utext="${workspaceID}"/>
+                            <option th:utext="${chosenWorkspace.workspaceDisplayName}" th:value="${chosenWorkspace.workspaceID}"></option>
+                            <option th:each="workspace : ${workspaceIdList}"
+                                    th:if="${workspace.workspaceID} != ${chosenWorkspace.workspaceID}"
+                                    th:value="${workspace.workspaceID}"
+                                    th:utext="${workspace.workspaceDisplayName}"/>
                         </select>
 
                     </td>
@@ -29,10 +29,18 @@
     </ul>
 </head>
 <body>
-    <span>To use new Workspace please add the generated Service Account to all relevant projects</span>
-    <p th:text="'Projects: ' + ${createWorkspace.project}" />
+    <h3>To use new Workspace please add the generated Service Account to all relevant projects</h3>
+    <div class="projects" th:if="${not #lists.isEmpty(createWorkspace.projects)}">
+        <table class="results">
+            <th>projects: </th>
+            <th:block th:each="project : ${createWorkspace.projects}">
+                <th th:text="${project}"></th>
+            </th:block>
+        </table>
+    </div>
     <p th:text="'Generated Service Account: ' + ${createWorkspace.serviceAccountEmail}" />
     <p th:text="'The Workspace name is: ' + ${createWorkspace.workspaceName}" />
+
 
 
 </body>

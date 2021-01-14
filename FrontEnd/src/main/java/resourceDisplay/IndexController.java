@@ -27,7 +27,7 @@ public class IndexController {
     private static DatabaseClient dbClient;
     private static String userID;
     private static String userName;
-    private static String workspaceID;
+    private static WorkspaceObject chosenWorkspace;
 
     /**
      * This helper function returns a DatabaseClient to use for connection to DB
@@ -73,13 +73,21 @@ public class IndexController {
         AssetsRepository assets = new AssetsRepository();
         List<WorkspaceObject> workspaceIdList = assets.getWorkspaceIdList(dbClient, userID);
         model.addAttribute("workspaceIdList", workspaceIdList);
-        model.addAttribute("workspaceObject", workspaceObject);
+        //model.addAttribute("workspaceObject", workspaceObject);
         if(!workspaceIdList.isEmpty()) {
-            workspaceID = workspaceIdList.get(0).getWorkspaceID();
+            chosenWorkspace = new WorkspaceObject(workspaceIdList.get(0).getWorkspaceID(), workspaceIdList.get(0).getWorkspaceDisplayName());
+//            chosenWorkspace.setWorkspaceID(workspaceIdList.get(0).getWorkspaceID());
+//            chosenWorkspace.setWorkspaceID(workspaceIdList.get(0).getWorkspaceDisplayName());
         }
-        model.addAttribute("chosenWorkspaceID", workspaceID);
+        model.addAttribute("chosenWorkspace", chosenWorkspace);
         if (workspaceObject.getWorkspaceID() != null) {
-            workspaceID = workspaceObject.getWorkspaceID();
+            chosenWorkspace.setWorkspaceID(workspaceObject.getWorkspaceID());
+            for (int i = 0; i < workspaceIdList.size(); i++) {
+                if (workspaceIdList.get(i).getWorkspaceID().equals(workspaceObject.getWorkspaceID())) {
+                    chosenWorkspace.setWorkspaceDisplayName(workspaceIdList.get(i).getWorkspaceDisplayName());
+                    break;
+                }
+            }
         }
         return "index";
     }
@@ -95,29 +103,35 @@ public class IndexController {
      */
     @GetMapping("/allassets")
     public String getAll(@AuthenticationPrincipal OAuth2User principal, Model model,
-                       @ModelAttribute FilterObject filterObject, @ModelAttribute WorkspaceObject workspaceObject) {
+                         @ModelAttribute FilterObject filterObject, @ModelAttribute WorkspaceObject workspaceObject) {
         dbClient = getDbClient(SPANNER_PROJECT_ID, SPANNER_INSTANCE_ID, SPANNER_DATABASE_ID);
         AssetsRepository assets = new AssetsRepository();
         List<WorkspaceObject> workspaceIdList = assets.getWorkspaceIdList(dbClient, userID);
         model.addAttribute("workspaceIdList", workspaceIdList);
         model.addAttribute("workspaceObject", workspaceObject);
-        model.addAttribute("chosenWorkspaceID", workspaceID);
+        model.addAttribute("chosenWorkspace", chosenWorkspace);
         if (workspaceObject.getWorkspaceID() != null) {
-            workspaceID = workspaceObject.getWorkspaceID();
+            chosenWorkspace.setWorkspaceID(workspaceObject.getWorkspaceID());
+            for (int i = 0; i < workspaceIdList.size(); i++) {
+                if (workspaceIdList.get(i).getWorkspaceID().equals(workspaceObject.getWorkspaceID())) {
+                    chosenWorkspace.setWorkspaceDisplayName(workspaceIdList.get(i).getWorkspaceDisplayName());
+                    break;
+                }
+            }
         }
-        if (workspaceID != null) {
+        if (chosenWorkspace.getWorkspaceID() != null) {
             model.addAttribute("filterObject", filterObject);
-            List<String> locationList = assets.getFilterList(dbClient, workspaceID, "location");
+            List<String> locationList = assets.getFilterList(dbClient, chosenWorkspace.getWorkspaceID() , "location");
             model.addAttribute("locationList", locationList);
-            List<String> statusList = assets.getFilterList(dbClient, workspaceID, "status");
+            List<String> statusList = assets.getFilterList(dbClient, chosenWorkspace.getWorkspaceID() , "status");
             model.addAttribute("statusList", statusList);
-            List<String> kindList = assets.getFilterList(dbClient, workspaceID, "kind");
+            List<String> kindList = assets.getFilterList(dbClient, chosenWorkspace.getWorkspaceID() , "kind");
             model.addAttribute("kindList", kindList);
             String status = filterObject.getStatus();
             String location = filterObject.getLocation();
             String kind = filterObject.getKind();
             if (status != null && location != null && kind != null) {
-                ResultListObject resultListObject = assets.getAllAssets(dbClient, location, status, kind, workspaceID);
+                ResultListObject resultListObject = assets.getAllAssets(dbClient, location, status, kind, chosenWorkspace.getWorkspaceID() );
                 model.addAttribute("displayNames", resultListObject.columnDisplays);
                 model.addAttribute("allAssets", resultListObject.columnResults);
             }
@@ -142,16 +156,22 @@ public class IndexController {
         List<WorkspaceObject> workspaceIdList = assets.getWorkspaceIdList(dbClient, userID);
         model.addAttribute("workspaceIdList", workspaceIdList);
         model.addAttribute("workspaceObject", workspaceObject);
-        model.addAttribute("chosenWorkspaceID", workspaceID);
+        model.addAttribute("chosenWorkspace", chosenWorkspace);
         if (workspaceObject.getWorkspaceID() != null) {
-            workspaceID = workspaceObject.getWorkspaceID();
+            chosenWorkspace.setWorkspaceID(workspaceObject.getWorkspaceID());
+            for (int i = 0; i < workspaceIdList.size(); i++) {
+                if (workspaceIdList.get(i).getWorkspaceID().equals(workspaceObject.getWorkspaceID())) {
+                    chosenWorkspace.setWorkspaceDisplayName(workspaceIdList.get(i).getWorkspaceDisplayName());
+                    break;
+                }
+            }
         }
         model.addAttribute("kindObject", kindObject);
-        List<String> kindList = assets.getFilterList(dbClient, workspaceID, "kind");
+        List<String> kindList = assets.getFilterList(dbClient, chosenWorkspace.getWorkspaceID(), "kind");
         model.addAttribute("kindList", kindList);
         String kind = kindObject.getKind();
         if (kind != null && !kind.equals("")) {
-            ResultListObject resultListObject = assets.getAssetsByKind(dbClient, kind, workspaceID);
+            ResultListObject resultListObject = assets.getAssetsByKind(dbClient, kind, chosenWorkspace.getWorkspaceID());
             model.addAttribute("displayNames", resultListObject.columnDisplays);
             model.addAttribute("allAssets", resultListObject.columnResults);
         }
@@ -169,7 +189,7 @@ public class IndexController {
      */
     @GetMapping("/newworkspace")
     public String createNewWorkspace(@AuthenticationPrincipal OAuth2User principal, Model model,
-                                        @ModelAttribute CreateWorkspace createWorkspace, @ModelAttribute WorkspaceObject workspaceObject) {
+                                     @ModelAttribute CreateWorkspace createWorkspace, @ModelAttribute WorkspaceObject workspaceObject) {
         dbClient = getDbClient(SPANNER_PROJECT_ID, SPANNER_INSTANCE_ID, SPANNER_DATABASE_ID);
         createWorkspace.setUserName(userName);
         AssetsRepository assets = new AssetsRepository();
@@ -178,12 +198,18 @@ public class IndexController {
         model.addAttribute("createWorkspace", createWorkspace);
         model.addAttribute("serviceAccount", createWorkspace.getServiceAccount());
         model.addAttribute("workspaceObject", workspaceObject);
-        model.addAttribute("chosenWorkspaceID", workspaceID);
+        model.addAttribute("chosenWorkspace", chosenWorkspace);
         if (workspaceObject.getWorkspaceID() != null) {
-            workspaceID = workspaceObject.getWorkspaceID();
+            chosenWorkspace.setWorkspaceID(workspaceObject.getWorkspaceID());
+            for (int i = 0; i < workspaceIdList.size(); i++) {
+                if (workspaceIdList.get(i).getWorkspaceID().equals(workspaceObject.getWorkspaceID())) {
+                    chosenWorkspace.setWorkspaceDisplayName(workspaceIdList.get(i).getWorkspaceDisplayName());
+                    break;
+                }
+            }
         }
         return "newworkspace";
-        }
+    }
 
     /**
      * This page shows a newly created workspace
@@ -196,15 +222,21 @@ public class IndexController {
      */
     @PostMapping("/newworkspace")
     public String showNewWorkspace(@AuthenticationPrincipal OAuth2User principal, Model model,
-                                     @ModelAttribute CreateWorkspace createWorkspace, @ModelAttribute WorkspaceObject workspaceObject) {
+                                   @ModelAttribute CreateWorkspace createWorkspace, @ModelAttribute WorkspaceObject workspaceObject) {
         dbClient = getDbClient(SPANNER_PROJECT_ID, SPANNER_INSTANCE_ID, SPANNER_DATABASE_ID);
         AssetsRepository assets = new AssetsRepository();
         List<WorkspaceObject> workspaceIdList = assets.getWorkspaceIdList(dbClient, userID);
         model.addAttribute("workspaceIdList", workspaceIdList);
         model.addAttribute("workspaceObject", workspaceObject);
-        model.addAttribute("chosenWorkspaceID", workspaceID);
+        model.addAttribute("chosenWorkspace", chosenWorkspace);
         if (workspaceObject.getWorkspaceID() != null) {
-            workspaceID = workspaceObject.getWorkspaceID();
+            chosenWorkspace.setWorkspaceID(workspaceObject.getWorkspaceID());
+            for (int i = 0; i < workspaceIdList.size(); i++) {
+                if (workspaceIdList.get(i).getWorkspaceID().equals(workspaceObject.getWorkspaceID())) {
+                    chosenWorkspace.setWorkspaceDisplayName(workspaceIdList.get(i).getWorkspaceDisplayName());
+                    break;
+                }
+            }
         }
         if (createWorkspace.getWorkspaceName() != null) {
             createWorkspace.setIdAndServiceAccount(userID, dbClient, userName);
